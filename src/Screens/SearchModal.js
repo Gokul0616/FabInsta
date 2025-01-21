@@ -1,0 +1,1327 @@
+import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
+  Switch,
+  BackHandler,
+  ActivityIndicator,
+  Image,
+  Alert,
+} from "react-native";
+import Icon from "react-native-vector-icons/Feather";
+import debounce from "lodash/debounce";
+import { font } from "../Common/Theme";
+import {
+  combineColourObjects,
+  combineSolidPatternObjects,
+  extractDisplayOrderData,
+  findKeyForFabricContent,
+  findObjectByName,
+  formateData,
+  getChildren,
+  processGroupedContent,
+} from "../Common/FilterData";
+import { FiInput } from "../Common/FiInput";
+import { Checkbox, List } from "react-native-paper";
+import { backendUrl, common } from "../Common/Common";
+import api from "../Service/api";
+import AlertBox from "../Common/AlertBox";
+import { FiButton } from "../Common/FiButton";
+
+const SearchModal = ({ isVisible, onClose, searchData }) => {
+  const [categoryFilter, setCategoryFilter] = useState([]);
+  const [categoryFilterChildren, setCategoryFilterChildren] = useState([]);
+  const [filterResponseData, setFilterResponseData] = useState([]);
+  const [expandedSection, setExpandedSection] = useState("");
+  const [selectedSolidPattern, setSelectedSolidPattern] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemsParent, setSelectedItemsParent] = useState([]);
+  const [selectedColour, setSelectedColour] = useState([]);
+  const [groupedContent, setGroupedContent] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(100);
+  const [isLoadingLeft, setIsLoadingLeft] = useState(true);
+  const [isError, setIsError] = useState({
+    message: "",
+    heading: "",
+    isRight: false,
+    rightButtonText: "OK",
+    triggerFunction: () => {},
+    setShowAlert: () => {},
+    showAlert: false,
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const [response1, response2] = await Promise.all([
+        api.get("/product-category/filter"),
+        api.get("/variant/filter"),
+      ]);
+
+      setFilterResponseData([...response1.response, ...response2.response]);
+
+      const data1 = extractDisplayOrderData(response1.response);
+      const data2 = extractDisplayOrderData(response2.response);
+
+      const combinedData = processGroupedContent([
+        ...data1,
+        ...data2,
+
+        { group: "BASIC", name: "Price" },
+        { group: "BASIC", name: "Weight" },
+        { group: "BASIC", name: "Width" },
+        { group: "BASIC", name: "MOQ" },
+      ]);
+
+      setGroupedContent(combinedData);
+      setExpandedSection("Garment Type");
+    } catch (err) {
+      console.error(err);
+      setIsError({
+        message: err.response?.data?.message || "An Unexpected error occurred",
+        heading: "Error",
+        isRight: false,
+        rightButtonText: "OK",
+        triggerFunction: () => {},
+        setShowAlert: () => {
+          isError.setShowAlert(false);
+        },
+        showAlert: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSetFabricContentRange = (child) => {
+    const selectedChild = selectedItems.find(
+      (item) =>
+        item[expandedSection]?.categoryId.split("(")[0] ===
+        child.categoryId.split("(")[0]
+    );
+    const numMinValue = Number(selectedChild[expandedSection].minValue);
+    const numMaxValue = Number(selectedChild[expandedSection].maxValue);
+
+    if (numMinValue > numMaxValue || numMinValue === numMaxValue) {
+      setIsError({
+        message: "Range Must be Less to Greater",
+        heading: "Error",
+        isRight: false,
+        rightButtonText: "OK",
+        triggerFunction: () => {},
+        setShowAlert: () => {
+          isError.setShowAlert(false);
+        },
+        showAlert: true,
+      });
+    } else if (numMaxValue > 100) {
+      setIsError({
+        message: "Maximum Value is 100 or less than 100",
+        heading: "Error",
+        isRight: false,
+        rightButtonText: "OK",
+        triggerFunction: () => {},
+        setShowAlert: () => {
+          isError.setShowAlert(false);
+        },
+        showAlert: true,
+      });
+    } else {
+      const selectedChild = selectedItems.find(
+        (item) =>
+          item[expandedSection]?.categoryId.split("(")[0] ===
+          child.categoryId.split("(")[0]
+      );
+
+      if (selectedChild) {
+        const baseCategoryId = child.categoryId.split("(")[0];
+        selectedChild[
+          expandedSection
+        ].categoryId = `${baseCategoryId}(${numMinValue}-${numMaxValue})`;
+        handleApplyFilter();
+        onClose();
+      }
+    }
+  };
+  const handleReset = () => {
+    setSelectedColour([]);
+    setSelectedItems([]);
+    setSelectedItemsParent([]);
+    setSelectedSolidPattern([]);
+    setSearchText("");
+  };
+  const handleClose = () => {
+    setSearchText("");
+    handleReset();
+    setExpandedSection("Garment Type");
+    searchData([]);
+    onClose();
+  };
+  const handleSelectSolidPattern = (item) => {
+    setSelectedSolidPattern((prev) => {
+      const updatedSelection = [...prev];
+      const index = updatedSelection.findIndex(
+        (patterns) =>
+          Array.isArray(patterns["Solid / Pattern"]) &&
+          patterns["Solid / Pattern"].some((pattern) => pattern === item.id)
+      );
+
+      if (index === -1) {
+        updatedSelection.push({ [expandedSection]: [item.id] });
+      } else {
+        updatedSelection.splice(index, 1);
+      }
+
+      return updatedSelection;
+    });
+  };
+  const handleSelectColor = (item) => {
+    setSelectedColour((prev) => {
+      const updatedSelection = [...prev];
+
+      const index = updatedSelection.findIndex(
+        (colorObj) =>
+          Array.isArray(colorObj.Colour) &&
+          colorObj.Colour.some((color) => color === item.id)
+      );
+
+      if (index === -1) {
+        updatedSelection.push({ [expandedSection]: [item.id] });
+      } else {
+        updatedSelection.splice(index, 1);
+      }
+
+      return updatedSelection;
+    });
+  };
+  useEffect(() => {
+    const handleBackPress = () => {
+      if (isVisible) {
+        onClose();
+        return true;
+      }
+      return false;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isVisible, onClose]);
+
+  const toggleSection = async (section) => {
+    try {
+      setIsLoadingLeft(true);
+
+      const objNameArr = await findObjectByName(filterResponseData, section);
+      if (objNameArr) {
+        setCategoryFilter(objNameArr);
+
+        const getChild = getChildren(objNameArr);
+        setCategoryFilterChildren(getChild);
+      }
+    } catch (err) {
+      setIsError({
+        message: err.response?.data?.message || "An Unexpected error occurred",
+        heading: "Error",
+        isRight: false,
+        rightButtonText: "OK",
+        triggerFunction: () => {},
+        setShowAlert: () => {
+          isError.setShowAlert(false);
+        },
+        showAlert: true,
+      });
+    } finally {
+      setIsLoadingLeft(false);
+    }
+  };
+
+  useEffect(() => {
+    toggleSection(expandedSection);
+    if (expandedSection == null) {
+      setCategoryFilterChildren([]);
+    }
+  }, [expandedSection]);
+  const handleResetSection = () => {
+    if (expandedSection) {
+      const resetAllChildren = (children) => {
+        children.forEach((child) => {
+          setSelectedItems((prev) =>
+            prev.filter(
+              (garment) =>
+                garment[expandedSection]?.categoryId !== child.categoryId
+            )
+          );
+
+          if (child.child && child.child.length > 0) {
+            resetAllChildren(child.child);
+          }
+        });
+      };
+
+      const resetAllParents = (section) => {
+        selectedItemsParent.forEach((parent) => {
+          if (parent.productGroupName === section) {
+            setSelectedItemsParent((prev) =>
+              prev.filter(
+                (garment) =>
+                  garment.productGroupName !== parent.productGroupName
+              )
+            );
+
+            if (parent.child && parent.child.length > 0) {
+              resetAllChildren(parent.child);
+            }
+          }
+        });
+      };
+
+      resetAllParents(expandedSection);
+      resetAllChildren(categoryFilterChildren);
+
+      if (expandedSection === "Colour") {
+        setSelectedColour([]);
+      } else if (expandedSection === "Solid / Pattern") {
+        setSelectedSolidPattern([]);
+      } else if (
+        ["Price", "Weight", "Width", "MOQ"].includes(expandedSection)
+      ) {
+      }
+    }
+    setSearchText("");
+  };
+
+  const handleApplyFilter = () => {
+    const res = formateData([
+      ...selectedItems,
+      ...selectedColour,
+      ...selectedSolidPattern,
+    ]);
+
+    // console.log([res, { Weight: ["20", "200"] }]);
+    searchData({ data: [res] });
+    onClose();
+  };
+
+  const closeAlert = () => {
+    setIsError((prev) => ({ ...prev, showAlert: false }));
+  };
+
+  const filterItems = (items) => {
+    if (!searchText) return items;
+
+    return items.filter(
+      (item) =>
+        item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        (item.child &&
+          item.child.length > 0 &&
+          filterItems(item.child).length > 0)
+    );
+  };
+
+  const handleParentToggle = (parent) => {
+    const isParentSelected = selectedItemsParent.some(
+      (garment) => garment.categoryId === parent.categoryId
+    );
+
+    if (isParentSelected) {
+      setSelectedItemsParent((prev) =>
+        prev.filter(
+          (garment) =>
+            garment.categoryId !== parent.categoryId &&
+            !parent.child.some(
+              (child) =>
+                child[expandedSection]?.categoryId ===
+                garment[expandedSection]?.categoryId
+            )
+        )
+      );
+
+      setSelectedItems((prev) =>
+        prev.filter(
+          (garment) => garment[expandedSection]?.parentId !== parent.categoryId
+        )
+      );
+    } else {
+      setSelectedItemsParent((prev) => [...prev, parent]);
+
+      setSelectedItems((prev) => [
+        ...prev,
+        ...parent.child
+          .map((child) => ({
+            [expandedSection]: child,
+          }))
+          .filter(
+            (childObj) =>
+              !prev.some(
+                (garment) =>
+                  garment[expandedSection]?.categoryId ===
+                  childObj[expandedSection]?.categoryId
+              )
+          ),
+      ]);
+    }
+  };
+  const handleChildToggle = (child, item) => {
+    let obj;
+    if (expandedSection === "Fabric Content") {
+      const baseCategoryId = child.categoryId.split("(")[0];
+      child.categoryId = `${baseCategoryId}(${minValue}-${maxValue})`;
+
+      child.minValue = 0;
+      child.maxValue = 100;
+
+      obj = {
+        [expandedSection]: child,
+      };
+    } else {
+      obj = {
+        [expandedSection]: child,
+      };
+    }
+
+    const isChildSelected = selectedItems.some((garment) =>
+      garment[expandedSection]?.categoryId
+        ? garment[expandedSection]?.categoryId === child.categoryId
+        : false
+    );
+
+    if (isChildSelected) {
+      setSelectedItems((prev) =>
+        prev.filter(
+          (garment) => garment[expandedSection]?.categoryId !== child.categoryId
+        )
+      );
+    } else {
+      setSelectedItems((prev) => [...prev, obj]);
+    }
+
+    const selectedChildrenCount = selectedItems.filter(
+      (garment) => garment[expandedSection]?.parentId === item?.categoryId
+    ).length;
+
+    if (
+      item?.child.length ===
+      selectedChildrenCount + (isChildSelected ? -1 : 1)
+    ) {
+      setSelectedItemsParent((prev) => [...prev, item]);
+    } else {
+      setSelectedItemsParent((prev) =>
+        prev.filter((garment) => garment?.categoryId !== item?.categoryId)
+      );
+    }
+  };
+  const getSelectedLengthForSection = (children) => {
+    return children.reduce((count, child) => {
+      const isSelected = selectedItems.some(
+        (garment) => garment[expandedSection]?.categoryId === child.categoryId
+      );
+
+      let total = isSelected ? 1 : 0;
+
+      if (child.child && child.child.length > 0) {
+        total += getSelectedLengthForSection(child.child);
+      }
+
+      return count + total;
+    }, 0);
+  };
+
+  const getMinValue = (child) => {
+    const selectedChild = selectedItems.find(
+      (item) =>
+        item[expandedSection]?.categoryId.split("(")[0] ===
+        child.categoryId.split("(")[0]
+    );
+    const res = selectedChild ? selectedChild[expandedSection].minValue : "";
+    return res;
+  };
+  const getMaxValue = (child) => {
+    const selectedChild = selectedItems.find(
+      (item) =>
+        item[expandedSection]?.categoryId.split("(")[0] ===
+        child.categoryId.split("(")[0]
+    );
+
+    const res = selectedChild ? selectedChild[expandedSection].maxValue : "";
+    return res;
+  };
+
+  const handleChangeMaxValue = (val, child) => {
+    setSelectedItems((prev) => {
+      const updatedItems = prev.map((item) => {
+        if (
+          item[expandedSection]?.categoryId.split("(")[0] ===
+          child.categoryId.split("(")[0]
+        ) {
+          return {
+            ...item,
+            [expandedSection]: {
+              ...item[expandedSection],
+              maxValue: val,
+            },
+          };
+        }
+        return item;
+      });
+      return updatedItems;
+    });
+  };
+
+  const handleChangeMinValue = (val, child) => {
+    setSelectedItems((prev) => {
+      const updatedItems = prev.map((item) => {
+        if (
+          item[expandedSection]?.categoryId.split("(")[0] ===
+          child.categoryId.split("(")[0]
+        ) {
+          return {
+            ...item,
+            [expandedSection]: {
+              ...item[expandedSection],
+              minValue: val,
+            },
+          };
+        }
+        return item;
+      });
+      return updatedItems;
+    });
+  };
+
+  const renderAccordion = (item, depth) => {
+    return (
+      <View key={item.name} style={{}}>
+        <View
+          style={{
+            flexDirection: "row",
+            marginLeft:
+              expandedSection !== "Fabric Content" && depth >= 1 ? 10 : 0,
+            padding: 0,
+            flex: 1,
+            maxWidth: "90%",
+            minWidth: "90%",
+          }}
+        >
+          {expandedSection !== "Fabric Content" && depth === 1 && (
+            <View
+              style={{
+                paddingTop: 15,
+                height: "100%",
+                width: "auto",
+              }}
+            >
+              <Checkbox
+                onPress={() => handleParentToggle(item)}
+                color={common.PRIMARY_COLOR}
+                status={
+                  selectedItemsParent.includes(item) ? "checked" : "unchecked"
+                }
+              />
+            </View>
+          )}
+          <List.Accordion
+            title={item.name}
+            style={[
+              styles.accordion,
+              {
+                alignItems: "center",
+                minWidth: "100%",
+                maxWidth: "100%",
+                padding: 0,
+              },
+            ]}
+            contentStyle={{
+              marginLeft: 0,
+              paddingLeft: 0,
+            }}
+            titleStyle={[
+              styles.accordionTitle,
+              {
+                fontFamily:
+                  expandedSection !== "Fabric Content" && depth === 1
+                    ? font.regular
+                    : font.semiBold,
+              },
+            ]}
+            theme={{
+              colors: { primary: styles.accordionTitle.color },
+            }}
+          >
+            {item.child.map((child) =>
+              child.child && child.child.length > 0 ? (
+                renderAccordion(child, depth + 1)
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (expandedSection !== "Fabric Content" && depth >= 1) {
+                      handleChildToggle(child, item);
+                    } else {
+                      handleChildToggle(child);
+                    }
+                  }}
+                  style={{}}
+                  key={child.name}
+                >
+                  {selectedItems.some(
+                    (garment) =>
+                      garment[expandedSection]?.categoryId.split("(")[0] ===
+                      child.categoryId.split("(")[0]
+                  ) && expandedSection === "Fabric Content" ? (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        width: "100%",
+                        paddingLeft: 8,
+                        flex: 1,
+                      }}
+                    >
+                      <View
+                        style={{
+                          paddingTop: 15,
+                          height: "100%",
+                          width: "auto",
+                        }}
+                      >
+                        <Checkbox
+                          color={common.PRIMARY_COLOR}
+                          status="checked"
+                        />
+                      </View>
+                      <List.Accordion
+                        title={child.name}
+                        style={[
+                          styles.listItem,
+                          {
+                            alignItems: "center",
+                            backgroundColor: "#fff",
+                            minWidth: "90%",
+                            maxWidth: "90%",
+                            padding: 0,
+                          },
+                        ]}
+                        contentStyle={{
+                          marginLeft: 0,
+                          paddingLeft: 0,
+                        }}
+                        titleStyle={[
+                          styles.listItem,
+
+                          {
+                            fontSize: 14,
+                          },
+                        ]}
+                        theme={{
+                          colors: { primary: styles.accordionTitle.color },
+                        }}
+                      >
+                        <View
+                          style={{
+                            minWidth: "80%",
+                            maxWidth: "80%",
+                          }}
+                        >
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              flex: 1,
+                              alignItems: "center",
+                              justifyContent: "space-around",
+                            }}
+                          >
+                            <FiInput
+                              keyboardType={"numeric"}
+                              style={styles.rangeInput}
+                              placeholder={"0"}
+                              maxLength={2}
+                              value={getMinValue(child)}
+                              onChangeText={(val) =>
+                                handleChangeMinValue(val, child)
+                              }
+                            />
+
+                            <Text>-</Text>
+                            <FiInput
+                              style={styles.rangeInput}
+                              maxLength={3}
+                              keyboardType={"numeric"}
+                              onChangeText={(val) =>
+                                handleChangeMaxValue(val, child)
+                              }
+                              placeholder={"100"}
+                              value={getMaxValue(child)}
+                            />
+                          </View>
+                          <FiButton
+                            style={[styles.applyButton]}
+                            title={"Apply"}
+                            titleStyle={styles.applyButtonText}
+                            onPress={() => handleSetFabricContentRange(child)}
+                          />
+                        </View>
+                      </List.Accordion>
+                    </View>
+                  ) : (
+                    <List.Item
+                      key={child.name}
+                      title={child.name}
+                      style={[
+                        styles.listItem,
+                        {
+                          height: 50,
+                          minWidth:
+                            expandedSection === "Fabric Content"
+                              ? "100%"
+                              : "80%",
+                          marginLeft: 10,
+                        },
+                      ]}
+                      titleStyle={[
+                        styles.listItem,
+                        {
+                          marginLeft: 0,
+                          width: "100%",
+                        },
+                      ]}
+                      left={() => (
+                        <Checkbox
+                          color={common.PRIMARY_COLOR}
+                          status={
+                            selectedItems.some(
+                              (garment) =>
+                                garment[expandedSection]?.categoryId &&
+                                garment[expandedSection]?.categoryId ===
+                                  child.categoryId
+                            )
+                              ? "checked"
+                              : "unchecked"
+                          }
+                        />
+                      )}
+                    />
+                  )}
+                </TouchableOpacity>
+              )
+            )}
+          </List.Accordion>
+        </View>
+      </View>
+    );
+  };
+  return (
+    <Modal
+      visible={isVisible}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={handleClose}
+    >
+      <AlertBox
+        heading={isError.heading}
+        message={isError.message}
+        setShowAlert={closeAlert}
+        showAlert={isError.showAlert}
+        triggerFunction={isError.triggerFunction}
+        isRight={isError.isRight}
+        rightButtonText={isError.rightButtonText}
+      />
+      {isLoading && (
+        <View style={styles.loadingOverlay} pointerEvents="auto">
+          <ActivityIndicator size="large" color={common.PRIMARY_COLOR} />
+        </View>
+      )}
+      {!isLoading && (
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={handleClose}>
+              <Icon name="x" size={24} color="#000" />
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { fontFamily: font.bold }]}>
+              Search Filters
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                handleResetSection();
+              }}
+            >
+              <Text style={[styles.resetText, { fontFamily: font.regular }]}>
+                Reset
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.mainContent}>
+            <ScrollView
+              style={{
+                width: "34%",
+                borderRightWidth: 1,
+                borderRightColor: "#ddd",
+              }}
+              contentContainerStyle={styles.leftSection}
+            >
+              {groupedContent.map(({ groupName, items }) => (
+                <View key={groupName}>
+                  <Text
+                    key={groupName}
+                    style={[styles.filterHeaderLabel, { marginBottom: 16 }]}
+                  >
+                    {groupName}
+                  </Text>
+                  {items.map((item) => (
+                    <TouchableOpacity
+                      key={item.name}
+                      style={styles.filterOption}
+                      onPress={() => {
+                        setSearchText("");
+                        setExpandedSection(
+                          expandedSection === item.name ? null : item.name
+                        );
+                      }}
+                    >
+                      <Text
+                        style={
+                          (styles.categoryText,
+                          {
+                            marginBottom: 10,
+                            fontFamily: font.regular,
+                            ...(expandedSection == item.name
+                              ? {
+                                  fontFamily: font.semiBold,
+                                }
+                              : {}),
+                          })
+                        }
+                      >
+                        {item.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ))}
+            </ScrollView>
+
+            <ScrollView
+              style={{ width: "66%" }}
+              contentContainerStyle={styles.rightSection}
+            >
+              {isLoadingLeft && (
+                <View style={styles.loadingOverlay} pointerEvents="auto">
+                  <ActivityIndicator
+                    size="large"
+                    color={common.PRIMARY_COLOR}
+                  />
+                </View>
+              )}
+              {expandedSection == null && (
+                <Text style={[styles.filterLabel]}>Select Filter</Text>
+              )}
+              {![
+                "Colour",
+                "Solid / Pattern",
+                "Price",
+                "Weight",
+                "MOQ",
+                "Width",
+                null,
+              ].includes(expandedSection) && (
+                <View style={styles.filterSection}>
+                  <Text style={[styles.filterLabel]}>{expandedSection}</Text>
+                  <Text style={[styles.categoryText]}>
+                    Selected (
+                    {getSelectedLengthForSection(categoryFilterChildren)})
+                  </Text>
+                  <FiInput
+                    style={styles.searchInput}
+                    placeholder={`Search ${expandedSection}`}
+                    value={searchText}
+                    onChangeText={setSearchText}
+                  />
+
+                  {categoryFilterChildren.length > 0 &&
+                    filterItems(categoryFilterChildren).map((item) => (
+                      <View key={item.name} style={{ overflow: "hidden" }}>
+                        {item.child && item.child.length > 0 ? (
+                          renderAccordion(item, 0)
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() => handleChildToggle(item)}
+                            style={styles.checkboxRow}
+                          >
+                            <Checkbox
+                              color={common.PRIMARY_COLOR}
+                              status={
+                                selectedItems.some(
+                                  (garment) =>
+                                    garment[expandedSection]?.categoryId &&
+                                    garment[expandedSection]?.categoryId ===
+                                      item.categoryId
+                                )
+                                  ? "checked"
+                                  : "unchecked"
+                              }
+                            />
+                            <Text style={styles.listItem}>{item.name}</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ))}
+                </View>
+              )}
+              {expandedSection === "Colour" &&
+                categoryFilter.name === "Colour" && (
+                  <View style={styles.filterSection}>
+                    <Text style={[styles.filterLabel]}>Color Options</Text>
+                    <Text style={[styles.categoryText]}>
+                      Selected ({selectedColour.length})
+                    </Text>
+                    <View style={styles.rowContainer}>
+                      {categoryFilterChildren.map((item) => (
+                        <TouchableOpacity
+                          key={item.name}
+                          style={[styles.colorOptionRow, {}]}
+                          onPress={() => {
+                            handleSelectColor(item);
+                          }}
+                        >
+                          <Text
+                            style={[
+                              styles.tickMark,
+                              {
+                                color: selectedColour.some(
+                                  (colorObj) =>
+                                    Array.isArray(colorObj.Colour) &&
+                                    colorObj.Colour.some(
+                                      (color) => color === item.id
+                                    )
+                                )
+                                  ? common.PRIMARY_COLOR
+                                  : "#ccc",
+                              },
+                            ]}
+                          >
+                            ✓
+                          </Text>
+
+                          <View
+                            style={[
+                              styles.colorBox,
+                              { backgroundColor: item.hexaColorCode },
+                            ]}
+                          />
+                          <Text style={[styles.colorLabel, { color: "black" }]}>
+                            {item.name}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
+              {expandedSection === "Solid / Pattern" && (
+                <View style={styles.filterSection}>
+                  <Text style={[styles.filterLabel]}>Solid / Pattern</Text>
+                  <Text style={[styles.categoryText]}>
+                    Selected ({selectedSolidPattern.length})
+                    {/* Fixed typo from "lenght" to "length" */}
+                  </Text>
+                  <View style={styles.rowContainer}>
+                    {categoryFilterChildren.map((item) => (
+                      <TouchableOpacity
+                        key={item.name}
+                        style={[
+                          styles.patternOptionRow,
+                          selectedSolidPattern.some(
+                            (patterns) =>
+                              Array.isArray(patterns["Solid / Pattern"]) &&
+                              patterns["Solid / Pattern"].some(
+                                (pattern) => pattern === item.id
+                              )
+                          ) && {
+                            borderColor: common.PRIMARY_COLOR,
+                            borderWidth: 2,
+                          },
+                        ]}
+                        onPress={() => handleSelectSolidPattern(item)}
+                      >
+                        <Image
+                          source={{
+                            uri: backendUrl + item?.image?.replace("/api", ""),
+                          }}
+                          style={styles.patternImage}
+                        />
+                        <Text style={[styles.patternLabel, { color: "black" }]}>
+                          {item.name}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {expandedSection === "Weight" && (
+                <View style={styles.filterSection}>
+                  <Text style={[styles.filterLabel]}>Weight</Text>
+                  <View>
+                    <View style={styles.switchRow}>
+                      <FiInput
+                        style={[
+                          styles.rangeInput,
+                          { minWidth: "40%", maxWidth: "40%" },
+                        ]}
+                        placeholder={"min"}
+                      />
+                      <Text>-</Text>
+                      <FiInput
+                        style={[
+                          styles.rangeInput,
+                          { minWidth: "40%", maxWidth: "40%" },
+                        ]}
+                        placeholder={"max"}
+                      />
+                      <Text style={{ fontFamily: font.medium }}>gsm</Text>
+                    </View>
+                    <FiButton
+                      style={styles.applyButton}
+                      titleStyle={styles.applyButtonText}
+                      title={"Apply"}
+                    />
+                  </View>
+                </View>
+              )}
+              {expandedSection === "Width" && (
+                <View style={styles.filterSection}>
+                  <Text style={[styles.filterLabel]}>Width</Text>
+                  <View>
+                    <View style={styles.switchRow}>
+                      <FiInput
+                        style={[
+                          styles.rangeInput,
+                          { minWidth: "40%", maxWidth: "40%" },
+                        ]}
+                        placeholder={"min"}
+                      />
+                      <Text>-</Text>
+                      <FiInput
+                        style={[
+                          styles.rangeInput,
+                          { minWidth: "40%", maxWidth: "40%" },
+                        ]}
+                        placeholder={"max"}
+                      />
+                      <Text style={{ fontFamily: font.medium }}>Inch</Text>
+                    </View>
+                    <FiButton
+                      style={styles.applyButton}
+                      titleStyle={styles.applyButtonText}
+                      title={"Apply"}
+                    />
+                  </View>
+                </View>
+              )}
+              {expandedSection === "MOQ" && (
+                <View style={styles.filterSection}>
+                  <Text style={[styles.filterLabel]}>MOQ</Text>
+                  <View>
+                    <View style={styles.switchRow}>
+                      <Text
+                        style={{
+                          fontFamily: font.regular,
+                        }}
+                      >
+                        Less than
+                      </Text>
+                      <FiInput
+                        style={[
+                          styles.rangeInput,
+                          { minWidth: "40%", maxWidth: "40%" },
+                        ]}
+                        placeholder={"moq"}
+                      />
+                      <Text style={{ fontFamily: font.medium }}>kg</Text>
+                    </View>
+                    <FiButton
+                      style={styles.applyButton}
+                      titleStyle={styles.applyButtonText}
+                      title={"Apply"}
+                    />
+                  </View>
+                </View>
+              )}
+              {expandedSection === "Price" && (
+                <View style={styles.filterSection}>
+                  <Text style={[styles.filterLabel]}>Price </Text>
+                  <View>
+                    <View style={styles.switchRow}>
+                      <FiInput
+                        style={[
+                          styles.rangeInput,
+                          { minWidth: "40%", maxWidth: "40%" },
+                        ]}
+                        placeholder={"min"}
+                      />
+                      <Text>-</Text>
+                      <FiInput
+                        style={[
+                          styles.rangeInput,
+                          { minWidth: "40%", maxWidth: "40%" },
+                        ]}
+                        placeholder={"0"}
+                      />
+                      <Text style={{ fontFamily: font.medium }}>₹</Text>
+                    </View>
+                    <FiButton
+                      style={styles.applyButton}
+                      titleStyle={styles.applyButtonText}
+                      title={"Apply"}
+                    />
+                  </View>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={[styles.applyButton]}
+              onPress={handleApplyFilter}
+            >
+              <Text style={[styles.applyButtonText, { fontFamily: font.bold }]}>
+                Apply Filters
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.applyButton, { backgroundColor: "#D3D3D3" }]}
+              onPress={handleClose}
+            >
+              <Text
+                style={[
+                  styles.applyButtonText,
+                  { fontFamily: font.bold, color: "#000" },
+                ]}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </Modal>
+  );
+};
+
+export default SearchModal;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  headerTitle: {
+    fontSize: 18,
+    color: "#000",
+  },
+  resetText: {
+    fontSize: 14,
+    color: "#FF6F61",
+  },
+  mainContent: {
+    flexDirection: "row",
+    flex: 1,
+    width: "100%",
+  },
+  leftSection: {
+    padding: 10,
+  },
+  rightSection: {
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+  },
+  filterSection: {},
+  filterLabel: {
+    fontSize: 16,
+    fontFamily: font.medium,
+    marginBottom: 10,
+  },
+  switchRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  filterHeaderLabel: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    fontFamily: font.bold,
+    fontSize: 15,
+  },
+  filterOption: {
+    paddingVertical: 5,
+  },
+
+  footer: {
+    flexDirection: "row",
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
+  applyButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    backgroundColor: common.PRIMARY_COLOR,
+    marginHorizontal: 4,
+  },
+  applyButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 8,
+    marginVertical: 10,
+    fontSize: 16,
+    fontFamily: font.regular,
+  },
+  rangeInput: {
+    minWidth: "35%",
+    maxWidth: "40%",
+    maxHeight: 40,
+    minHeight: 40,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 8,
+    marginVertical: 10,
+    fontSize: 16,
+    fontFamily: font.regular,
+  },
+  garmentList: {
+    maxHeight: 200,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 0,
+    paddingVertical: 0,
+  },
+  garmentLabel: {
+    flex: 1,
+    flexWrap: "wrap",
+    fontSize: 14,
+    maxWidth: "90%",
+    textAlign: "left",
+    fontFamily: font.semiBold,
+    lineBreakMode: "clip",
+  },
+
+  categoryText: {
+    fontSize: 14,
+    marginLeft: 8,
+    fontFamily: font.regular,
+    color: "#555",
+  },
+  fabric_contentHeading: {
+    fontFamily: font.semiBold,
+    fontSize: 16,
+  },
+  colorOptionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    marginVertical: 2,
+  },
+  colorBox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginRight: 8,
+  },
+  colorLabel: {
+    fontSize: 14,
+    color: "#555",
+    fontFamily: font.regular,
+  },
+  tickMark: {
+    fontSize: 16,
+    color: common.PRIMARY_COLOR,
+    width: 24,
+    height: 24,
+  },
+  patternOptionRow: {
+    flexDirection: "column",
+    alignItems: "center",
+    margin: 8,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+  },
+  patternImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  patternLabel: {
+    fontSize: 14,
+    fontFamily: font.regular,
+    textAlign: "center",
+  },
+  accordion: {
+    backgroundColor: "#fff",
+  },
+  accordionTitle: {
+    fontSize: 16,
+    color: "#333",
+    fontFamily: font.semiBold,
+    alignItems: "center",
+
+    width: "100%",
+  },
+  listItem: {
+    backgroundColor: "transparent",
+    fontFamily: font.regular,
+    fontSize: 14,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+});
