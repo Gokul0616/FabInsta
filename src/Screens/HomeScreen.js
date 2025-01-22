@@ -17,6 +17,7 @@ import api from "../Service/api";
 import { font } from "../Common/Theme";
 import SearchModal from "./SearchModal";
 import SortingDropdown from "./SortingDropdown";
+import { formateData } from "../Common/FilterData";
 
 const HomeScreen = ({ navigation }) => {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -54,7 +55,7 @@ const HomeScreen = ({ navigation }) => {
       if (storage.getString("token")) {
         url = `pim/searchFilter?page=${
           fromsearch ? 0 : page
-        }&size=${16}&sortData=${filterDropdownValue}`;
+        }&size=${14}&sortData=${filterDropdownValue}`;
       } else {
         url = `pim/sampleProduct`;
       }
@@ -136,7 +137,10 @@ const HomeScreen = ({ navigation }) => {
 
   const handleSearchData = (searchData) => {
     if (searchData.data && Object.keys(searchData.data[0]).length > 0) {
-      setSearchData(searchData.data[0]);
+      // console.log(searchData.data[0][0]["Garment Type"].name);
+      // console.log(searchData.data[0]);
+      const res = formateData(searchData.data[0]);
+      setSearchData(res);
     } else {
       setSearchData(null);
     }

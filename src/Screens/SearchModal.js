@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import React, { useState, useEffect, useMemo } from "react";
 import {
   StyleSheet,
@@ -7,22 +6,16 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
-  Switch,
   BackHandler,
   ActivityIndicator,
   Image,
-  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import debounce from "lodash/debounce";
 import { font } from "../Common/Theme";
 import {
-  combineColourObjects,
-  combineSolidPatternObjects,
   extractDisplayOrderData,
-  findKeyForFabricContent,
   findObjectByName,
-  formateData,
   getChildren,
   processGroupedContent,
 } from "../Common/FilterData";
@@ -45,8 +38,13 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
   const [selectedColour, setSelectedColour] = useState([]);
   const [groupedContent, setGroupedContent] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(100);
+  const [hardValue, setHardValue] = useState({
+    Weight: { min: "", max: "" },
+    Width: { min: "", max: "" },
+    Price: { min: "", max: "" },
+    MOQ: { val: "" },
+  });
+  const [finalHardCodeArray, setFinalHardCodeArray] = useState([]);
   const [isLoadingLeft, setIsLoadingLeft] = useState(true);
   const [isError, setIsError] = useState({
     message: "",
@@ -151,7 +149,6 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
           expandedSection
         ].categoryId = `${baseCategoryId}(${numMinValue}-${numMaxValue})`;
         handleApplyFilter();
-        onClose();
       }
     }
   };
@@ -160,6 +157,13 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
     setSelectedItems([]);
     setSelectedItemsParent([]);
     setSelectedSolidPattern([]);
+    setHardValue({
+      Weight: { min: "", max: "" },
+      Width: { min: "", max: "" },
+      Price: { min: "", max: "" },
+      MOQ: { val: "" },
+    });
+    setFinalHardCodeArray([]);
     setSearchText("");
   };
   const handleClose = () => {
@@ -303,21 +307,31 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
       } else if (
         ["Price", "Weight", "Width", "MOQ"].includes(expandedSection)
       ) {
+        if (expandedSection === "MOQ") {
+          setHardValue((prev) => ({
+            ...prev,
+            [expandedSection]: { val: "" },
+          }));
+        } else {
+          setHardValue((prev) => ({
+            ...prev,
+            [expandedSection]: { min: "", max: "" },
+          }));
+        }
       }
     }
     setSearchText("");
   };
-
   const handleApplyFilter = () => {
-    const res = formateData([
+    const res = [
       ...selectedItems,
       ...selectedColour,
       ...selectedSolidPattern,
-    ]);
-
-    // console.log([res, { Weight: ["20", "200"] }]);
-    searchData({ data: [res] });
-    onClose();
+      ...finalHardCodeArray,
+    ];
+    console.log(res);
+    // searchData({ data: [res] });
+    // onClose();
   };
 
   const closeAlert = () => {
@@ -505,7 +519,74 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
       return updatedItems;
     });
   };
+  const handleHardCodeApplyMOQ = (val, item) => {
+    if (item === "MOQ") {
+      const val = Number(hardValue[item].val);
 
+      const obj = {
+        [item]: [val.toString()],
+      };
+
+      setFinalHardCodeArray((prev) => {
+        const index = prev.findIndex((existingObj) => existingObj[item]);
+
+        if (index !== -1) {
+          prev[index] = obj;
+        } else {
+          prev.push(obj);
+        }
+
+        return [...prev];
+      });
+      handleApplyFilter();
+    }
+  };
+  const handleHardCodeApply = (min, max, item) => {
+    const numMinValue = Number(hardValue[item].min);
+    const numMaxValue = Number(hardValue[item].max);
+    if (numMaxValue === 0 || numMinValue === 0) {
+      setIsError({
+        message: "Please Enter Values",
+        heading: "Error",
+        isRight: false,
+        rightButtonText: "OK",
+        triggerFunction: () => {},
+        setShowAlert: () => {
+          isError.setShowAlert(false);
+        },
+        showAlert: true,
+      });
+    } else if (numMinValue > numMaxValue || numMinValue === numMaxValue) {
+      setIsError({
+        message: "Range Must be Less to Greater",
+        heading: "Error",
+        isRight: false,
+        rightButtonText: "OK",
+        triggerFunction: () => {},
+        setShowAlert: () => {
+          isError.setShowAlert(false);
+        },
+        showAlert: true,
+      });
+    } else {
+      const obj = {
+        [item]: [min, max].map((value) => value.toString()),
+      };
+
+      setFinalHardCodeArray((prev) => {
+        const index = prev.findIndex((existingObj) => existingObj[item]);
+
+        if (index !== -1) {
+          prev[index] = obj;
+        } else {
+          prev.push(obj);
+        }
+
+        return [...prev];
+      });
+      handleApplyFilter();
+    }
+  };
   const renderAccordion = (item, depth) => {
     return (
       <View key={item.name} style={{}}>
@@ -979,6 +1060,17 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                   <View>
                     <View style={styles.switchRow}>
                       <FiInput
+                        value={hardValue[expandedSection]["min"]}
+                        keyboardType={"numeric"}
+                        onChangeText={(val) => {
+                          setHardValue((prev) => ({
+                            ...prev,
+                            [expandedSection]: {
+                              ...prev[expandedSection],
+                              min: val,
+                            },
+                          }));
+                        }}
                         style={[
                           styles.rangeInput,
                           { minWidth: "40%", maxWidth: "40%" },
@@ -987,6 +1079,17 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                       />
                       <Text>-</Text>
                       <FiInput
+                        keyboardType={"numeric"}
+                        value={hardValue[expandedSection]["max"]}
+                        onChangeText={(val) => {
+                          setHardValue((prev) => ({
+                            ...prev,
+                            [expandedSection]: {
+                              ...prev[expandedSection],
+                              max: val,
+                            },
+                          }));
+                        }}
                         style={[
                           styles.rangeInput,
                           { minWidth: "40%", maxWidth: "40%" },
@@ -998,6 +1101,13 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                     <FiButton
                       style={styles.applyButton}
                       titleStyle={styles.applyButtonText}
+                      onPress={() =>
+                        handleHardCodeApply(
+                          hardValue[expandedSection].min,
+                          hardValue[expandedSection].max,
+                          expandedSection
+                        )
+                      }
                       title={"Apply"}
                     />
                   </View>
@@ -1009,6 +1119,17 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                   <View>
                     <View style={styles.switchRow}>
                       <FiInput
+                        keyboardType={"numeric"}
+                        value={hardValue[expandedSection]["min"]}
+                        onChangeText={(val) => {
+                          setHardValue((prev) => ({
+                            ...prev,
+                            [expandedSection]: {
+                              ...prev[expandedSection],
+                              min: val,
+                            },
+                          }));
+                        }}
                         style={[
                           styles.rangeInput,
                           { minWidth: "40%", maxWidth: "40%" },
@@ -1017,6 +1138,17 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                       />
                       <Text>-</Text>
                       <FiInput
+                        keyboardType={"numeric"}
+                        value={hardValue[expandedSection]["max"]}
+                        onChangeText={(val) => {
+                          setHardValue((prev) => ({
+                            ...prev,
+                            [expandedSection]: {
+                              ...prev[expandedSection],
+                              max: val,
+                            },
+                          }));
+                        }}
                         style={[
                           styles.rangeInput,
                           { minWidth: "40%", maxWidth: "40%" },
@@ -1029,6 +1161,13 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                       style={styles.applyButton}
                       titleStyle={styles.applyButtonText}
                       title={"Apply"}
+                      onPress={() =>
+                        handleHardCodeApply(
+                          hardValue[expandedSection].min,
+                          hardValue[expandedSection].max,
+                          expandedSection
+                        )
+                      }
                     />
                   </View>
                 </View>
@@ -1046,6 +1185,17 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                         Less than
                       </Text>
                       <FiInput
+                        value={hardValue[expandedSection]["val"]}
+                        keyboardType={"numeric"}
+                        onChangeText={(val) => {
+                          setHardValue((prev) => ({
+                            ...prev,
+                            [expandedSection]: {
+                              ...prev[expandedSection],
+                              val: val,
+                            },
+                          }));
+                        }}
                         style={[
                           styles.rangeInput,
                           { minWidth: "40%", maxWidth: "40%" },
@@ -1058,6 +1208,12 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                       style={styles.applyButton}
                       titleStyle={styles.applyButtonText}
                       title={"Apply"}
+                      onPress={() =>
+                        handleHardCodeApplyMOQ(
+                          hardValue[expandedSection].val,
+                          expandedSection
+                        )
+                      }
                     />
                   </View>
                 </View>
@@ -1068,6 +1224,17 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                   <View>
                     <View style={styles.switchRow}>
                       <FiInput
+                        keyboardType={"numeric"}
+                        value={hardValue[expandedSection]["min"]}
+                        onChangeText={(val) => {
+                          setHardValue((prev) => ({
+                            ...prev,
+                            [expandedSection]: {
+                              ...prev[expandedSection],
+                              min: val,
+                            },
+                          }));
+                        }}
                         style={[
                           styles.rangeInput,
                           { minWidth: "40%", maxWidth: "40%" },
@@ -1076,6 +1243,17 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                       />
                       <Text>-</Text>
                       <FiInput
+                        keyboardType={"numeric"}
+                        value={hardValue[expandedSection]["max"]}
+                        onChangeText={(val) => {
+                          setHardValue((prev) => ({
+                            ...prev,
+                            [expandedSection]: {
+                              ...prev[expandedSection],
+                              max: val,
+                            },
+                          }));
+                        }}
                         style={[
                           styles.rangeInput,
                           { minWidth: "40%", maxWidth: "40%" },
@@ -1088,6 +1266,13 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                       style={styles.applyButton}
                       titleStyle={styles.applyButtonText}
                       title={"Apply"}
+                      onPress={() =>
+                        handleHardCodeApply(
+                          hardValue[expandedSection].min,
+                          hardValue[expandedSection].max,
+                          expandedSection
+                        )
+                      }
                     />
                   </View>
                 </View>

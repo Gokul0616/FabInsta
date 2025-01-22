@@ -11,7 +11,7 @@ import {
   Vibration,
 } from "react-native";
 import { backendUrl, common } from "../Common";
-// import ImageSlider from "react-native-image-slider";
+
 import { font } from "../Theme";
 import api from "../../Service/api";
 import ImageSliderFI from "./ImageSllider";
@@ -20,8 +20,8 @@ import { useNavigation } from "@react-navigation/native";
 const MainProductPage = ({ route }) => {
   const { pimId } = route.params;
   const [activeSlide, setActiveSlide] = useState(0);
-  const [product, setProduct] = useState(null); // Initialize as null to track loading state
-  const [loading, setLoading] = useState(true); // State for loading indicator
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const images = [];
 
   const getPimVariantImages = (data) => {
@@ -32,11 +32,11 @@ const MainProductPage = ({ route }) => {
       .map((image) => backendUrl + image.replace("/api", ""));
   };
   const navigation = useNavigation();
-  // Fetch product data
+
   const fetchData = async () => {
     const response = await api.get(`/pim/product/${pimId}`);
     setProduct(response.response);
-    setLoading(false); // Set loading to false once data is fetched
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const MainProductPage = ({ route }) => {
   useEffect(() => {
     const handleBackPress = () => {
       navigation.goBack();
-      return true; // Prevents default back behavior
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -59,8 +59,6 @@ const MainProductPage = ({ route }) => {
       backHandler.remove();
     };
   }, []);
-  // Check if product data and images are loaded
-  // const isDataLoaded = product && images.length > 0;
 
   images.push(...getPimVariantImages(product));
 
@@ -69,7 +67,7 @@ const MainProductPage = ({ route }) => {
       <View style={styles.imageContainer}>
         {loading ? (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#FF6F61" />
+            <ActivityIndicator size="large" color={common.PRIMARY_COLOR} />
           </View>
         ) : (
           <ImageSliderFI uri={images} />
