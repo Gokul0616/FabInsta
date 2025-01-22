@@ -329,9 +329,8 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
       ...selectedSolidPattern,
       ...finalHardCodeArray,
     ];
-    console.log(res);
-    // searchData({ data: [res] });
-    // onClose();
+    searchData({ data: [res] });
+    onClose();
   };
 
   const closeAlert = () => {
