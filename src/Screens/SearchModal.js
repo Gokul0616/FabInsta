@@ -267,567 +267,564 @@ const SearchModal = ({ isVisible, onClose, searchData, data }) => {
       setCategoryFilterChildren([]);
     }
   }, [expandedSection]);
-  const handleResetSection = () => {
-    if (expandedSection) {
-      const resetAllChildren = (children) => {
-        children.forEach((child) => {
-          setSelectedItems((prev) =>
-            prev.filter(
-              (garment) =>
-                garment[expandedSection]?.categoryId !== child.categoryId
-            )
-          );
+ const handleResetSection = () => {
+   if (!["Price", "Weight", "Width", "MOQ"].includes(expandedSection)) {
+     if (expandedSection) {
+       setSelectedItems((prevSelectedItems) => {
+         return prevSelectedItems.filter(
+           (garment) => !garment.hasOwnProperty(expandedSection)
+         );
+       });
+       setSelectedItemsParent((prevSelectedItems) => {
+         return prevSelectedItems.filter(
+           (garment) => !garment.hasOwnProperty(expandedSection)
+         );
+       });
+     } else if (["Price", "Weight", "Width", "MOQ"].includes(expandedSection)) {
+       if (expandedSection === "MOQ") {
+         setHardValue((prev) => ({
+           ...prev,
+           [expandedSection]: { val: "" },
+         }));
+       } else {
+         setHardValue((prev) => ({
+           ...prev,
+           [expandedSection]: { min: "", max: "" },
+         }));
+       }
+     }
+   }
+   setSearchText("");
+ };
 
-          if (child.child && child.child.length > 0) {
-            resetAllChildren(child.child);
-          }
-        });
-      };
+ const handleApplyFilter = () => {
+   const res = [...selectedItems, ...finalHardCodeArray];
+   searchData({ data: [res] });
+   onClose();
+ };
 
-      const resetAllParents = (section) => {
-        selectedItemsParent.forEach((parent) => {
-          if (parent.productGroupName === section) {
-            setSelectedItemsParent((prev) =>
-              prev.filter(
-                (garment) =>
-                  garment.productGroupName !== parent.productGroupName
-              )
-            );
+ useEffect(() => {
+   let res = [];
 
-            if (parent.child && parent.child.length > 0) {
-              resetAllChildren(parent.child);
-            }
-          }
-        });
-      };
+   data.map((item) => {
+     res.push(findKeyAndId(item, [...selectedItems, ...finalHardCodeArray]));
+   });
 
-      resetAllParents(expandedSection);
-      resetAllChildren(categoryFilterChildren);
+   setSelectedItems((prevSelectedItems) => {
+     return res.reduce((acc, data) => {
+       prevSelectedItems.forEach((item) => {
+         const selectedKey = Object.keys(item)[0];
+         const selectedValue = item[selectedKey];
 
-      if (expandedSection === "Colour") {
-        setSelectedColour([]);
-      } else if (expandedSection === "Solid / Pattern") {
-        setSelectedSolidPattern([]);
-      } else if (
-        ["Price", "Weight", "Width", "MOQ"].includes(expandedSection)
-      ) {
-        if (expandedSection === "MOQ") {
-          setHardValue((prev) => ({
-            ...prev,
-            [expandedSection]: { val: "" },
-          }));
-        } else {
-          setHardValue((prev) => ({
-            ...prev,
-            [expandedSection]: { min: "", max: "" },
-          }));
-        }
-      }
-    }
-    setSearchText("");
-  };
-  const handleApplyFilter = () => {
-    const res = [...selectedItems, ...finalHardCodeArray];
-    searchData({ data: [res] });
-    onClose();
-  };
+         if (data?.id === (selectedValue[0]?.id || selectedValue.categoryId)) {
+           if (!acc) {
+             acc = [];
+           }
+           acc.push({ [selectedKey]: selectedValue });
+         }
+       });
+       return acc;
+     }, []);
+   });
+ }, [data]);
 
-  useEffect(() => {
-    let res = [];
+ const closeAlert = () => {
+   setIsError((prev) => ({ ...prev, showAlert: false }));
+ };
 
-    data.map((item) => {
-      res.push(findKeyAndId(item, [...selectedItems, ...finalHardCodeArray]));
-    });
+ const filterItems = (items) => {
+   if (!searchText) return items;
 
-    setSelectedItems((prevSelectedItems) => {
-      return res.reduce((acc, data) => {
-        prevSelectedItems.forEach((item) => {
-          const selectedKey = Object.keys(item)[0];
-          const selectedValue = item[selectedKey];
+   return items.filter(
+     (item) =>
+       item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+       (item.child &&
+         item.child.length > 0 &&
+         filterItems(item.child).length > 0)
+   );
+ };
 
-          if (data?.id === (selectedValue[0]?.id || selectedValue.categoryId)) {
-            if (!acc) {
-              acc = [];
-            }
-            acc.push({ [selectedKey]: selectedValue });
-          }
-        });
-        return acc;
-      }, []);
-    });
-  }, [data]);
+ const handleParentToggle = (parent) => {
+   const isParentSelected = selectedItemsParent.some(
+     (garment) => garment[expandedSection]?.categoryId === parent.categoryId
+   );
 
-  const closeAlert = () => {
-    setIsError((prev) => ({ ...prev, showAlert: false }));
-  };
+   if (isParentSelected) {
+     setSelectedItemsParent((prev) =>
+       prev.filter(
+         (garment) =>
+           garment[expandedSection]?.categoryId !== parent?.categoryId &&
+           !parent?.child.some(
+             (child) =>
+               child[expandedSection]?.categoryId ===
+               garment[expandedSection]?.categoryId
+           )
+       )
+     );
 
-  const filterItems = (items) => {
-    if (!searchText) return items;
+     setSelectedItems((prev) =>
+       prev.filter(
+         (garment) => garment[expandedSection]?.parentId !== parent.categoryId
+       )
+     );
+   } else {
+     setSelectedItemsParent((prev) => [
+       ...prev,
+       {
+         [expandedSection]: parent,
+       },
+     ]);
 
-    return items.filter(
-      (item) =>
-        item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        (item.child &&
-          item.child.length > 0 &&
-          filterItems(item.child).length > 0)
-    );
-  };
+     setSelectedItems((prev) => [
+       ...prev,
+       ...parent.child
+         .map((child) => ({
+           [expandedSection]: child,
+         }))
+         .filter(
+           (childObj) =>
+             !prev.some(
+               (garment) =>
+                 garment[expandedSection]?.categoryId ===
+                 childObj[expandedSection]?.categoryId
+             )
+         ),
+     ]);
+     ``;
+   }
+ };
+ const handleChildToggle = (child, item) => {
+   let obj;
+   if (expandedSection === "Fabric Content") {
+     child.minValue = 0;
+     child.maxValue = 100;
+     const baseCategoryId = child.categoryId.split("(")[0];
+     child.categoryId = `${baseCategoryId}(${child.minValue}-${child.maxValue})`;
 
-  const handleParentToggle = (parent) => {
-    const isParentSelected = selectedItemsParent.some(
-      (garment) => garment.categoryId === parent.categoryId
-    );
+     obj = {
+       [expandedSection]: child,
+     };
+   } else {
+     obj = {
+       [expandedSection]: child,
+     };
+   }
 
-    if (isParentSelected) {
-      setSelectedItemsParent((prev) =>
-        prev.filter(
-          (garment) =>
-            garment.categoryId !== parent.categoryId &&
-            !parent.child.some(
-              (child) =>
-                child[expandedSection]?.categoryId ===
-                garment[expandedSection]?.categoryId
-            )
-        )
-      );
+   const isChildSelected = selectedItems.some((garment) =>
+     garment[expandedSection]?.categoryId
+       ? garment[expandedSection]?.categoryId === child.categoryId
+       : false
+   );
 
-      setSelectedItems((prev) =>
-        prev.filter(
-          (garment) => garment[expandedSection]?.parentId !== parent.categoryId
-        )
-      );
-    } else {
-      setSelectedItemsParent((prev) => [...prev, parent]);
+   if (isChildSelected) {
+     setSelectedItems((prev) =>
+       prev.filter(
+         (garment) => garment[expandedSection]?.categoryId !== child?.categoryId
+       )
+     );
+   } else {
+     setSelectedItems((prev) => [...prev, obj]);
+   }
 
-      setSelectedItems((prev) => [
-        ...prev,
-        ...parent.child
-          .map((child) => ({
-            [expandedSection]: child,
-          }))
-          .filter(
-            (childObj) =>
-              !prev.some(
-                (garment) =>
-                  garment[expandedSection]?.categoryId ===
-                  childObj[expandedSection]?.categoryId
-              )
-          ),
-      ]);
-    }
-  };
-  const handleChildToggle = (child, item) => {
-    let obj;
-    if (expandedSection === "Fabric Content") {
-      child.minValue = 0;
-      child.maxValue = 100;
-      const baseCategoryId = child.categoryId.split("(")[0];
-      child.categoryId = `${baseCategoryId}(${child.minValue}-${child.maxValue})`;
+   const selectedChildrenCount = selectedItems.filter(
+     (garment) => garment[expandedSection]?.parentId === item?.categoryId
+   ).length;
+   if (
+     item?.child.length ===
+     selectedChildrenCount + (isChildSelected ? -1 : 1)
+   ) {
+     setSelectedItemsParent((prev) => [
+       ...prev,
+       {
+         [expandedSection]: item,
+       },
+     ]);
+   } else if (item?.child.length === undefined) {
+     return;
+   } else {
+     setSelectedItemsParent((prev) =>
+       prev.filter(
+         (garment) =>
+           garment[expandedSection]?.categoryId !== item?.categoryId &&
+           !item?.child.some(
+             (child) =>
+               child[expandedSection]?.categoryId ===
+               garment[expandedSection]?.categoryId
+           )
+       )
+     );
+   }
+ };
+ const getSelectedLengthForSection = (children) => {
+   return children.reduce((count, child) => {
+     const isSelected = selectedItems.some(
+       (garment) => garment[expandedSection]?.categoryId === child?.categoryId
+     );
 
-      obj = {
-        [expandedSection]: child,
-      };
-    } else {
-      obj = {
-        [expandedSection]: child,
-      };
-    }
+     let total = isSelected ? 1 : 0;
 
-    const isChildSelected = selectedItems.some((garment) =>
-      garment[expandedSection]?.categoryId
-        ? garment[expandedSection]?.categoryId === child.categoryId
-        : false
-    );
+     if (child.child && child.child.length > 0) {
+       total += getSelectedLengthForSection(child.child);
+     }
 
-    if (isChildSelected) {
-      setSelectedItems((prev) =>
-        prev.filter(
-          (garment) => garment[expandedSection]?.categoryId !== child.categoryId
-        )
-      );
-    } else {
-      setSelectedItems((prev) => [...prev, obj]);
-    }
+     return count + total;
+   }, 0);
+ };
 
-    const selectedChildrenCount = selectedItems.filter(
-      (garment) => garment[expandedSection]?.parentId === item?.categoryId
-    ).length;
+ const getMinValue = (child) => {
+   const selectedChild = selectedItems.find(
+     (item) =>
+       item[expandedSection]?.categoryId.split("(")[0] ===
+       child.categoryId.split("(")[0]
+   );
+   const res = selectedChild ? selectedChild[expandedSection].minValue : "";
+   return res;
+ };
+ const getMaxValue = (child) => {
+   const selectedChild = selectedItems.find(
+     (item) =>
+       item[expandedSection]?.categoryId.split("(")[0] ===
+       child.categoryId.split("(")[0]
+   );
 
-    if (
-      item?.child.length ===
-      selectedChildrenCount + (isChildSelected ? -1 : 1)
-    ) {
-      setSelectedItemsParent((prev) => [...prev, item]);
-    } else {
-      setSelectedItemsParent((prev) =>
-        prev.filter((garment) => garment?.categoryId !== item?.categoryId)
-      );
-    }
-  };
-  const getSelectedLengthForSection = (children) => {
-    return children.reduce((count, child) => {
-      const isSelected = selectedItems.some(
-        (garment) => garment[expandedSection]?.categoryId === child.categoryId
-      );
+   const res = selectedChild ? selectedChild[expandedSection].maxValue : "";
+   return res;
+ };
 
-      let total = isSelected ? 1 : 0;
+ const handleChangeMaxValue = (val, child) => {
+   setSelectedItems((prev) => {
+     const updatedItems = prev.map((item) => {
+       if (
+         item[expandedSection]?.categoryId.split("(")[0] ===
+         child.categoryId.split("(")[0]
+       ) {
+         return {
+           ...item,
+           [expandedSection]: {
+             ...item[expandedSection],
+             maxValue: val,
+           },
+         };
+       }
+       return item;
+     });
+     return updatedItems;
+   });
+ };
 
-      if (child.child && child.child.length > 0) {
-        total += getSelectedLengthForSection(child.child);
-      }
+ const handleChangeMinValue = (val, child) => {
+   setSelectedItems((prev) => {
+     const updatedItems = prev.map((item) => {
+       if (
+         item[expandedSection]?.categoryId.split("(")[0] ===
+         child.categoryId.split("(")[0]
+       ) {
+         return {
+           ...item,
+           [expandedSection]: {
+             ...item[expandedSection],
+             minValue: val,
+           },
+         };
+       }
+       return item;
+     });
+     return updatedItems;
+   });
+ };
+ const handleHardCodeApplyMOQ = (val, item) => {
+   if (item === "MOQ") {
+     const val = Number(hardValue[item].val);
 
-      return count + total;
-    }, 0);
-  };
+     const obj = {
+       [item]: [val.toString()],
+     };
 
-  const getMinValue = (child) => {
-    const selectedChild = selectedItems.find(
-      (item) =>
-        item[expandedSection]?.categoryId.split("(")[0] ===
-        child.categoryId.split("(")[0]
-    );
-    const res = selectedChild ? selectedChild[expandedSection].minValue : "";
-    return res;
-  };
-  const getMaxValue = (child) => {
-    const selectedChild = selectedItems.find(
-      (item) =>
-        item[expandedSection]?.categoryId.split("(")[0] ===
-        child.categoryId.split("(")[0]
-    );
+     setFinalHardCodeArray((prev) => {
+       const index = prev.findIndex((existingObj) => existingObj[item]);
 
-    const res = selectedChild ? selectedChild[expandedSection].maxValue : "";
-    return res;
-  };
+       if (index !== -1) {
+         prev[index] = obj;
+       } else {
+         prev.push(obj);
+       }
 
-  const handleChangeMaxValue = (val, child) => {
-    setSelectedItems((prev) => {
-      const updatedItems = prev.map((item) => {
-        if (
-          item[expandedSection]?.categoryId.split("(")[0] ===
-          child.categoryId.split("(")[0]
-        ) {
-          return {
-            ...item,
-            [expandedSection]: {
-              ...item[expandedSection],
-              maxValue: val,
-            },
-          };
-        }
-        return item;
-      });
-      return updatedItems;
-    });
-  };
+       return [...prev];
+     });
+     handleApplyFilter();
+   }
+ };
+ const handleHardCodeApply = (min, max, item) => {
+   const numMinValue = Number(hardValue[item].min);
+   const numMaxValue = Number(hardValue[item].max);
+   if (numMaxValue === 0 || numMinValue === 0) {
+     setIsError({
+       message: "Please Enter Values",
+       heading: "Error",
+       isRight: false,
+       rightButtonText: "OK",
+       triggerFunction: () => {},
+       setShowAlert: () => {
+         isError.setShowAlert(false);
+       },
+       showAlert: true,
+     });
+   } else if (numMinValue > numMaxValue || numMinValue === numMaxValue) {
+     setIsError({
+       message: "Range Must be Less to Greater",
+       heading: "Error",
+       isRight: false,
+       rightButtonText: "OK",
+       triggerFunction: () => {},
+       setShowAlert: () => {
+         isError.setShowAlert(false);
+       },
+       showAlert: true,
+     });
+   } else {
+     const obj = {
+       [item]: [min, max].map((value) => value.toString()),
+     };
 
-  const handleChangeMinValue = (val, child) => {
-    setSelectedItems((prev) => {
-      const updatedItems = prev.map((item) => {
-        if (
-          item[expandedSection]?.categoryId.split("(")[0] ===
-          child.categoryId.split("(")[0]
-        ) {
-          return {
-            ...item,
-            [expandedSection]: {
-              ...item[expandedSection],
-              minValue: val,
-            },
-          };
-        }
-        return item;
-      });
-      return updatedItems;
-    });
-  };
-  const handleHardCodeApplyMOQ = (val, item) => {
-    if (item === "MOQ") {
-      const val = Number(hardValue[item].val);
+     setFinalHardCodeArray((prev) => {
+       const index = prev.findIndex((existingObj) => existingObj[item]);
 
-      const obj = {
-        [item]: [val.toString()],
-      };
+       if (index !== -1) {
+         prev[index] = obj;
+       } else {
+         prev.push(obj);
+       }
 
-      setFinalHardCodeArray((prev) => {
-        const index = prev.findIndex((existingObj) => existingObj[item]);
+       return [...prev];
+     });
+     handleApplyFilter();
+   }
+ };
+ const renderAccordion = (item, depth) => {
+   return (
+     <View key={item.name} style={{}}>
+       <View
+         style={{
+           flexDirection: "row",
+           marginLeft:
+             expandedSection !== "Fabric Content" && depth >= 1 ? 10 : 0,
+           padding: 0,
+           flex: 1,
+           maxWidth: "90%",
+           minWidth: "90%",
+         }}
+       >
+         {expandedSection !== "Fabric Content" && depth === 1 && (
+           <View
+             style={{
+               paddingTop: 15,
+               height: "100%",
+               width: "auto",
+             }}
+           >
+             <Checkbox
+               onPress={() => handleParentToggle(item)}
+               color={common.PRIMARY_COLOR}
+               status={
+                 selectedItemsParent.some(
+                   (garment) =>
+                     garment[expandedSection]?.categoryId &&
+                     garment[expandedSection]?.categoryId === item.categoryId
+                 )
+                   ? "checked"
+                   : "unchecked"
+               }
+             />
+           </View>
+         )}
+         <List.Accordion
+           title={item.name}
+           style={[
+             styles.accordion,
+             {
+               alignItems: "center",
+               minWidth: "100%",
+               maxWidth: "100%",
+               padding: 0,
+             },
+           ]}
+           contentStyle={{
+             marginLeft: 0,
+             paddingLeft: 0,
+           }}
+           titleStyle={[
+             styles.accordionTitle,
+             {
+               fontFamily:
+                 expandedSection !== "Fabric Content" && depth === 1
+                   ? font.regular
+                   : font.semiBold,
+             },
+           ]}
+           theme={{
+             colors: { primary: styles.accordionTitle.color },
+           }}
+         >
+           {item.child.map((child) =>
+             child.child && child.child.length > 0 ? (
+               renderAccordion(child, depth + 1)
+             ) : (
+               <TouchableOpacity
+                 onPress={() => {
+                   if (expandedSection !== "Fabric Content") {
+                     handleChildToggle(child, item);
+                   } else {
+                     handleChildToggle(child);
+                   }
+                 }}
+                 style={{}}
+                 key={child.name}
+               >
+                 {selectedItems.some(
+                   (garment) =>
+                     garment[expandedSection]?.categoryId.split("(")[0] ===
+                     child.categoryId.split("(")[0]
+                 ) && expandedSection === "Fabric Content" ? (
+                   <View
+                     style={{
+                       flexDirection: "row",
+                       width: "100%",
+                       paddingLeft: 8,
+                       flex: 1,
+                     }}
+                   >
+                     <View
+                       style={{
+                         paddingTop: 15,
+                         height: "100%",
+                         width: "auto",
+                       }}
+                     >
+                       <Checkbox
+                         color={common.PRIMARY_COLOR}
+                         status="checked"
+                       />
+                     </View>
+                     <List.Accordion
+                       title={child.name}
+                       style={[
+                         styles.listItem,
+                         {
+                           alignItems: "center",
+                           backgroundColor: "#fff",
+                           minWidth: "90%",
+                           maxWidth: "90%",
+                           padding: 0,
+                         },
+                       ]}
+                       contentStyle={{
+                         marginLeft: 0,
+                         paddingLeft: 0,
+                       }}
+                       titleStyle={[
+                         styles.listItem,
 
-        if (index !== -1) {
-          prev[index] = obj;
-        } else {
-          prev.push(obj);
-        }
+                         {
+                           fontSize: 14,
+                         },
+                       ]}
+                       theme={{
+                         colors: { primary: styles.accordionTitle.color },
+                       }}
+                     >
+                       <View
+                         style={{
+                           minWidth: "80%",
+                           maxWidth: "80%",
+                         }}
+                       >
+                         <View
+                           style={{
+                             flexDirection: "row",
+                             flex: 1,
+                             alignItems: "center",
+                             justifyContent: "space-around",
+                           }}
+                         >
+                           <FiInput
+                             keyboardType={"numeric"}
+                             style={styles.rangeInput}
+                             placeholder={"0"}
+                             maxLength={2}
+                             value={getMinValue(child)}
+                             onChangeText={(val) =>
+                               handleChangeMinValue(val, child)
+                             }
+                           />
 
-        return [...prev];
-      });
-      handleApplyFilter();
-    }
-  };
-  const handleHardCodeApply = (min, max, item) => {
-    const numMinValue = Number(hardValue[item].min);
-    const numMaxValue = Number(hardValue[item].max);
-    if (numMaxValue === 0 || numMinValue === 0) {
-      setIsError({
-        message: "Please Enter Values",
-        heading: "Error",
-        isRight: false,
-        rightButtonText: "OK",
-        triggerFunction: () => {},
-        setShowAlert: () => {
-          isError.setShowAlert(false);
-        },
-        showAlert: true,
-      });
-    } else if (numMinValue > numMaxValue || numMinValue === numMaxValue) {
-      setIsError({
-        message: "Range Must be Less to Greater",
-        heading: "Error",
-        isRight: false,
-        rightButtonText: "OK",
-        triggerFunction: () => {},
-        setShowAlert: () => {
-          isError.setShowAlert(false);
-        },
-        showAlert: true,
-      });
-    } else {
-      const obj = {
-        [item]: [min, max].map((value) => value.toString()),
-      };
-
-      setFinalHardCodeArray((prev) => {
-        const index = prev.findIndex((existingObj) => existingObj[item]);
-
-        if (index !== -1) {
-          prev[index] = obj;
-        } else {
-          prev.push(obj);
-        }
-
-        return [...prev];
-      });
-      handleApplyFilter();
-    }
-  };
-  const renderAccordion = (item, depth) => {
-    return (
-      <View key={item.name} style={{}}>
-        <View
-          style={{
-            flexDirection: "row",
-            marginLeft:
-              expandedSection !== "Fabric Content" && depth >= 1 ? 10 : 0,
-            padding: 0,
-            flex: 1,
-            maxWidth: "90%",
-            minWidth: "90%",
-          }}
-        >
-          {expandedSection !== "Fabric Content" && depth === 1 && (
-            <View
-              style={{
-                paddingTop: 15,
-                height: "100%",
-                width: "auto",
-              }}
-            >
-              <Checkbox
-                onPress={() => handleParentToggle(item)}
-                color={common.PRIMARY_COLOR}
-                status={
-                  selectedItemsParent.includes(item) ? "checked" : "unchecked"
-                }
-              />
-            </View>
-          )}
-          <List.Accordion
-            title={item.name}
-            style={[
-              styles.accordion,
-              {
-                alignItems: "center",
-                minWidth: "100%",
-                maxWidth: "100%",
-                padding: 0,
-              },
-            ]}
-            contentStyle={{
-              marginLeft: 0,
-              paddingLeft: 0,
-            }}
-            titleStyle={[
-              styles.accordionTitle,
-              {
-                fontFamily:
-                  expandedSection !== "Fabric Content" && depth === 1
-                    ? font.regular
-                    : font.semiBold,
-              },
-            ]}
-            theme={{
-              colors: { primary: styles.accordionTitle.color },
-            }}
-          >
-            {item.child.map((child) =>
-              child.child && child.child.length > 0 ? (
-                renderAccordion(child, depth + 1)
-              ) : (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (expandedSection !== "Fabric Content" && depth >= 1) {
-                      handleChildToggle(child, item);
-                    } else {
-                      handleChildToggle(child);
-                    }
-                  }}
-                  style={{}}
-                  key={child.name}
-                >
-                  {selectedItems.some(
-                    (garment) =>
-                      garment[expandedSection]?.categoryId.split("(")[0] ===
-                      child.categoryId.split("(")[0]
-                  ) && expandedSection === "Fabric Content" ? (
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        width: "100%",
-                        paddingLeft: 8,
-                        flex: 1,
-                      }}
-                    >
-                      <View
-                        style={{
-                          paddingTop: 15,
-                          height: "100%",
-                          width: "auto",
-                        }}
-                      >
-                        <Checkbox
-                          color={common.PRIMARY_COLOR}
-                          status="checked"
-                        />
-                      </View>
-                      <List.Accordion
-                        title={child.name}
-                        style={[
-                          styles.listItem,
-                          {
-                            alignItems: "center",
-                            backgroundColor: "#fff",
-                            minWidth: "90%",
-                            maxWidth: "90%",
-                            padding: 0,
-                          },
-                        ]}
-                        contentStyle={{
-                          marginLeft: 0,
-                          paddingLeft: 0,
-                        }}
-                        titleStyle={[
-                          styles.listItem,
-
-                          {
-                            fontSize: 14,
-                          },
-                        ]}
-                        theme={{
-                          colors: { primary: styles.accordionTitle.color },
-                        }}
-                      >
-                        <View
-                          style={{
-                            minWidth: "80%",
-                            maxWidth: "80%",
-                          }}
-                        >
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              flex: 1,
-                              alignItems: "center",
-                              justifyContent: "space-around",
-                            }}
-                          >
-                            <FiInput
-                              keyboardType={"numeric"}
-                              style={styles.rangeInput}
-                              placeholder={"0"}
-                              maxLength={2}
-                              value={getMinValue(child)}
-                              onChangeText={(val) =>
-                                handleChangeMinValue(val, child)
-                              }
-                            />
-
-                            <Text>-</Text>
-                            <FiInput
-                              style={styles.rangeInput}
-                              maxLength={3}
-                              keyboardType={"numeric"}
-                              onChangeText={(val) =>
-                                handleChangeMaxValue(val, child)
-                              }
-                              placeholder={"100"}
-                              value={getMaxValue(child)}
-                            />
-                          </View>
-                          <FiButton
-                            style={[styles.applyButton]}
-                            title={"Apply"}
-                            titleStyle={styles.applyButtonText}
-                            onPress={() => handleSetFabricContentRange(child)}
-                          />
-                        </View>
-                      </List.Accordion>
-                    </View>
-                  ) : (
-                    <List.Item
-                      key={child.name}
-                      title={child.name}
-                      style={[
-                        styles.listItem,
-                        {
-                          height: 50,
-                          minWidth:
-                            expandedSection === "Fabric Content"
-                              ? "100%"
-                              : "80%",
-                          marginLeft: 10,
-                        },
-                      ]}
-                      titleStyle={[
-                        styles.listItem,
-                        {
-                          marginLeft: 0,
-                          width: "100%",
-                        },
-                      ]}
-                      left={() => (
-                        <Checkbox
-                          color={common.PRIMARY_COLOR}
-                          status={
-                            selectedItems.some(
-                              (garment) =>
-                                garment[expandedSection]?.categoryId &&
-                                garment[expandedSection]?.categoryId ===
-                                  child.categoryId
-                            )
-                              ? "checked"
-                              : "unchecked"
-                          }
-                        />
-                      )}
-                    />
-                  )}
-                </TouchableOpacity>
-              )
-            )}
-          </List.Accordion>
-        </View>
-      </View>
-    );
-  };
+                           <Text>-</Text>
+                           <FiInput
+                             style={styles.rangeInput}
+                             maxLength={3}
+                             keyboardType={"numeric"}
+                             onChangeText={(val) =>
+                               handleChangeMaxValue(val, child)
+                             }
+                             placeholder={"100"}
+                             value={getMaxValue(child)}
+                           />
+                         </View>
+                         <FiButton
+                           style={[styles.applyButton]}
+                           title={"Apply"}
+                           titleStyle={styles.applyButtonText}
+                           onPress={() => handleSetFabricContentRange(child)}
+                         />
+                       </View>
+                     </List.Accordion>
+                   </View>
+                 ) : (
+                   <List.Item
+                     key={child.name}
+                     title={child.name}
+                     style={[
+                       styles.listItem,
+                       {
+                         height: 50,
+                         minWidth:
+                           expandedSection === "Fabric Content"
+                             ? "100%"
+                             : "80%",
+                         marginLeft: 10,
+                       },
+                     ]}
+                     titleStyle={[
+                       styles.listItem,
+                       {
+                         marginLeft: 0,
+                         width: "100%",
+                       },
+                     ]}
+                     left={() => (
+                       <Checkbox
+                         color={common.PRIMARY_COLOR}
+                         status={
+                           selectedItems.some(
+                             (garment) =>
+                               garment[expandedSection]?.categoryId &&
+                               garment[expandedSection]?.categoryId ===
+                                 child.categoryId
+                           )
+                             ? "checked"
+                             : "unchecked"
+                         }
+                       />
+                     )}
+                   />
+                 )}
+               </TouchableOpacity>
+             )
+           )}
+         </List.Accordion>
+       </View>
+     </View>
+   );
+ };
   return (
     <Modal
       visible={isVisible}
