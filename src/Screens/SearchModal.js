@@ -11,10 +11,10 @@ import {
   Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import debounce from "lodash/debounce";
 import { font } from "../Common/Theme";
 import {
   extractDisplayOrderData,
+  findKeyAndId,
   findObjectByName,
   getChildren,
   processGroupedContent,
@@ -26,16 +26,15 @@ import api from "../Service/api";
 import AlertBox from "../Common/AlertBox";
 import { FiButton } from "../Common/FiButton";
 
-const SearchModal = ({ isVisible, onClose, searchData }) => {
+const SearchModal = ({ isVisible, onClose, searchData, data }) => {
   const [categoryFilter, setCategoryFilter] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+
   const [categoryFilterChildren, setCategoryFilterChildren] = useState([]);
   const [filterResponseData, setFilterResponseData] = useState([]);
   const [expandedSection, setExpandedSection] = useState("");
-  const [selectedSolidPattern, setSelectedSolidPattern] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemsParent, setSelectedItemsParent] = useState([]);
-  const [selectedColour, setSelectedColour] = useState([]);
   const [groupedContent, setGroupedContent] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hardValue, setHardValue] = useState({
@@ -102,6 +101,13 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
       setIsLoading(false);
     }
   };
+  const countSelectedItems = (name) => {
+    const colourCount = selectedItems.filter((item) =>
+      Object.keys(item).includes(name)
+    ).length;
+
+    return colourCount;
+  };
 
   const handleSetFabricContentRange = (child) => {
     const selectedChild = selectedItems.find(
@@ -153,10 +159,8 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
     }
   };
   const handleReset = () => {
-    setSelectedColour([]);
     setSelectedItems([]);
     setSelectedItemsParent([]);
-    setSelectedSolidPattern([]);
     setHardValue({
       Weight: { min: "", max: "" },
       Width: { min: "", max: "" },
@@ -174,16 +178,16 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
     onClose();
   };
   const handleSelectSolidPattern = (item) => {
-    setSelectedSolidPattern((prev) => {
+    setSelectedItems((prev) => {
       const updatedSelection = [...prev];
       const index = updatedSelection.findIndex(
         (patterns) =>
           Array.isArray(patterns["Solid / Pattern"]) &&
-          patterns["Solid / Pattern"].some((pattern) => pattern === item.id)
+          patterns["Solid / Pattern"].some((pattern) => pattern.id === item.id)
       );
 
       if (index === -1) {
-        updatedSelection.push({ [expandedSection]: [item.id] });
+        updatedSelection.push({ [expandedSection]: [item] });
       } else {
         updatedSelection.splice(index, 1);
       }
@@ -192,17 +196,17 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
     });
   };
   const handleSelectColor = (item) => {
-    setSelectedColour((prev) => {
+    setSelectedItems((prev) => {
       const updatedSelection = [...prev];
 
       const index = updatedSelection.findIndex(
         (colorObj) =>
           Array.isArray(colorObj.Colour) &&
-          colorObj.Colour.some((color) => color === item.id)
+          colorObj.Colour.some((color) => color.id === item.id)
       );
 
       if (index === -1) {
-        updatedSelection.push({ [expandedSection]: [item.id] });
+        updatedSelection.push({ [expandedSection]: [item] });
       } else {
         updatedSelection.splice(index, 1);
       }
@@ -323,15 +327,35 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
     setSearchText("");
   };
   const handleApplyFilter = () => {
-    const res = [
-      ...selectedItems,
-      ...selectedColour,
-      ...selectedSolidPattern,
-      ...finalHardCodeArray,
-    ];
+    const res = [...selectedItems, ...finalHardCodeArray];
     searchData({ data: [res] });
     onClose();
   };
+
+  useEffect(() => {
+    let res = [];
+
+    data.map((item) => {
+      res.push(findKeyAndId(item, [...selectedItems, ...finalHardCodeArray]));
+    });
+
+    setSelectedItems((prevSelectedItems) => {
+      return res.reduce((acc, data) => {
+        prevSelectedItems.forEach((item) => {
+          const selectedKey = Object.keys(item)[0];
+          const selectedValue = item[selectedKey];
+
+          if (data?.id === (selectedValue[0]?.id || selectedValue.categoryId)) {
+            if (!acc) {
+              acc = [];
+            }
+            acc.push({ [selectedKey]: selectedValue });
+          }
+        });
+        return acc;
+      }, []);
+    });
+  }, [data]);
 
   const closeAlert = () => {
     setIsError((prev) => ({ ...prev, showAlert: false }));
@@ -395,11 +419,10 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
   const handleChildToggle = (child, item) => {
     let obj;
     if (expandedSection === "Fabric Content") {
-      const baseCategoryId = child.categoryId.split("(")[0];
-      child.categoryId = `${baseCategoryId}(${minValue}-${maxValue})`;
-
       child.minValue = 0;
       child.maxValue = 100;
+      const baseCategoryId = child.categoryId.split("(")[0];
+      child.categoryId = `${baseCategoryId}(${child.minValue}-${child.maxValue})`;
 
       obj = {
         [expandedSection]: child,
@@ -968,7 +991,7 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                   <View style={styles.filterSection}>
                     <Text style={[styles.filterLabel]}>Color Options</Text>
                     <Text style={[styles.categoryText]}>
-                      Selected ({selectedColour.length})
+                      Selected ({countSelectedItems(expandedSection)})
                     </Text>
                     <View style={styles.rowContainer}>
                       {categoryFilterChildren.map((item) => (
@@ -983,11 +1006,11 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                             style={[
                               styles.tickMark,
                               {
-                                color: selectedColour.some(
+                                color: selectedItems.some(
                                   (colorObj) =>
                                     Array.isArray(colorObj.Colour) &&
                                     colorObj.Colour.some(
-                                      (color) => color === item.id
+                                      (color) => color.id === item.id
                                     )
                                 )
                                   ? common.PRIMARY_COLOR
@@ -1016,7 +1039,7 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                 <View style={styles.filterSection}>
                   <Text style={[styles.filterLabel]}>Solid / Pattern</Text>
                   <Text style={[styles.categoryText]}>
-                    Selected ({selectedSolidPattern.length})
+                    Selected ({countSelectedItems(expandedSection)})
                     {/* Fixed typo from "lenght" to "length" */}
                   </Text>
                   <View style={styles.rowContainer}>
@@ -1025,11 +1048,11 @@ const SearchModal = ({ isVisible, onClose, searchData }) => {
                         key={item.name}
                         style={[
                           styles.patternOptionRow,
-                          selectedSolidPattern.some(
+                          selectedItems.some(
                             (patterns) =>
                               Array.isArray(patterns["Solid / Pattern"]) &&
                               patterns["Solid / Pattern"].some(
-                                (pattern) => pattern === item.id
+                                (pattern) => pattern.id === item.id
                               )
                           ) && {
                             borderColor: common.PRIMARY_COLOR,

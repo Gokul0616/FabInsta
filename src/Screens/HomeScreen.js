@@ -11,13 +11,14 @@ import {
 } from "react-native";
 import MiniProduct from "../Common/Product/MiniProduct";
 import Header from "./Header";
-import { storage } from "../Common/Common";
+import { common, storage } from "../Common/Common";
 import Icon from "react-native-vector-icons/Feather";
 import api from "../Service/api";
 import { font } from "../Common/Theme";
 import SearchModal from "./SearchModal";
 import SortingDropdown from "./SortingDropdown";
-import { formateData } from "../Common/FilterData";
+import { extractNames, findKeyAndId, formateData } from "../Common/FilterData";
+import { ScrollView } from "react-native";
 
 const HomeScreen = ({ navigation }) => {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -33,7 +34,8 @@ const HomeScreen = ({ navigation }) => {
   const [render, setRender] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [searchData, setSearchData] = useState(null);
-
+  const [searchDisplayData, setSearchDisplayData] = useState([]);
+  const [searchFilterRawData, setSearchFilterRawData] = useState([]);
   const [isFullScreenLoading, setFullScreenLoading] = useState(false);
   const [itemCount, setItemCount] = useState(0);
   const data = [
@@ -137,14 +139,89 @@ const HomeScreen = ({ navigation }) => {
 
   const handleSearchData = (searchData) => {
     if (searchData.data && Object.keys(searchData.data[0]).length > 0) {
-      // console.log(searchData.data[0][0]["Garment Type"].name);
-      // console.log(searchData.data[0]);
+      setSearchFilterRawData(searchData.data[0]);
       const res = formateData(searchData.data[0]);
+      setSearchDisplayData(extractNames(searchData.data[0]));
       setSearchData(res);
     } else {
+      setIsAppliedFiltersVisible(false);
       setSearchData(null);
     }
   };
+  const handleRemoveItem = (item) => {
+    setSearchDisplayData((prevData) =>
+      prevData.filter((dataItem) => dataItem !== item)
+    );
+
+    if (searchDisplayData.length === 0) {
+      setIsAppliedFiltersVisible(false);
+    }
+
+    const res = findKeyAndId(item, searchFilterRawData);
+
+    const updatedSearchData = { ...searchData };
+
+    if (res?.key in updatedSearchData) {
+      updatedSearchData[res?.key] = updatedSearchData[res?.key].filter(
+        (dataItem) => dataItem !== res?.id
+      );
+    }
+
+    setSearchData(updatedSearchData);
+  };
+
+  const handleClearAll = () => {
+    setSearchDisplayData([]);
+    setSearchData(null);
+    setIsAppliedFiltersVisible(false);
+  };
+  const renderSearchItems = () => {
+    if (searchDisplayData.length === 0) {
+      setIsAppliedFiltersVisible(false);
+      return (
+        <View style={{ margin: "auto" }}>
+          <Text style={{ fontFamily: font.semiBold }}>No Data Found</Text>
+        </View>
+      );
+    }
+    return (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.searchItemsScroll}
+      >
+        <TouchableOpacity
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingRight: 10,
+          }}
+          onPress={handleClearAll}
+        >
+          <Icon name="refresh-cw" size={18} color={common.PRIMARY_COLOR} />
+        </TouchableOpacity>
+
+        {searchDisplayData.map((item, index) => (
+          <View key={index} style={styles.searchTextContainer}>
+            <Text style={styles.searchFilterText}>{item}</Text>
+            <TouchableOpacity
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingLeft: 5,
+              }}
+              onPress={() => handleRemoveItem(item)}
+            >
+              <Text style={{ color: "#616A7D", fontFamily: font.bold }}>X</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
+    );
+  };
+
   const SearchAndFilterTab = () => {
     return (
       <View style={styles.searchContainerMain}>
@@ -203,7 +280,7 @@ const HomeScreen = ({ navigation }) => {
         {SearchAndFilterTab()}
         {isAppliedFiltersVisible && (
           <View style={styles.filterVisibleContainer}>
-            <Text>Hello</Text>
+            {renderSearchItems()}
           </View>
         )}
 
@@ -211,6 +288,7 @@ const HomeScreen = ({ navigation }) => {
           isVisible={isModalVisible}
           onClose={() => setModalVisible(false)}
           searchData={handleSearchData}
+          data={searchDisplayData}
         />
       </Animated.View>
       {productList.length === 0 && !isFullScreenLoading && (
@@ -261,8 +339,6 @@ const HomeScreen = ({ navigation }) => {
             }
           }}
           showsVerticalScrollIndicator={false}
-          // refreshing={refreshing}
-          // onRefresh={onRefresh}
           decelerationRate="fast"
         />
       )}
@@ -380,8 +456,29 @@ const styles = StyleSheet.create({
   },
   filterVisibleContainer: {
     marginTop: 100,
-    width: "100%",
-    height: "50",
+    height: 50,
     backgroundColor: "#F8F8F8",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  searchItemsScroll: {
+    flexGrow: 0,
+    paddingHorizontal: 20,
+    width: "auto",
+  },
+  searchTextContainer: {
+    backgroundColor: "#1C2740",
+    alignSelf: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 50,
+    flexDirection: "row",
+    marginRight: 10,
+  },
+
+  searchFilterText: {
+    color: "#fff",
+    fontFamily: font.semiBold,
+    fontSize: 16,
   },
 });

@@ -125,10 +125,69 @@ export const formateData = (data) => {
       if (categoryId) {
         result[categoryName].push(categoryId);
       } else {
-        result[categoryName].push(...category);
+        result[categoryName].push(category[0].id);
       }
     }
   });
 
   return result;
+};
+
+export function extractNames(data) {
+  const result = [];
+
+  data.forEach((item) => {
+    const key = Object.keys(item)[0];
+    const value = item[key];
+
+    if (key === "Fabric Content") {
+      if (value.name) {
+        if (key === "Fabric Content" && value.categoryId.includes("(")) {
+          const range = value.categoryId.match(/\((.*?)\)/)?.[1] || "";
+          result.push(`${value.name}(${range})`);
+        }
+      }
+    } else if (key === "Colour" || key === "Solid / Pattern") {
+      if (Array.isArray(value)) {
+        value.forEach((v) => {
+          if (v.name) {
+            result.push(v.name);
+          }
+        });
+      }
+    } else {
+      if (value.name) {
+        result.push(value.name);
+      }
+    }
+  });
+
+  return result;
+}
+
+export const findKeyAndId = (name, data) => {
+  for (const item of data) {
+    const [key, value] = Object.entries(item)[0];
+
+    if (Array.isArray(value)) {
+      const match = value.find((v) => v.name === name);
+
+      if (match) {
+        return {
+          key,
+          id: match.id,
+        };
+      }
+    } else if (value.name === name) {
+      return {
+        key,
+        id:
+          key === "Colour" || key === "Solid / pattern"
+            ? value.id
+            : value.categoryId,
+      };
+    }
+  }
+
+  return null;
 };
