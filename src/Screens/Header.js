@@ -8,11 +8,12 @@ import {
 } from "react-native";
 import { font } from "../Common/Theme";
 import { common } from "../Common/Common";
+import Icon from "react-native-vector-icons/Feather";
 
-const Header = ({ scrollY }) => {
+const Header = ({ scrollY, onOptionsPress, isOptionsVisible }) => {
   const translateY = scrollY.interpolate({
-    inputRange: [0, 100], // Adjust based on scroll distance
-    outputRange: [0, -60], // Hide header
+    inputRange: [0, 100],
+    outputRange: [0, -60],
     extrapolate: "clamp",
   });
 
@@ -20,8 +21,12 @@ const Header = ({ scrollY }) => {
     <Animated.View style={[styles.header, { transform: [{ translateY }] }]}>
       <View style={styles.headerContent}>
         <Text style={styles.logoText}>{common.title}</Text>
-        <TouchableOpacity>
-          <Text style={styles.menuIcon}>☰</Text>
+        <TouchableOpacity onPress={() => onOptionsPress()}>
+          {isOptionsVisible ? (
+            <Icon name="x" size={28} />
+          ) : (
+            <Icon name="menu" size={28} />
+          )}
         </TouchableOpacity>
       </View>
     </Animated.View>

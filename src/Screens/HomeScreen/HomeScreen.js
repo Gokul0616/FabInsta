@@ -8,28 +8,46 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
 } from "react-native";
-import MiniProduct from "../Common/Product/MiniProduct";
-import Header from "./Header";
-import { common, storage } from "../Common/Common";
+import MiniProduct from "../../Common/Product/MiniProduct";
+import Header from "../Header";
+import { common, storage } from "../../Common/Common";
 import Icon from "react-native-vector-icons/Feather";
-import api from "../Service/api";
-import { font } from "../Common/Theme";
+import api from "../../Service/api";
+import { font } from "../../Common/Theme";
 import SearchModal from "./SearchModal";
 import SortingDropdown from "./SortingDropdown";
-import { extractNames, findKeyAndId, formateData } from "../Common/FilterData";
+import {
+  extractNames,
+  findKeyAndId,
+  formateData,
+} from "../../Common/FilterData";
 import { ScrollView } from "react-native";
+import AlertBox from "../../Common/AlertBox";
+import OptionsModal from "../../Common/OptionsModal/OptionsModal";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 
 const HomeScreen = ({ navigation }) => {
+  const navigate = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollOffsetY = useRef(0);
+  const [isError, setIsError] = useState({
+    message: "",
+    heading: "",
+    isRight: false,
+    rightButtonText: "OK",
+    triggerFunction: () => {},
+    setShowAlert: () => {},
+    showAlert: false,
+  });
 
   const [totalItems, setTotalItems] = useState(0);
   const [productList, setProductList] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
   const [isAppliedFiltersVisible, setIsAppliedFiltersVisible] = useState(false);
   const [render, setRender] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -37,7 +55,75 @@ const HomeScreen = ({ navigation }) => {
   const [searchDisplayData, setSearchDisplayData] = useState([]);
   const [searchFilterRawData, setSearchFilterRawData] = useState([]);
   const [isFullScreenLoading, setFullScreenLoading] = useState(false);
-  const [itemCount, setItemCount] = useState(0);
+  const options = [
+    {
+      order: 1,
+      displayOrder: 1,
+      label: "Fabric Inquiries",
+      onPress: () => navigate.navigate("FabricInqiries"),
+    },
+    {
+      order: 1,
+      displayOrder: 2,
+      label: "Order Inquiries",
+      onPress: () => console.log("Option 1 selected"),
+    },
+    {
+      order: 1,
+      displayOrder: 3,
+      label: "Bulk Quotes",
+      onPress: () => console.log("Option 1 selected"),
+    },
+    {
+      order: 1,
+      displayOrder: 4,
+      label: `My ${common.title}`,
+      onPress: () => console.log("Option 2 selected"),
+    },
+    {
+      order: 1,
+      displayOrder: 5,
+      label: "WishList",
+      onPress: () => console.log("Option 2 selected"),
+    },
+    {
+      order: 2,
+      displayOrder: 1,
+      label: "Fabric Orders",
+      onPress: () => console.log("Option 2 selected"),
+    },
+    {
+      order: 3,
+      displayOrder: 1,
+      label: "Addresses",
+      onPress: () => console.log("Option 2 selected"),
+    },
+    // {
+    //   order: 3,
+    //   displayOrder: 2,
+    //   label: "Account",
+    //   onPress: () => navigate.navigate("Profile"),
+    // },
+    {
+      order: 4,
+      displayOrder: 1,
+      label: "Logout",
+      onPress: () => clearStackAndNavigate(),
+    },
+  ];
+  const clearStackAndNavigate = () => {
+    navigate.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: "Signin",
+          },
+        ],
+      })
+    );
+    storage.delete("token");
+  };
   const data = [
     { label: "Newest First", value: "New False" },
     { label: "Price Low - High", value: "Price True" },
@@ -50,7 +136,6 @@ const HomeScreen = ({ navigation }) => {
   );
   const fetchProducts = async (fromsearch = false) => {
     if ((isFullScreenLoading || !hasMore) && fromsearch) return;
-    setLoading(true);
     setFullScreenLoading(true);
     try {
       let url = "";
@@ -61,7 +146,9 @@ const HomeScreen = ({ navigation }) => {
       } else {
         url = `pim/sampleProduct`;
       }
+
       const response = await api.post(url, searchData);
+
       if (!response || !response.response) {
         throw new Error("Invalid response structure");
       }
@@ -75,7 +162,6 @@ const HomeScreen = ({ navigation }) => {
           : [],
       }));
       const totalPages = response.response.totalPages;
-      setItemCount(response.response.totalElements);
 
       if (render) {
         setProductList((prev) => [...prev, ...filteredPim]);
@@ -87,8 +173,18 @@ const HomeScreen = ({ navigation }) => {
       setHasMore(page < totalPages - 1);
     } catch (error) {
       console.error("Failed to fetch products:", error);
+      setIsError({
+        message: err.response?.data?.message || "An Unexpected error occurred",
+        heading: "Error",
+        isRight: false,
+        rightButtonText: "OK",
+        triggerFunction: () => {},
+        setShowAlert: () => {
+          isError.setShowAlert(false);
+        },
+        showAlert: true,
+      });
     } finally {
-      setLoading(false);
       setFullScreenLoading(false);
     }
   };
@@ -115,6 +211,10 @@ const HomeScreen = ({ navigation }) => {
     }
 
     return gridData;
+  };
+
+  const closeAlert = () => {
+    setIsError((prev) => ({ ...prev, showAlert: false }));
   };
 
   const renderProduct = ({ item }) => (
@@ -236,7 +336,7 @@ const HomeScreen = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.searchButton}
+            style={styles.applyFilterVisibleButton}
             onPress={() => {
               setIsAppliedFiltersVisible(!isAppliedFiltersVisible);
             }}
@@ -253,9 +353,9 @@ const HomeScreen = ({ navigation }) => {
       </View>
     );
   };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Header scrollY={scrollY} />
       {isFullScreenLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#FF6F61" />
@@ -277,6 +377,11 @@ const HomeScreen = ({ navigation }) => {
           },
         ]}
       >
+        <OptionsModal
+          isVisible={isOptionsVisible}
+          onClose={() => setIsOptionsVisible(false)}
+          options={options}
+        />
         {SearchAndFilterTab()}
         {isAppliedFiltersVisible && (
           <View style={styles.filterVisibleContainer}>
@@ -296,7 +401,15 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.noResultFound}>No Results found</Text>
         </View>
       )}
-
+      <AlertBox
+        heading={isError.heading}
+        message={isError.message}
+        setShowAlert={closeAlert}
+        showAlert={isError.showAlert}
+        triggerFunction={isError.triggerFunction}
+        isRight={isError.isRight}
+        rightButtonText={isError.rightButtonText}
+      />
       {productList.length > 0 && (
         <Animated.FlatList
           data={getGridData()}
@@ -433,13 +546,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
     width: "100%",
   },
   searchButton: {
     width: "50%",
-    height: 35,
+    height: 50,
+    justifyContent: "center",
+    // borderRightWidth: 1,
+    // borderColor: "#ccc",
+    alignItems: "center",
+    display: "flex",
+  },
+  applyFilterVisibleButton: {
+    width: "50%",
+    height: 50,
     justifyContent: "center",
     alignItems: "center",
     display: "flex",
@@ -480,5 +600,35 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: font.semiBold,
     fontSize: 16,
+  },
+  modalOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+
+  optionsModal: {
+    position: "absolute",
+    top: 50,
+    right: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 5,
+    width: 150,
+    padding: 10,
+  },
+  optionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  optionText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#333",
+    fontFamily: "sans-serif-medium",
   },
 });

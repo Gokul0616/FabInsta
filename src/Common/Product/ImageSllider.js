@@ -4,33 +4,32 @@ import { Dimensions } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { common } from "../Common";
-
+import { SwiperFlatList } from "react-native-swiper-flatlist";
 const width = Dimensions.get("window").width;
 
 const ImageSliderFI = ({ uri }) => {
   const progress = useSharedValue(0);
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
-  const handleProgressChange = (_, absoluteProgress) => {
-    progress.value = absoluteProgress;
-    setCurrentIndex(Math.round(absoluteProgress));
+  const handleProgressChange = (index) => {
+    setCurrentIndex(index);
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <Carousel
-        width={width}
-        height={220}
+      <SwiperFlatList
+        autoplay={true}
+        autoplayDelay={3}
+        autoplayLoop={true}
+        onChangeIndex={(index) => handleProgressChange(index.index)}
         data={uri}
-        loop={false}
-        onProgressChange={handleProgressChange}
-        renderItem={({ item, index }) => (
-          <View key={index} style={styles.customSlide}>
+        renderItem={({ item }) => (
+          <View style={styles.customSlide}>
             <Image source={{ uri: item }} style={styles.customImage} />
           </View>
         )}
       />
-      {/* Dot-based Pagination */}
+
       <View style={styles.paginationContainer}>
         {uri.map((_, index) => (
           <View
@@ -47,7 +46,6 @@ const ImageSliderFI = ({ uri }) => {
 };
 
 export default ImageSliderFI;
-
 const styles = StyleSheet.create({
   customSlide: {
     flex: 1,
@@ -56,7 +54,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     borderRadius: 10,
     overflow: "hidden",
-    margin: 5,
+    width: width,
   },
   customImage: {
     width: "100%",
@@ -74,10 +72,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   paginationContainer: {
+    position: "absolute",
+    bottom: 10,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 10,
+    width: "100%",
   },
   dot: {
     width: 7,
