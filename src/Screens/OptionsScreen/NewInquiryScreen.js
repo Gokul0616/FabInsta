@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { font } from "../../Common/Theme";
 import { FiInput } from "../../Common/FiInput";
 import Icon from "react-native-vector-icons/Feather";
-import { common } from "../../Common/Common";
+import { backendUrl, common, storage } from "../../Common/Common";
 import LargeTextBox from "../../Common/LargeTextBox";
 import { Checkbox } from "react-native-paper";
 import { FiButton } from "../../Common/FiButton";
@@ -22,7 +22,21 @@ import FIDropdown from "../../Common/FIDropdown";
 import { launchImageLibrary } from "react-native-image-picker";
 import AlertBox from "../../Common/AlertBox";
 import api from "../../Service/api";
-
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
+const initialState = {
+  endUse: "",
+  season: "",
+  fabricType: "",
+  fiberComposition: "",
+  weightMin: "",
+  weightMax: "",
+  priceMin: "",
+  priceMax: "",
+  finishOrPerformance: "",
+  expectedOrderAmount: "",
+  note: "",
+};
 const NewInquiryScreen = () => {
   const seasonOptions = ["S/S", "F/W", "SeasonLess"];
   const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
@@ -40,6 +54,7 @@ const NewInquiryScreen = () => {
   const [note, setNote] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [text, setText] = useState("");
+  const navigate = useNavigation();
   const [errors, setErrors] = useState({
     endUse: "",
     season: "",
@@ -50,6 +65,7 @@ const NewInquiryScreen = () => {
     priceMin: "",
     priceMax: "",
     finishOrPerformance: "",
+    selectedImage: "",
     expectedOrderAmount: "",
   });
   const [isError, setIsError] = useState({
@@ -83,6 +99,7 @@ const NewInquiryScreen = () => {
     clearError("priceMax", priceMax);
     clearError("finishOrPerformance", finishPerformance);
     clearError("expectedOrderAmount", expectedOrderAmount);
+    clearError("selectedImage", selectedImage);
   }, [
     endUse,
     season,
@@ -94,6 +111,7 @@ const NewInquiryScreen = () => {
     priceMin,
     priceMax,
     expectedOrderAmount,
+    selectedImage,
   ]);
 
   const handleImageSelect = () => {
@@ -133,6 +151,7 @@ const NewInquiryScreen = () => {
       priceMin: "",
       priceMax: "",
       finishOrPerformance: "",
+      selectedImage: "",
       expectedOrderAmount: "",
     };
 
@@ -200,11 +219,16 @@ const NewInquiryScreen = () => {
       newErrors.expectedOrderAmount = "Order amount must be a valid number.";
       isValid = false;
     }
+    if (!selectedImage) {
+      newErrors.selectedImage = "Image required";
+      isValid = false;
+    }
     setErrors(newErrors);
     if (isValid) {
-      // setIsFullScreenLoading(true);
+      setIsFullScreenLoading(true);
 
       const formDataToSubmit = new FormData();
+
       formDataToSubmit.append(
         "fabricInquiry",
 
@@ -226,48 +250,108 @@ const NewInquiryScreen = () => {
       if (selectedImage) {
         formDataToSubmit.append("image", {
           uri: selectedImage.uri,
-          type: selectedImage.type || "image/jpeg",
           name: selectedImage.fileName || "image.jpg",
+          type: selectedImage.type || "image/jpeg",
         });
       }
-      console.log(formDataToSubmit);
-      // try {
-      const response = await api.post("/fabricInquiry", formDataToSubmit, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log(response);
-      // setEndUse("");
-      // setSeason("");
-      // setFabricType("");
-      // setFiberComposition("");
-      // setWeightMin("");
-      // setWeightMax("");
-      // setFinishPerformance("");
-      // setPriceMin("");
-      // setPriceMax("");
-      // setExpectedOrderAmount("");
-      // setNote("");
-      // setSelectedImage(null);
-      // setText("");
-      // } catch (error) {
-      //   console.error("Error submitting the form:", error);
 
-      //   setIsError({
-      //     message: error.message || "An unexpected error occurred",
-      //     heading: "Error",
-      //     isRight: false,
-      //     rightButtonText: "OK",
-      //     triggerFunction: () => {},
-      //     setShowAlert: () => {
-      //       isError.setShowAlert(false);
-      //     },
-      //     showAlert: true,
-      //   });
-      // } finally {
-      //   setIsFullScreenLoading(false);
-      // }
+      const token = storage.getString("token");
+
+      try {
+        const res = await axios.post(
+          `${backendUrl}/fabricInquiry`,
+          formDataToSubmit,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (res) {
+          setIsError({
+            message: res.data.message || "Fabric Added Successfully",
+            heading: "Success",
+            isRight: true,
+            rightButtonText: "OK",
+            triggerFunction: () => {
+              navigate.goBack();
+            },
+            setShowAlert: () => {
+              isError.setShowAlert(false);
+            },
+            showAlert: true,
+          });
+           setEndUse("");
+           setSeason("");
+           setFabricType("");
+           setFiberComposition("");
+           setWeightMin("");
+           setWeightMax("");
+           setFinishPerformance("");
+           setPriceMin("");
+           setPriceMax("");
+           setExpectedOrderAmount("");
+           setNote("");
+           setSelectedImage(null);
+          setText("");
+        }
+      } catch (error) {
+        console.error("Error submitting the form:", error);
+        setIsError({
+          message: error || "An Unexpected error occurred",
+          heading: "Error",
+          isRight: false,
+          rightButtonText: "OK",
+          triggerFunction: () => {},
+          setShowAlert: () => {
+            isError.setShowAlert(false);
+          },
+          showAlert: true,
+        });
+        if (error.res) {
+          console.error("Response error:", error.res.data);
+          setIsError({
+            message: error.res.data || "An Unexpected error occurred",
+            heading: "Error",
+            isRight: false,
+            rightButtonText: "OK",
+            triggerFunction: () => {},
+            setShowAlert: () => {
+              isError.setShowAlert(false);
+            },
+            showAlert: true,
+          });
+        } else if (error.request) {
+          console.error("Request error:", error.request);
+          setIsError({
+            message: error.request || "An Unexpected error occurred",
+            heading: "Error",
+            isRight: false,
+            rightButtonText: "OK",
+            triggerFunction: () => {},
+            setShowAlert: () => {
+              isError.setShowAlert(false);
+            },
+            showAlert: true,
+          });
+        } else {
+          console.error("General error:", error.message);
+          setIsError({
+            message: error.message || "An Unexpected error occurred",
+            heading: "Error",
+            isRight: false,
+            rightButtonText: "OK",
+            triggerFunction: () => {},
+            setShowAlert: () => {
+              isError.setShowAlert(false);
+            },
+            showAlert: true,
+          });
+        }
+      } finally {
+        setIsFullScreenLoading(false);
+      }
     }
   };
   const renderForm = () => {
@@ -461,13 +545,19 @@ const NewInquiryScreen = () => {
             Please share any fabric/inspirational images that we can reference.
           </Text>
           <TouchableOpacity
-            style={styles.uploadImage}
+            style={[
+              styles.uploadImage,
+              errors.selectedImage && styles.errorInput,
+            ]}
             onPress={() => handleImageSelect()}
           >
             <Icon name="image" size={20} color={common.PRIMARY_COLOR} />
             <Text style={styles.uploadText}>Upload Image</Text>
           </TouchableOpacity>
         </View>
+        {errors.selectedImage && (
+          <Text style={styles.errorText}>{errors.selectedImage}</Text>
+        )}
         {selectedImage && (
           <View style={styles.imageViewContainer}>
             <View style={styles.imageContainer}>
@@ -476,7 +566,7 @@ const NewInquiryScreen = () => {
                 onPress={() => setSelectedImage(null)}
                 style={styles.closeButton}
               >
-                <Text style={styles.closeButtonText}>X</Text>
+                <Icon name="x" size={14} color="black" />
               </TouchableOpacity>
             </View>
             <View style={styles.imageDetailsContainer}>
@@ -561,7 +651,11 @@ const NewInquiryScreen = () => {
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
           <FiButton
-            style={styles.submitButton}
+            style={[
+              styles.submitButton,
+              !isCheckedConfirm ? { backgroundColor: "#ccc" } : null,
+            ]}
+            disabled={!isCheckedConfirm}
             title={"Submit Inquiry"}
             titleStyle={styles.buttonText}
             onPress={() => handleSubmit()}
@@ -753,6 +847,7 @@ const styles = StyleSheet.create({
     fontFamily: font.regular,
     fontSize: 16,
   },
+
   buttonContainer: {
     marginVertical: 20,
   },

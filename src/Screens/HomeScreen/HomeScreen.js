@@ -146,7 +146,6 @@ const HomeScreen = ({ navigation }) => {
       } else {
         url = `pim/sampleProduct`;
       }
-
       const response = await api.post(url, searchData);
 
       if (!response || !response.response) {

@@ -7,23 +7,24 @@ const api = axios.create({
   baseURL: backendUrl,
   timeout: 10000,
   headers: {
-    // "Content-Type": "application/json",
-    Accept: "application/json",
+    "Content-Type": "application/json",
+    Accept: ["application/json", "multipart/form-data"],
   },
 });
-
 api.interceptors.request.use(
   (config) => {
     const token = storage.getString("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
+
 
 api.interceptors.response.use(
   (response) => {

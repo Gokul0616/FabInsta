@@ -20,6 +20,7 @@ import AlertBox from "../../Common/AlertBox";
 const FabricInquiries = () => {
   const [data, setData] = useState([]);
   const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const navigate = useNavigation();
   const [isError, setIsError] = useState({
     message: "",
@@ -154,6 +155,8 @@ const FabricInquiries = () => {
         renderItem={renderRow}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.tableBody}
+        onRefresh={fetchData}
+        refreshing={refresh}
         decelerationRate={"fast"}
       />
     </SafeAreaView>
