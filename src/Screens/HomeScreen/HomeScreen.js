@@ -195,7 +195,9 @@ const HomeScreen = ({ navigation }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(0);
-    await fetchProducts(true);
+    setProductList([]);
+    await fetchProducts();
+
     setRefreshing(false);
   };
 
@@ -450,6 +452,8 @@ const HomeScreen = ({ navigation }) => {
               setPage((prev) => prev + 1);
             }
           }}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
           showsVerticalScrollIndicator={false}
           decelerationRate="fast"
         />

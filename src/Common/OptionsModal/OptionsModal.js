@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   optionItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   optionText: {
     marginLeft: 8,

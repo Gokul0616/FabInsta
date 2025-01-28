@@ -8,14 +8,14 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { font } from "../../Common/Theme";
-import api from "../../Service/api";
-import { FiButton } from "../../Common/FiButton";
-import { backendUrl, common } from "../../Common/Common";
+import { font } from "../../../Common/Theme";
+import api from "../../../Service/api";
+import { FiButton } from "../../../Common/FiButton";
+import { backendUrl, common } from "../../../Common/Common";
 import moment from "moment";
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
-import AlertBox from "../../Common/AlertBox";
+import AlertBox from "../../../Common/AlertBox";
 
 const FabricInquiries = () => {
   const [data, setData] = useState([]);

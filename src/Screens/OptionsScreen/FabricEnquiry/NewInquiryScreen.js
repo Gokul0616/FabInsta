@@ -11,17 +11,17 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { font } from "../../Common/Theme";
-import { FiInput } from "../../Common/FiInput";
+import { font } from "../../../Common/Theme";
+import { FiInput } from "../../../Common/FiInput";
 import Icon from "react-native-vector-icons/Feather";
-import { backendUrl, common, storage } from "../../Common/Common";
-import LargeTextBox from "../../Common/LargeTextBox";
+import { backendUrl, common, storage } from "../../../Common/Common";
+import LargeTextBox from "../../../Common/LargeTextBox";
 import { Checkbox } from "react-native-paper";
-import { FiButton } from "../../Common/FiButton";
-import FIDropdown from "../../Common/FIDropdown";
+import { FiButton } from "../../../Common/FiButton";
+import FIDropdown from "../../../Common/FIDropdown";
 import { launchImageLibrary } from "react-native-image-picker";
-import AlertBox from "../../Common/AlertBox";
-import api from "../../Service/api";
+import AlertBox from "../../../Common/AlertBox";
+import api from "../../../Service/api";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 const initialState = {
@@ -282,18 +282,18 @@ const NewInquiryScreen = () => {
             },
             showAlert: true,
           });
-           setEndUse("");
-           setSeason("");
-           setFabricType("");
-           setFiberComposition("");
-           setWeightMin("");
-           setWeightMax("");
-           setFinishPerformance("");
-           setPriceMin("");
-           setPriceMax("");
-           setExpectedOrderAmount("");
-           setNote("");
-           setSelectedImage(null);
+          setEndUse("");
+          setSeason("");
+          setFabricType("");
+          setFiberComposition("");
+          setWeightMin("");
+          setWeightMax("");
+          setFinishPerformance("");
+          setPriceMin("");
+          setPriceMax("");
+          setExpectedOrderAmount("");
+          setNote("");
+          setSelectedImage(null);
           setText("");
         }
       } catch (error) {

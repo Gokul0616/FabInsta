@@ -1,11 +1,11 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import MainProductPage from "../../Common/Product/MainProductPage";
-import FabricInqiries from "../OptionsScreen/FabricInqiries";
 import HomeScreen from "./HomeScreen";
-import FabricInquiryDetails from "../OptionsScreen/FabricInquiryDetails";
-import NewInquiryScreen from "../OptionsScreen/NewInquiryScreen";
+import FabricInqiries from "../OptionsScreen/FabricEnquiry/FabricInqiries";
+import FabricInquiryDetails from "../OptionsScreen/FabricEnquiry/FabricInquiryDetails";
+import NewInquiryScreen from "../OptionsScreen/FabricEnquiry/NewInquiryScreen";
+import Address from "../OptionsScreen/Address/address";
 
 const Stack = createStackNavigator();
 
@@ -36,6 +36,7 @@ const HomeTabLayout = () => {
       <Stack.Screen name="MainProductPage" component={MainProductPage} />
       <Stack.Screen name="FabricInqiries" component={FabricInqiries} />
       <Stack.Screen name="NewInquiryScreen" component={NewInquiryScreen} />
+      <Stack.Screen name="Address" component={Address} />
 
       <Stack.Screen
         name="FabricInquiryDetails"

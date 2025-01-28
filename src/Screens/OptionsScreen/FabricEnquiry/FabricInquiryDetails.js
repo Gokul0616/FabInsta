@@ -7,14 +7,13 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { font } from "../../Common/Theme";
-import { backendUrl, common } from "../../Common/Common";
+import { font } from "../../../Common/Theme";
+import { backendUrl, common } from "../../../Common/Common";
 import moment from "moment";
 
 const FabricInquiryDetails = ({ route }) => {
   const { item } = route.params;
   const imageUrl = backendUrl + item?.referenceImage?.replace("/api", "");
-  console.log(item);
   return (
     <ScrollView>
       <SafeAreaView style={styles.container}>

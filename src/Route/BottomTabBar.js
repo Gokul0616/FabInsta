@@ -76,14 +76,12 @@ function MyTabs() {
       order: 3,
       displayOrder: 1,
       label: "Addresses",
-      onPress: () => console.log("Option 2 selected"),
+      onPress: () =>
+        navigate.navigate("Tabs", {
+          screen: "Home",
+          params: { screen: "Address" },
+        }),
     },
-    // {
-    //   order: 3,
-    //   displayOrder: 2,
-    //   label: "Account",
-    //   onPress: () => navigate.navigate("Profile"),
-    // },
     {
       order: 4,
       displayOrder: 1,

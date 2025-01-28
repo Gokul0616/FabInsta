@@ -1,5 +1,6 @@
 import { TextInput } from "react-native-gesture-handler";
 import { common } from "./Common";
+import { StyleSheet } from "react-native";
 
 export const FiInput = ({
   style,
@@ -10,12 +11,12 @@ export const FiInput = ({
   keyboardType,
   ref,
   maxLength,
-  editable,
+  editable = true,
 }) => {
   return (
     <TextInput
       ref={ref}
-      style={style}
+      style={[styles.input, style, !editable && styles.disabled]}
       placeholder={placeholder}
       placeholderTextColor="#999"
       value={value}
@@ -28,3 +29,8 @@ export const FiInput = ({
     />
   );
 };
+const styles = StyleSheet.create({
+  disabled: {
+    backgroundColor: "#f0f0f0",
+  },
+});
