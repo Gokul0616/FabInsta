@@ -69,6 +69,16 @@ function MyTabs() {
         }),
     },
     {
+      order: 1,
+      displayOrder: 6,
+      label: "Checkout",
+      onPress: () =>
+        navigate.navigate("Tabs", {
+          screen: "Home",
+          params: { screen: "Checkout" },
+        }),
+    },
+    {
       order: 2,
       displayOrder: 1,
       label: "Fabric Orders",

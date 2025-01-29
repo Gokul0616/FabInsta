@@ -9,7 +9,15 @@ import {
 import Icon from "react-native-vector-icons/Feather";
 import { font } from "./Theme";
 
-const FIDropdown = ({ values, onSelect, style }) => {
+const FIDropdown = ({
+  dropdownTextStyle,
+  values,
+  onSelect,
+  style,
+  defaultValue,
+  optionsTextStyle,
+  dropdownListContainer,
+}) => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
 
@@ -25,14 +33,14 @@ const FIDropdown = ({ values, onSelect, style }) => {
         onPress={() => setIsVisible(!isVisible)}
         style={[styles.dropdownButton, style]}
       >
-        <Text style={styles.dropdownText}>
-          {selectedValue || "Select an option"}
+        <Text style={[dropdownTextStyle || styles.dropdownText]}>
+          {selectedValue || defaultValue || "Select an option"}
         </Text>
         <Icon name="chevron-down" size={20} color="#000" />
       </TouchableOpacity>
 
       {isVisible && (
-        <View style={styles.dropdownListContainer}>
+        <View style={[dropdownListContainer, styles.dropdownListContainer]}>
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.scrollViewContent}
@@ -44,7 +52,9 @@ const FIDropdown = ({ values, onSelect, style }) => {
                 onPress={() => handleSelect(item)}
                 style={styles.option}
               >
-                <Text style={styles.optionText}>{item}</Text>
+                <Text style={[optionsTextStyle || styles.optionText]}>
+                  {item}
+                </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>

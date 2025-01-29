@@ -356,7 +356,14 @@ const CartDetails = () => {
   };
 
   const handleProceed = (amount) => {
-    navigation.navigate('shipping', { params: { cartItem: getStateValue("toShippingTab"), priceSlab: getStateValue("price"), combo: comboCart, amount: credit } })
+    navigation.navigate("Checkout", {
+      params: {
+        cartItem: getStateValue("toShippingTab"),
+        priceSlab: getStateValue("price"),
+        combo: comboCart,
+        amount: amount,
+      },
+    });
   }
 
   const getStateValue = (key) => {

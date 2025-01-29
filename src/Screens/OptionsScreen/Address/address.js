@@ -275,7 +275,7 @@ const Address = () => {
   };
   const renderEditModal = () => {
     return (
-      <KeyboardAvoidingView behavior="padding">
+      <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={100}>
         <Modal
           visible={isEditModalVisible}
           transparent
@@ -550,8 +550,8 @@ const Address = () => {
                       placeholder="Contact Email"
                     />
                   </>
-                  {errors.mobileNo && (
-                    <Text style={styles.errorText}>{errors.mobileNo}</Text>
+                  {errors.email && (
+                    <Text style={styles.errorText}>{errors.email}</Text>
                   )}
                 </View>
                 <View style={{ marginBottom: 10 }}>
@@ -740,6 +740,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8F8",
     paddingHorizontal: 16,
     paddingVertical: 50,
+    flexGrow: 1,
   },
   innerContainer: {
     gap: 16,
