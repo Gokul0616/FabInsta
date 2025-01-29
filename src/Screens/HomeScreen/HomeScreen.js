@@ -1,32 +1,29 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  SafeAreaView,
-  StyleSheet,
-  FlatList,
+  ActivityIndicator,
   Animated,
-  View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
-  Modal,
+  View
 } from "react-native";
-import MiniProduct from "../../Common/Product/MiniProduct";
-import Header from "../Header";
-import { common, storage } from "../../Common/Common";
 import Icon from "react-native-vector-icons/Feather";
-import api from "../../Service/api";
-import { font } from "../../Common/Theme";
-import SearchModal from "./SearchModal";
-import SortingDropdown from "./SortingDropdown";
+import AlertBox from "../../Common/AlertBox";
+import { common, storage } from "../../Common/Common";
 import {
   extractNames,
   findKeyAndId,
   formateData,
 } from "../../Common/FilterData";
-import { ScrollView } from "react-native";
-import AlertBox from "../../Common/AlertBox";
 import OptionsModal from "../../Common/OptionsModal/OptionsModal";
-import { CommonActions, useNavigation } from "@react-navigation/native";
+import { font } from "../../Common/Theme";
+import MainProductPage from "../../components/product/MainProductPage";
+import api from "../../Service/api";
+import SearchModal from "./SearchModal";
+import SortingDropdown from "./SortingDropdown";
 
 const HomeScreen = ({ navigation }) => {
   const navigate = useNavigation();
@@ -220,7 +217,7 @@ const HomeScreen = ({ navigation }) => {
 
   const renderProduct = ({ item }) => (
     <View style={styles.itemContainer}>
-      <MiniProduct product={item} navigation={navigation} />
+      <MainProductPage product={item} navigation={navigation} />
     </View>
   );
 

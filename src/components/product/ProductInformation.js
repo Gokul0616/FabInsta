@@ -2,19 +2,17 @@ import _ from 'lodash';
 import React, { useState } from 'react';
 import { ActivityIndicator, Dimensions, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import Carousel from 'react-native-reanimated-carousel';
+import SwiperFlatList from 'react-native-swiper-flatlist';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { common } from '../../Common/Common';
 import { font } from '../../Common/Theme';
+const width = Dimensions.get("window").width;
 
 const ProductInformation = ({ pimData, loading, media, cartOptions, selectedValue }) => {
-    const width = Dimensions.get("window").width;
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const progress = useSharedValue(0);
+    const [currentIndex, setCurrentIndex] = React.useState(0);
 
-    const handleProgressChange = (_, absoluteProgress) => {
-        progress.value = absoluteProgress;
-        setCurrentIndex(Math.round(absoluteProgress));
+    const handleProgressChange = (index) => {
+        setCurrentIndex(index);
     };
 
     return (
@@ -26,33 +24,35 @@ const ProductInformation = ({ pimData, loading, media, cartOptions, selectedValu
                     </View>
                 ) : (
                     <View style={{ flex: 1 }}>
-                        <Carousel
+                        <SwiperFlatList
                             width={width}
                             height={220}
+                            autoplay={true}
+                            autoplayDelay={3}
+                            autoplayLoop={true}
+                            onChangeIndex={(index) => handleProgressChange(index.index)}
                             data={media}
-                            loop={true}
-                            autoPlay={true}
-                            autoPlayInterval={3000}
-                            onProgressChange={handleProgressChange}
-                            renderItem={({ item, index }) => (
-                                <View key={index} style={styles.customSlide}>
-                                    {item.type === 'image' ? (
-                                        <Image
-                                            source={{ uri: item.src }}
-                                            style={styles.customImage}
-                                            resizeMode="cover"
-                                        />
-                                    ) : (
-                                        <Video
-                                            source={{ uri: item.src }}
-                                            poster={item.poster}
-                                            style={styles.customImage}
-                                            resizeMode="contain"
-                                            controls
-                                        />
-                                    )}
-                                </View>
-                            )}
+                            renderItem={({ item, index }) => {
+                                return (
+                                    <View key={index} style={styles.customSlide}>
+                                        {item.type === 'image' ? (
+                                            <Image
+                                                source={{ uri: item.src }}
+                                                style={styles.customImage}
+                                                resizeMode="cover"
+                                            />
+                                        ) : (
+                                            <Video
+                                                source={{ uri: item.src }}
+                                                poster={item.poster}
+                                                style={styles.customImage}
+                                                resizeMode="contain"
+                                                controls
+                                            />
+                                        )}
+                                    </View>
+                                );
+                            }}
                         />
                         {/* Dot-based Pagination */}
                         <View style={styles.paginationContainer}>
@@ -164,7 +164,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#f9f9f9",
         borderRadius: 10,
         overflow: "hidden",
-        margin: 5,
+        width: width,
+        marginTop: 5,
     },
     customImage: {
         width: "100%",

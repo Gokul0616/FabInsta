@@ -1,9 +1,11 @@
+import { useNavigation } from '@react-navigation/native';
 import _ from 'lodash';
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const ProductSpecification = ({ pimData, categories, fabricCodes, priceSlab }) => {
   const [solidPatternVariant, setSolidPatternVariant] = useState(null);
+  const navigation = useNavigation();
 
   const DisplayHierarchy = () => {
     return (
@@ -33,26 +35,26 @@ const ProductSpecification = ({ pimData, categories, fabricCodes, priceSlab }) =
   };
 
   const handleScubaClick = (category) => {
-    for (const [key, value] of Object.entries(product?.attributes || {})) {
+    for (const [key, value] of Object.entries(pimData?.attributes || {})) {
       const stateValue = { [key]: [value] }
       if (key === "Fabric Type") {
-        navigate(`/fabrics?FabricType=${category.name}`, { state: stateValue });
+        const queryString = `fabrics?FabricType=${category.name}`;
+        // navigation.navigate(queryString);
       }
     }
   };
 
   const handleFabricFilterClick = (fabric, categoryId) => {
-    // const name = fabricName.replace(' ', '_');
-    // const res = api.get(`product-category/category/${fabricCategoryId}`);
-    // const fabricObject = {
-    //   ...res.response,
-    //   name: `${name} (0-100)%`,
-    //   min: "0",
-    //   max: "100",
-    //   value: `${fabricCategoryId}(0-100)`
-    // };
-    // navigate(`/fabrics?FabricContent=${name}`, { state: { "Fabric Content": [fabricObject] } });
-    console.log('Fabric filter clicked:', fabric, categoryId);
+    const name = fabricName.replace(' ', '_');
+    const res = api.get(`product-category/category/${fabricCategoryId}`);
+    const fabricObject = {
+      ...res.response,
+      name: `${name} (0-100)%`,
+      min: "0",
+      max: "100",
+      value: `${fabricCategoryId}(0-100)`
+    };
+    // navigation.navigate(`fabrics?FabricContent=${name}`, { state: { "Fabric Content": [fabricObject] } });
   };
 
   useEffect(() => {
@@ -128,8 +130,6 @@ const ProductSpecification = ({ pimData, categories, fabricCodes, priceSlab }) =
                 const CategoryId = code.replace(')', '');
                 const percentage = Math.round((value / Object.values(fabricCodes).reduce((sum, v) => sum + v, 0)) * 100);
                 const fabricWithPercentage = `${fabric.trim()} ${percentage}%`;
-                console.log('fab : ', fabricWithPercentage);
-
                 return (
                   <View key={fabric} style={styles.fabricValueList}>
                     <TouchableOpacity onPress={() => handleFabricFilterClick(fabric.trim(), CategoryId)}>

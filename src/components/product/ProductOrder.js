@@ -6,6 +6,7 @@ import { font } from '../../Common/Theme';
 import api from '../../Service/api';
 import { Checkbox } from 'react-native-paper';
 import { storage } from '../../Common/Common';
+import { useNavigation } from '@react-navigation/native';
 
 const ProductOrder = ({
   pimData, colorOption, cartOptions, selectedValue, setSelectedValue,
@@ -17,6 +18,7 @@ const ProductOrder = ({
   const buttonRef = useRef(null);
   const [selectedLabel, setSelectedLabel] = useState();
   const [selectedCode, setSelectedCode] = useState();
+  const navigation = useNavigation();
 
   const onSelect = useCallback((item) => {
     setSelectedLabel(item.label);
@@ -27,7 +29,15 @@ const ProductOrder = ({
     setSelectedSku(skuCode)
     setExpanded(false);
   }, []);
-  
+
+
+  useEffect(() => {
+    if (selectedValue) {
+      const foundColor = colorOption.find(color => color.id === selectedValue);
+      setSelectedLabel(foundColor?.label);
+      setSelectedCode(foundColor?.code);
+    }
+  }, [selectedValue])
 
   // Add to cart function
   const handleAddToCart = async () => {
@@ -51,7 +61,7 @@ const ProductOrder = ({
         })
       }
       reloadHeader()
-      return navigate('/cart', { state: { cartType: cart?.cartType } });
+      return navigation.navigate('Cart', { params: { cartType: cart?.cartType } });
     }
     else {
       setModalMessage('You are not approved yet. Please Contact your Sales Manager');
@@ -148,7 +158,7 @@ const ProductOrder = ({
           />
         ) :
           <Button
-          color='#ff6f61'
+            color='#ff6f61'
             onPress={handleAddToCart}
             disabled={(combo?.includes(selectedSku) && (isAnyComboTrue)) || (minimumOrder < cartOptions[selectedValue]?.Wholesale && sampleCheck) || minimumOrder < cartOptions[selectedValue]?.SampleMin || !selectedValue || (!backOrder && minimumOrder > totalQuantity) || (combo?.includes(selectedSku) && minimumOrder < cartOptions[selectedValue]?.Wholesale)}
             title={

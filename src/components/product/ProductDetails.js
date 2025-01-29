@@ -13,10 +13,7 @@ export const CreateProduct = createContext();
 const ProductDetails = ({ route }) => {
     const navigation = useNavigation();
     const { pimId } = route.params;
-    const routes = useRoute();
-    const { search } = routes.params || {};
-    const queryParams = search ? JSON.parse(decodeURIComponent(search)) : {};
-    const variantId = queryParams.variantId;
+    const variantId = route.params.variantId;
     const [loading, setLoading] = useState(true);
     const [pim, setPim] = useState({});
     const [mainContent, setMainContent] = useState(null);
@@ -171,7 +168,7 @@ const ProductDetails = ({ route }) => {
             const { sampleMoq, wholesaleMoq } = moqs?.response || {};
             return { sampleMoq, wholesaleMoq };
         } catch (error) {
-            console.log("error");
+            console.error("error");
             return {};
         }
     };

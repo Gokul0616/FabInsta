@@ -1,16 +1,14 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../Screens/HomeScreen/HomeScreen";
-import ProfileScreen from "../Screens/ProfileScreen";
-import Icon from "react-native-vector-icons/Feather";
-import CartScreen from "../Screens/CartScreen";
-import Header from "../Screens/Header";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import { useRef, useState } from "react";
 import { Animated } from "react-native";
-import HomeTabLayout from "../Screens/HomeScreen/HomeTabLayout";
-import OptionsModal from "../Common/OptionsModal/OptionsModal";
+import Icon from "react-native-vector-icons/Feather";
 import { common, storage } from "../Common/Common";
-import { CommonActions, useNavigation } from "@react-navigation/native";
-import { Text } from "react-native-paper";
+import OptionsModal from "../Common/OptionsModal/OptionsModal";
+import CartDetails from "../components/cart/CartDetails";
+import Header from "../Screens/Header";
+import HomeTabLayout from "../Screens/HomeScreen/HomeTabLayout";
+import ProfileScreen from "../Screens/ProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -64,7 +62,11 @@ function MyTabs() {
       order: 1,
       displayOrder: 5,
       label: "WishList",
-      onPress: () => console.log("Option 2 selected"),
+      onPress: () =>
+        navigate.navigate("Tabs", {
+          screen: "Home",
+          params: { screen: "wishList-Details" },
+        }),
     },
     {
       order: 2,
@@ -125,7 +127,7 @@ function MyTabs() {
         initialRouteName="Home"
       >
         <Tab.Screen name="Home" component={HomeTabLayout} />
-        <Tab.Screen name="Cart" component={CartScreen} />
+        <Tab.Screen name="Cart" component={CartDetails} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </>
