@@ -10,6 +10,7 @@ import CartProductSelect from './CartProductSelect';
 import CartVariant from './CartVariant';
 import ComboCartVariant from './ComboCartVariant';
 import ProceedCart from './ProceedCart';
+import { common } from '../../Common/Common';
 
 
 const CartDetails = () => {
@@ -355,8 +356,10 @@ const CartDetails = () => {
     return updatedItems;
   };
 
-  const handleProceed = (amount) => {
-    navigation.navigate("Checkout", {
+  const handleProceed = (event, amount) => {
+    // event.persist();
+    navigation.navigate("Cart", {
+      screen:'checkout',
       params: {
         cartItem: getStateValue("toShippingTab"),
         priceSlab: getStateValue("price"),
@@ -636,6 +639,7 @@ const CartDetails = () => {
                 status={selectAll ? "checked" : "unchecked"}
                 onPress={() => handleSelectAllChange()}
                 disabled={disableSelectAll}
+                color={common.PRIMARY_COLOR}
               />
               <Text style={styles.selectAllLabel}>Select All</Text>
             </TouchableOpacity>

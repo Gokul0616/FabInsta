@@ -9,6 +9,7 @@ import CartDetails from "../components/cart/CartDetails";
 import Header from "../Screens/Header";
 import HomeTabLayout from "../Screens/HomeScreen/HomeTabLayout";
 import ProfileScreen from "../Screens/ProfileScreen";
+import CartTabLayout from "../components/layout/CartTabLayout";
 
 const Tab = createBottomTabNavigator();
 
@@ -66,16 +67,6 @@ function MyTabs() {
         navigate.navigate("Tabs", {
           screen: "Home",
           params: { screen: "wishList-Details" },
-        }),
-    },
-    {
-      order: 1,
-      displayOrder: 6,
-      label: "Checkout",
-      onPress: () =>
-        navigate.navigate("Tabs", {
-          screen: "Home",
-          params: { screen: "Checkout" },
         }),
     },
     {
@@ -137,7 +128,7 @@ function MyTabs() {
         initialRouteName="Home"
       >
         <Tab.Screen name="Home" component={HomeTabLayout} />
-        <Tab.Screen name="Cart" component={CartDetails} />
+        <Tab.Screen name="Cart" component={CartTabLayout} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </>

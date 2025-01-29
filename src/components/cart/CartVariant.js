@@ -3,7 +3,7 @@ import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { backendUrl } from '../../Common/Common';
+import { backendUrl, common } from '../../Common/Common';
 
 const CartVariant = (
     { items, handleIndividualChange, handleEdit, removeOneCartItems, activeIndex,
@@ -43,6 +43,7 @@ const CartVariant = (
                                 }
                                 onPress={() => handleIndividualChange(item)}
                                 disabled={item.published === "false" || (item.outOfStock && !item.backOrder) || item?.comboVariants?.includes(item?.variantSku)}
+                                color={common.PRIMARY_COLOR}
                             />
                         )}
                         <View style={styles.cartProductInfo}>

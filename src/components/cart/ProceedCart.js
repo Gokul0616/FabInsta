@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Button, Checkbox } from 'react-native-paper';
 import _ from 'lodash';
+import { common } from '../../Common/Common';
 
 const ProceedCart = ({
     sampleCart, wholesaleCart, sampleSelected, wholesaleSelected, isToggled, handleToggle,
@@ -47,13 +48,14 @@ const ProceedCart = ({
                 <Checkbox
                     status={selectCheckBox ? 'checked' : 'unChecked'}
                     onPress={() => setSelectCheckBox(prev => !prev)}
+                    color={common.PRIMARY_COLOR}
                 />
                 <Text style={styles.checkboxText}>Ordered kg and Actual kg may varies, Click here to Proceed Cart.</Text>
             </View>
             {selectCheckBox &&
-                <Button style={styles.proceedBtn} disabled={getStateValue("cartItem") < 1} onPress={handleProceed}>
+                <TouchableOpacity style={styles.proceedBtn} disabled={getStateValue("cartItem") < 1} onPress={handleProceed}>
                     <Text style={styles.proceedBtnText}>Proceed to cart</Text>
-                </Button>}
+                </TouchableOpacity>}
         </View>
     )
 }

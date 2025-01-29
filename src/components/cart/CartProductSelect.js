@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Checkbox } from 'react-native-paper';
+import { common } from '../../Common/Common';
 
 const CartProductSelect = (
     { items, selectedStatus, handleComboTotalChange, handleTotalChange, comboCart,
@@ -16,6 +17,7 @@ const CartProductSelect = (
                     status={(comboCart) ? (comboSelected?.some(selectedItem => selectedItem.combo.id === items.combo.id) ? 'checked' : 'unChecked') : (selectedStatus(items) ? 'checked' : 'unChecked')}
                     onPress={() => (comboCart) ? handleComboTotalChange(items) : handleTotalChange(items)}
                     disabled={!comboCart ? items.every(item => item.published === "false" || (!item.backOrder && item.outOfStock) || (item?.comboVariants?.includes(item.variantSku))) : !(items.variants.length > 0)}
+                    color={common.PRIMARY_COLOR}
                 />
                 <TouchableOpacity
                     onPress={() => {

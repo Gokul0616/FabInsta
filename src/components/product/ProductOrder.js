@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/AntDesign";
 import { font } from '../../Common/Theme';
 import api from '../../Service/api';
 import { Checkbox } from 'react-native-paper';
-import { storage } from '../../Common/Common';
+import { common, storage } from '../../Common/Common';
 import { useNavigation } from '@react-navigation/native';
 
 const ProductOrder = ({
@@ -130,7 +130,7 @@ const ProductOrder = ({
           <Text>Order by Roll </Text>
           <View>
             <View>
-              <Checkbox checked={sampleCheck} onPress={() => handleSampleCheck()} />
+              <Checkbox color={common.PRIMARY_COLOR} checked={sampleCheck} onPress={() => handleSampleCheck()} />
               {<Text style={{ color: 'grey' }}>For WholeSale Order Only</Text>}
             </View>
           </View>
