@@ -4,6 +4,7 @@ import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import Icon from "react-native-vector-icons/AntDesign";
 import { backendUrl, storage } from "../../Common/Common";
 import api from "../../Service/api";
+import { font } from '../../Common/Theme';
 
 const ProductStandardColor = ({ pimData, colorOption }) => {
     const [pimVariantIds, setPimVariantIds] = useState([]);
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     },
     stdColorHeader: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: font.bold,
         marginBottom: 10,
     },
     colorOptionContainer: {
@@ -114,11 +115,11 @@ const styles = StyleSheet.create({
     colorText: {
         fontSize: 14,
         color: '#1c2740',
-        fontWeight: 600,
+        fontFamily: font.semiBold,
     },
     colorCode: {
         fontSize: 14,
         color: '#545f6e',
-        fontWeight: 600,
+        fontFamily: font.bold,
     },
 });

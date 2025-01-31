@@ -1,7 +1,7 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { Alert, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button, Checkbox } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -11,6 +11,8 @@ import CartVariant from './CartVariant';
 import ComboCartVariant from './ComboCartVariant';
 import ProceedCart from './ProceedCart';
 import { common } from '../../Common/Common';
+import { font } from '../../Common/Theme';
+import EditCart from './EditCart';
 
 
 const CartDetails = () => {
@@ -35,16 +37,29 @@ const CartDetails = () => {
   const [sampleMoq, setSampleMoq] = useState();
   const [wholesaleMoq, setWholesaleMoq] = useState();
   const [price, setPrice] = useState([]);
+  const [credit, setCredit] = useState(0)
   const navigation = useNavigation();
   const route = useRoute();
+  const [editOpenModal, setEditOpenModal] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (route?.params?.cartType) {
       const type = route.params.cartType
       setActiveIndex(type?.toLowerCase())
     }
-    fetchCarts()
+    fetchCarts();
+    fetchCustomer();
   }, [route]);
+
+  // useEffect(()=>{})
+
+  const fetchCustomer = async () => {
+    const res = await api.get(`customer/swatchPoint`);
+    setCredit(res.response)
+
+  }
 
   const fetchCarts = async (recalculate = false, editItem) => {
     try {
@@ -356,15 +371,14 @@ const CartDetails = () => {
     return updatedItems;
   };
 
-  const handleProceed = (event, amount) => {
-    // event.persist();
+  const handleProceed = () => {
     navigation.navigate("Cart", {
-      screen:'checkout',
+      screen: 'checkout',
       params: {
         cartItem: getStateValue("toShippingTab"),
         priceSlab: getStateValue("price"),
         combo: comboCart,
-        amount: amount,
+        amount: credit,
       },
     });
   }
@@ -466,7 +480,7 @@ const CartDetails = () => {
         return;
     }
     try {
-      await B2B_API.post('cart/save', { json: editItem });
+      await api.post('/cart/save', editItem);
       setError('');
       setEditOpenModal(false);
       fetchCarts(true, editItem);
@@ -482,8 +496,14 @@ const CartDetails = () => {
 
   const handleEdit = (item) => {
     setError('')
+    setEditOpenModal(true)
     setEditItem(item);
   }
+
+  const cancelRemove = () => {
+    setEditOpenModal(false)
+    setSelectedItem(null);
+  };
 
   const removeAllCartItems = (item) => {
     setSelectedItem(item);
@@ -700,7 +720,9 @@ const CartDetails = () => {
                         <View style={styles.cartEmpty}>
                           <FeatherIcon name="shopping-cart" size={50} color="#000" />
                           <Text style={styles.cartEmptyText}>Cart is empty</Text>
-                          <Button textColor='white' style={styles.cartEmptyBtn} onPress={() => navigation.navigate('Home', { screen: 'HomeScreen' })}>Start adding products</Button>
+                          <TouchableOpacity textColor='white' style={styles.cartEmptyBtn} onPress={() => navigation.navigate('Home', { screen: 'HomeScreen' })}>
+                            <Text style={styles.cartBtnText}>Start adding products</Text>
+                          </TouchableOpacity>
                         </View>
                     }
                   </View>
@@ -724,6 +746,26 @@ const CartDetails = () => {
             </View>
           </ScrollView>
         </View>
+        <Modal
+          visible={editOpenModal}
+          transparent
+          animationType="slide"
+          style={{
+            flex: 1,
+            maxHeight: "80%",
+          }}
+        >
+          <EditCart
+            editItem={editItem}
+            sampleMoq={sampleMoq}
+            setEditItem={setEditItem}
+            setError={setError}
+            wholesaleMoq={wholesaleMoq}
+            handleEditSave={handleEditSave}
+            cancelRemove={cancelRemove}
+            error={error}
+          />
+        </Modal>
       </View>
     </SafeAreaView>
   );
@@ -747,7 +789,7 @@ const styles = StyleSheet.create({
   },
   cartHeader: {
     fontSize: 26,
-    fontWeight: 'bold',
+    fontFamily: font.bold,
     marginVertical: 10,
   },
 
@@ -780,10 +822,11 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 10,
-    fontWeight: 'bold',
+    fontFamily: font.bold,
   },
   badgeCount: {
     fontSize: 10,
+    fontFamily: font.semiBold,
   },
   selectedTab: {
     flex: 1,
@@ -829,10 +872,12 @@ const styles = StyleSheet.create({
   },
   selectAllLabel: {
     fontSize: 12,
+    fontFamily: font.medium,
   },
 
   cartEmpty: {
     paddingVertical: 40,
+    marginTop: 50,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
@@ -840,15 +885,19 @@ const styles = StyleSheet.create({
   },
   cartEmptyText: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: font.bold,
   },
   cartEmptyBtn: {
-    padding: 5,
+    padding: 15,
     borderWidth: 1,
     borderRadius: 5,
+    borderColor: '#ff6f61',
     backgroundColor: '#ff6f61',
   },
-
+  cartBtnText: {
+    fontFamily: font.bold,
+    color: 'white',
+  },
   CartDetailsScroll: {
     flexDirection: 'column',
     gap: 50,

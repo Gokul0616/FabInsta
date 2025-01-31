@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import _ from 'lodash';
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { font } from '../../Common/Theme';
 
 const ProductSpecification = ({ pimData, categories, fabricCodes, priceSlab }) => {
   const [solidPatternVariant, setSolidPatternVariant] = useState(null);
@@ -217,14 +218,14 @@ const styles = StyleSheet.create({
   },
   specsHeader: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: font.bold,
   },
   specsRow: {
     marginTop: 10,
   },
   specsLabel: {
     fontSize: 17,
-    fontWeight: 'bold',
+    fontFamily: font.semiBold,
     marginBottom: 10,
   },
   specsValue: {
@@ -244,14 +245,17 @@ const styles = StyleSheet.create({
     textDecorationStyle: 'solid',
     color: "#596E85",
     fontSize: 15,
+    fontFamily: font.medium,
   },
   fabricText: {
     fontSize: 15,
     color: '#000',
+    fontFamily: font.medium,
   },
   separator: {
     marginHorizontal: 4,
     fontSize: 15,
+    fontFamily: font.medium,
   },
   horizontalLine: {
     height: 1,
@@ -261,7 +265,8 @@ const styles = StyleSheet.create({
   fiberText: {
     fontSize: 15,
     color: '#545f6e',
-    fontWeight: 'bold',
+    fontFamily: font.bold,
+    lineHeight: 25,
   },
   specsDimensionValue: {
     flexDirection: 'row',
@@ -270,9 +275,10 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   dimensionLabel: {
+    lineHeight: 35,
     color: '#788191',
     fontSize: 15,
-    fontWeight: 600,
+    fontFamily: font.semiBold,
   },
 
 
@@ -302,17 +308,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   headerText: {
-    fontWeight: 'bold',
+    fontFamily: font.bold,
   },
   tableText: {
     textAlign: 'center',
   },
   smallText: {
     fontSize: 10,
+    fontFamily: font.medium,
     color: '#777',
-  },
-  currency: {
-    fontWeight: 'bold',
-    color: '#333',
   },
 });

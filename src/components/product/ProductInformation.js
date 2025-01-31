@@ -54,7 +54,6 @@ const ProductInformation = ({ pimData, loading, media, cartOptions, selectedValu
                                 );
                             }}
                         />
-                        {/* Dot-based Pagination */}
                         <View style={styles.paginationContainer}>
                             {media.map((_, index) => (
                                 <View
@@ -96,7 +95,7 @@ const ProductInformation = ({ pimData, loading, media, cartOptions, selectedValu
                             {pimData?.product?.metrics?.weight}gsm
                         </Text>
                     )}
-                    {pimData?.pimVariants?.length && (
+                    {pimData?.pimVariants?.length > 0 && (
                         <Text style={styles.seeSpecsMap}>
                             {pimData?.pimVariants?.length} colors
                         </Text>
@@ -113,11 +112,11 @@ const ProductInformation = ({ pimData, loading, media, cartOptions, selectedValu
                     <Text style={styles.otherDetailsHeader}>Pricing</Text>
                     <Text style={styles.seeSpecsPricing}>
                         {pimData?.minPrice ? (
-                            <Text>
+                            <Text style={styles.seeSpecsPricingValue}>
                                 <Icon name="currency-inr" size={15} color="#000" /> {_.round(pimData?.minPrice, 2)} - <Icon name="currency-inr" size={15} color="#000" /> {_.round(pimData?.maxPrice, 2)} /kg
                             </Text>
                         ) : (
-                            <Text><Icon name="currency-inr" size={15} color="#000" /> {pimData?.product?.priceSetting?.sellingPrice} /kg</Text>
+                            <Text style={styles.seeSpecsPricingValue}><Icon name="currency-inr" size={15} color="#000" /> {pimData?.product?.priceSetting?.sellingPrice} /kg</Text>
                         )}
                     </Text>
                 </View>
@@ -195,13 +194,13 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
     },
     articleCodeText: {
-        fontSize: 20,
+        fontSize: 24,
         fontFamily: font.bold,
         paddingVertical: 5,
     },
     articleNameText: {
         paddingVertical: 5,
-        fontSize: 18,
+        fontSize: 20,
         fontFamily: font.bold,
     },
     seeSpecMapContainer: {
@@ -232,7 +231,7 @@ const styles = StyleSheet.create({
     },
     otherDetailsHeader: {
         fontSize: 16,
-        fontFamily: font.medium,
+        fontFamily: font.semiBold,
         color: "grey",
         width: 100,
     },
@@ -243,6 +242,9 @@ const styles = StyleSheet.create({
     seeSpecsPricing: {
         fontSize: 15,
         fontFamily: font.regular,
+    },
+    seeSpecsPricingValue:{
+        fontFamily: font.semiBold,
     },
     moqContainer: {
         width: 200,
@@ -255,10 +257,13 @@ const styles = StyleSheet.create({
     moqLabel: {
         width: '50%',
         fontSize: 15,
+        fontFamily: font.medium,
+        color: "#596E85",
     },
     moqValue: {
         width: '50%',
         fontSize: 15,
         textAlign: 'right',
+        fontFamily: font.semiBold,
     },
 });

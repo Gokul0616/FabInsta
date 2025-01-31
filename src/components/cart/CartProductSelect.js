@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import { common } from '../../Common/Common';
+import { font } from '../../Common/Theme';
 
 const CartProductSelect = (
     { items, selectedStatus, handleComboTotalChange, handleTotalChange, comboCart,
@@ -71,6 +72,7 @@ const styles = StyleSheet.create({
     articleCode: {
         textDecorationLine: 'underline',
         fontSize: 16,
+        fontFamily: font.bold,
     },
     cartProductDetails: {
         flexDirection: 'row',
@@ -86,9 +88,11 @@ const styles = StyleSheet.create({
     },
     productQuantityText: {
         fontSize: 12,
+        fontFamily: font.medium,
     },
     removeAll: {
         fontSize: 16,
+        fontFamily: font.semiBold,
         textDecorationLine: 'underline'
     },
     unavailableText: {

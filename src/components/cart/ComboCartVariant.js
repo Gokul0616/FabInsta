@@ -3,6 +3,7 @@ import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { backendUrl } from '../../Common/Common';
 import { useNavigation } from '@react-navigation/native';
+import { font } from '../../Common/Theme';
 
 const ComboCartVariant = ({ items }) => {
   const navigation = useNavigation();
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   },
   variantCode: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: font.bold,
     textDecorationLine: 'underline',
   },
   variantSampleText: {
@@ -89,10 +90,11 @@ const styles = StyleSheet.create({
     color: '#c67f06',
     width: 70,
     textAlign: 'center',
-    fontWeight: '600',
+    fontFamily: font.semiBold,
   },
   variantText: {
-    fontSize: 14
+    fontSize: 14,
+    fontFamily: font.medium,
   },
   comboCartPriceWieghtInfo: {
     width: '100%',
@@ -109,9 +111,11 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 12,
+    fontFamily: font.regular,
   },
   textLeft: {
     fontSize: 12,
+    fontFamily: font.regular,
     width: '35%',
     textAlign: 'left',
   },
@@ -120,11 +124,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 20,
     marginBottom: 10,
-  },
-  comboCartItemBtnText: {
-    textAlign: 'center',
-    fontSize: 15,
-    textDecorationLine: 'underline',
-    paddingHorizontal: 8,
   },
 })

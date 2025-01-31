@@ -1,36 +1,31 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { createContext, useEffect, useRef, useState } from 'react'
-import { SafeAreaView, ScrollView, View } from 'react-native'
-import ProductInformation from './ProductInformation';
-import api from '../../Service/api';
-import { backendUrl } from '../../Common/Common';
-import ProductOrder from './ProductOrder';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import _ from 'lodash';
+import React, { createContext, useEffect, useRef, useState } from 'react';
+import { SafeAreaView, ScrollView } from 'react-native';
+import { backendUrl, storage } from '../../Common/Common';
+import api from '../../Service/api';
+import ProductInformation from './ProductInformation';
+import ProductOrder from './ProductOrder';
 import ProductSpecification from './ProductSpecification';
 import ProductStandardColor from './ProductStandardColor';
 
 export const CreateProduct = createContext();
 const ProductDetails = ({ route }) => {
     const navigation = useNavigation();
+    const [pim, setPim] = useState({});
     const { pimId } = route.params;
     const variantId = route.params.variantId;
     const [loading, setLoading] = useState(true);
-    const [pim, setPim] = useState({});
-    const [mainContent, setMainContent] = useState(null);
-    const [isOpenModal, setIsOpenModal] = useState(false);
     const [profile, setProfile] = useState({});
-    const [modalMessage, setModalMessage] = useState('');
     const [selectedValue, setSelectedValue] = useState(null);
     const [media, setMedia] = useState([]);
     const [categories, setCategories] = useState([]);
     const [colorOption, setColorOption] = useState([]);
-    const [page, setPage] = useState(0);
     const [similarProduct, setSimilarProduct] = useState([]);
     const [totalPage, setTotalPage] = useState(0);
-    const [similarProductSlide, setSimilarProductSlide] = useState([]);
-    const [minimumOrderRequired, setMinimumOrderRequired] = useState('');
-    const [minimumOrder, setMinimumOrder] = useState();
-    const [pimVariantIds, setPimVariantIds] = useState([]);
+    // const [similarProductSlide, setSimilarProductSlide] = useState([]);
+    // const [minimumOrderRequired, setMinimumOrderRequired] = useState('');
+    const [minimumOrder, setMinimumOrder] = useState(0);
     const [cart, setCart] = useState({});
     const [cartOptions, setCartOptions] = useState([]);
     const [alreadyInCart, setAlreadyInCart] = useState({});
@@ -41,22 +36,11 @@ const ProductDetails = ({ route }) => {
     const [swatchAvailable, setSwatchAvailable] = useState(false);
     const [selectedSku, setSelectedSku] = useState(null);
     const [existComboSwatch, setExistComboSwatch] = useState();
-    const [solidPatternVariant, setSolidPatternVariant] = useState(null);
     const [priceBook, setPriceBook] = useState([]);
     const [priceSlab, setPriceSlab] = useState([]);
     const [kgPerRoll, setKgPerRoll] = useState(0);
     const [error, setError] = useState(false);
-    const [sampleCheck, setSampleCheck] = useState(false);
-
-    const fabricSpecsRef = useRef(null);
-    const pricingRef = useRef(null);
-    const moqRef = useRef(null);
-    const videoRef = useRef(null);
-    const scrollContainerRef = useRef(null);
-
-    const [showScrollRight, setShowScrollRight] = useState(true);
-    const [showScrollLeft, setShowScrollLeft] = useState(false);
-    const SCROLL_STEP = 300;
+    const [sampleCheck, setSampleCheck] = useState(true);
 
 
     // Fetch product information details useEffect
@@ -65,6 +49,7 @@ const ProductDetails = ({ route }) => {
             // pim details set state 
             const response = await api.get(`/pim/product/${pimId}`);
             const pimData = response.response;
+            pimData.pimVariants = _.filter(pimData?.pimVariants, (p) => p.status === 'ACTIVE');
             setPim(pimData || {});
             setLoading(false);
         };
@@ -75,6 +60,10 @@ const ProductDetails = ({ route }) => {
         fetchPimDetails();
         fetchAndSetCategories();
         fetchColorAndImage();
+        if (storage.getString("token")) {
+            existingCart()
+            fetchAllProfile();
+        }
     }, [pim]);
 
     // Fetch pim details function
@@ -84,8 +73,12 @@ const ProductDetails = ({ route }) => {
         const names = await replaceKeysWithNames(composition);
         setFabricCodes(names);
 
+        // swatch and combo set state
+        const Swatch = await api.get(`swatch/product?id=${pim.product.id}`);
+        setSwatchAvailable(Swatch.response);
+        setCombo(pim?.combo?.comboVariants);
+
         // Stocks set state 
-        pim.pimVariants = _.filter(pim?.pimVariants, (p) => p.status === 'ACTIVE');
         const skuIds = pim?.pimVariants.map((variant) => variant.variantSku);
         const res = await api.get(`stock/price?pimVariantSku=${skuIds}`);
         const stocks = res.response;
@@ -187,6 +180,7 @@ const ProductDetails = ({ route }) => {
                         hierarchy.push({
                             name: category.name,
                             hasParent: !!category.parentId,
+                            categoryId:category.categoryId
                         });
                         currentId = category.parentId;
                     } else {
@@ -257,7 +251,7 @@ const ProductDetails = ({ route }) => {
     }
 
     useEffect(() => {
-        setMainContent(_.filter(media, v => v.id === selectedValue)[0] || media[0])
+        // setMainContent(_.filter(media, v => v.id === selectedValue)[0] || media[0])
         setPriceSlab(priceBook?.filter(item => item.variantId === selectedValue)[0]?.priceSlabs || priceBook[0]?.priceSlabs)
         let backOrder = true;
         let kg = stock[selectedSku]?.kgPerRoll;
@@ -283,6 +277,22 @@ const ProductDetails = ({ route }) => {
         setBackOrder(backOrder)
         setKgPerRoll(kg || pim?.product?.otherInformation?.kilogram || 20)
     }, [selectedValue, selectedSku]);
+
+    useEffect(() => {
+        async function getCart() {
+            if (_.size(colorOption) > 0) {
+                const colorIds = colorOption?.map(option => option.id);
+                try {
+                    const res = await api.get(`cart?pimVariantId=${colorIds}`);
+                    setAlreadyInCart(res.response)
+                } catch (error) {
+                }
+            }
+        }
+        if (storage.getString("token")) {
+            getCart()
+        }
+    }, [colorOption])
 
     const totalQuantity = selectedValue
         ? (() => {
@@ -317,10 +327,101 @@ const ProductDetails = ({ route }) => {
             }
         })() : 0;
 
+    const existingCart = async () => {
+        if (Object.keys(pim).length > 0) {
+            const existComboSwatchRes = await api.get(`cart/comboSwatch?id=${pim?.pimId}`);
+            const existComboSwatch = existComboSwatchRes.response;
+            setExistComboSwatch(existComboSwatch);
+        }
+    }
+
+    useEffect(() => {
+        let orderType = '';
+        if (combo?.includes(selectedSku)) {
+            orderType = "COMBO";
+        }
+        else if (minimumOrder >= cartOptions[selectedValue]?.Wholesale) {
+            orderType = "WHOLESALE";
+        } else if (cartOptions[selectedValue]?.SampleMin <= minimumOrder <= cartOptions[selectedValue]?.SampleMax) {
+            orderType = "SAMPLE";
+        }
+        setCart(prev => ({
+            ...prev,
+            pimId: pim.id,
+            cartType: orderType,
+            quantity: minimumOrder,
+            pimVariantId: selectedValue,
+            comboId: combo?.includes(selectedSku) ? pim?.combo?.id : null,
+        }));
+    }, [minimumOrder])
+
+    // fetch customer profile function
+    const fetchAllProfile = async () => {
+        try {
+            const res = await api.get(`customer/profile`);
+            setProfile(res?.response || {});
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
+    // Similar product use effect
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                if (categories?.length > 0) {
+                    const response = await api.post(`pim/searchFilter?page=${0}&size=${15}&sortData=New false`, {
+                        [categories[0]?.name]: [categories[categories.length - 1]?.categoryId]
+                    });
+                    const pim = response?.response.content || [];
+                    const filteredProducts = pim
+                        .filter(p => p.pimId !== pimId)
+                        .map(p => ({ ...p, pimVariants: p.pimVariants.filter(pv => pv.status === 'ACTIVE'), }));
+                    const totalPages = response?.response.totalPages
+                    setTotalPage(totalPages)
+                    setSimilarProduct(filteredProducts)
+                }
+            } catch (error) {
+                console.error('Failed to fetch products:', error);
+            }
+        };
+        if (profile?.approveStatus === "APPROVED")
+            fetchProducts()
+    }, [categories])
+
+    // Add to cart function
+    const handleAddToCart = async () => {
+        if (minimumOrder % kgPerRoll !== 0 && minimumOrder >= cartOptions[selectedValue]?.Wholesale) {
+            setError(true)
+            return
+        }
+        if (profile?.approveStatus === "APPROVED") {
+            if (combo?.includes(selectedSku) === true) {
+                await api.post(`/cart/combo/save`, cart)
+                reloadHomeScreen()
+            } else {
+                await api.post(`/cart/save`, cart)
+                reloadHomeScreen()
+            }
+            return navigation.navigate('Cart', { screen: 'cart', });
+        }
+    };
+
+    const reloadHomeScreen = () => {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0, 
+            routes: [
+              { name: "HomeScreen" },
+            ],
+          })
+        );
+      };
+
     return (
-        <CreateProduct.Provider value={pim} >
+        <CreateProduct.Provider value={pim}>
             <SafeAreaView style={{ flex: 1, backgroundColor: "#fff", paddingTop: 50 }}>
-                <ScrollView style={{ flex: 1, flexGrow: 1 }}>
+                <ScrollView style={{ flex: 1, flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                     <ProductInformation
                         pimData={pim}
                         loading={loading}
@@ -346,6 +447,9 @@ const ProductDetails = ({ route }) => {
                         alreadyInCart={alreadyInCart}
                         setSelectedSku={setSelectedSku}
                         setSampleCheck={setSampleCheck}
+                        swatchAvailable={swatchAvailable}
+                        existComboSwatch={existComboSwatch}
+                        handleAddToCart={handleAddToCart}
                     />
                     <ProductSpecification
                         pimData={pim}

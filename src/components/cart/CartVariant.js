@@ -4,6 +4,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { backendUrl, common } from '../../Common/Common';
+import { font } from '../../Common/Theme';
 
 const CartVariant = (
     { items, handleIndividualChange, handleEdit, removeOneCartItems, activeIndex,
@@ -107,6 +108,7 @@ const styles = StyleSheet.create({
     cartProducts: {
         gap: 20,
         marginBottom: 20,
+        marginTop: 10,
     },
     productsGroup: {
         width: '100%',
@@ -134,6 +136,7 @@ const styles = StyleSheet.create({
     availableInfoText: {
         fontSize: 14,
         color: '#ff0000',
+        fontFamily: font.regular,
     },
     cartProductLayout: {
         flexDirection: 'column',
@@ -151,23 +154,25 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     cartProductVariantInfo: {
-        gap: 5,
+        gap: 8,
     },
     variantCode: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: font.bold,
         textDecorationLine: 'underline'
     },
     variantSampleText: {
         fontSize: 15,
         backgroundColor: '#fff6e5',
         color: '#c67f06',
-        width: 70,
+        width: 65,
+        borderRadius: 10,
         textAlign: 'center',
-        fontWeight: '600',
+        fontFamily: font.semiBold,
     },
     variantText: {
-        fontSize: 14
+        fontSize: 14,
+        fontFamily: font.regular,
     },
     cartPriceWieghtInfo: {
         width: '100%',
@@ -184,9 +189,11 @@ const styles = StyleSheet.create({
     },
     priceText: {
         fontSize: 12,
+        fontFamily: font.regular,
     },
     textLeft: {
         fontSize: 12,
+        fontFamily: font.regular,
         width: '35%',
         textAlign: 'left',
     },
@@ -199,6 +206,7 @@ const styles = StyleSheet.create({
     cartItemBtnText: {
         textAlign: 'center',
         fontSize: 15,
+        fontFamily: font.semiBold,
         textDecorationLine: 'underline',
         paddingHorizontal: 8,
     },

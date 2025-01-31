@@ -1,26 +1,28 @@
+import { useNavigation } from '@react-navigation/native';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Checkbox } from 'react-native-paper';
 import Icon from "react-native-vector-icons/AntDesign";
+import { common, storage } from '../../Common/Common';
 import { font } from '../../Common/Theme';
 import api from '../../Service/api';
-import { Checkbox } from 'react-native-paper';
-import { common, storage } from '../../Common/Common';
-import { useNavigation } from '@react-navigation/native';
 
 const ProductOrder = ({
-  pimData, colorOption, cartOptions, selectedValue, setSelectedValue,
-  minimumOrder, setMinimumOrder, setError, backOrder, totalQuantity,
-  kgPerRoll, combo, selectedSku, sampleCheck, alreadyInCart, setSelectedSku, setSampleCheck
+  pimData, colorOption, cartOptions, selectedValue, setSelectedValue, minimumOrder, handleAddToCart,
+  setMinimumOrder, setError, backOrder, totalQuantity, kgPerRoll, combo, selectedSku, 
+  sampleCheck, alreadyInCart, setSelectedSku, setSampleCheck, swatchAvailable, existComboSwatch,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = useCallback(() => setExpanded(!expanded), [expanded]);
   const buttonRef = useRef(null);
   const [selectedLabel, setSelectedLabel] = useState();
   const [selectedCode, setSelectedCode] = useState();
+  const [selectColor, setSelectColor] = useState();
   const navigation = useNavigation();
 
-  const onSelect = useCallback((item) => {
+  const onSelect = (item) => {
+    setSelectColor(item)
     setSelectedLabel(item.label);
     setSelectedCode(item.code);
     setSelectedValue(item.value);
@@ -28,7 +30,7 @@ const ProductOrder = ({
     const skuCode = filteredOption ? filteredOption.skucode : null;
     setSelectedSku(skuCode)
     setExpanded(false);
-  }, []);
+  };
 
 
   useEffect(() => {
@@ -39,71 +41,123 @@ const ProductOrder = ({
     }
   }, [selectedValue])
 
-  // Add to cart function
-  const handleAddToCart = async () => {
-    const token = storage.getString("token");
-    if (!token) {
-      setModalMessage('You need to log in to add items to the cart.');
-      return setIsOpenModal(true);
-    }
-    if (minimumOrder % kgPerRoll !== 0 && minimumOrder >= cartOptions[selectedValue]?.Wholesale) {
-      setError(true)
-      return
-    }
-    if (profile?.approveStatus === "APPROVED") {
-      if (combo?.includes(selectedSku)) {
-        await api.post(`cart/combo/save`, {
-          json: cart
-        })
-      } else {
-        await api.post(`cart/save`, {
-          json: cart
-        })
-      }
-      reloadHeader()
-      return navigation.navigate('Cart', { params: { cartType: cart?.cartType } });
-    }
-    else {
-      setModalMessage('You are not approved yet. Please Contact your Sales Manager');
-      // setIsOpenModal(true);
-    }
-  };
-
   const handleSampleCheck = () => {
     setMinimumOrder('')
     setSampleCheck((prev) => !prev)
   }
 
+  const handleQuantityChange = (qty) => {
+    setMinimumOrder(qty)
+  }
+
+  const isAnyComboTrue = Object.values(alreadyInCart).some(item => item.combo === true);
+
+  const handleSwatchCard = async () => {
+    const data = {
+      pimId: pim.pimId,
+      swatchId: pim.swatchId
+    }
+    await api.post(`cart/swatch/save`, {
+      json: data
+    })
+    return navigate('/cart');
+  }
+
+  const getButtonOneTitle = () => {
+    return (
+      totalQuantity < cartOptions[selectedValue]?.SampleMin && !backOrder || (!backOrder && totalQuantity === 0)
+        ? "Out of Stock" : existComboSwatch?.combo ? "Already in Combo Cart" :
+          (alreadyInCart[selectedValue]?.sample === true) && (alreadyInCart[selectedValue]?.wholeSale === true) ? "Already in Sample & Wholesale Cart" :
+            ((alreadyInCart[selectedValue]?.sample === true)) ? "Already in Sample Cart" :
+              (alreadyInCart[selectedValue]?.wholeSale === true) ? "Already in Wholesale Cart" : null
+    );
+  }
+
+  const getButtonTwoTitle = () => {
+    return (
+      !backOrder && totalQuantity === 0 && selectedValue ? "Out of Stock" : (
+        !backOrder && parseInt(minimumOrder) > totalQuantity ? `Maximum Quantity available : ${totalQuantity} Kg`
+          : ((combo?.includes(selectedSku) === true) ? (isAnyComboTrue ? "Already in Combo Cart" : "Add to Combo")
+            : (sampleCheck ? "Add to WholeSale Cart" : "Add to Sample Cart")
+          )
+      )
+    )
+  }
+
+  const isButtonDisabled = () => {
+    return (
+      (combo?.includes(selectedSku) && (isAnyComboTrue)) || (minimumOrder < cartOptions[selectedValue]?.Wholesale && sampleCheck) || minimumOrder < cartOptions[selectedValue]?.SampleMin || !selectedValue
+      || (!backOrder && minimumOrder > totalQuantity) || (combo?.includes(selectedSku) && minimumOrder < cartOptions[selectedValue]?.Wholesale)
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.orderDetailsContainer}>
-        <Text style={styles.orderDetailsHeader}>Order</Text>
-        <View style={styles.colorFieldContainer}>
-          <View style={styles.colorFieldInnerContainer}>
-            <Text style={styles.colorFieldlabel}>Color</Text>
-            <View style={styles.colorFieldvalue} ref={buttonRef}>
-              <TouchableOpacity style={styles.dropdownField} activeOpacity={0.8} onPress={toggleExpanded}>
-                <Text style={selectedLabel ? '' : styles.dropdownPlaceholder}>
+    <View style={styles.productOrderContainer}>
+      {(swatchAvailable && pimData.swatchCard) &&
+        <View style={styles.innerContainer}>
+          <Text style={styles.commonTitleText}>Swatch</Text>
+          <View style={styles.swatchContentContainer}>
+            <View style={styles.swatchRow}>
+              <Text style={[styles.commonLabelText, { width: '25%' }]}>Color</Text>
+              <Text style={[styles.commonValueText, { fontWeight: '400' }]}>Includes all available colors</Text>
+            </View>
+            <View style={styles.swatchRow}>
+              <Text style={[styles.commonLabelText, { width: '25%' }]}>Price</Text>
+              <Text style={styles.commonValueText}>1 Swatch Point</Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.swatchButtonContainer, { backgroundColor: existComboSwatch?.swatch ? '#e3e3e3' : '#ff6f61' }]}
+              disabled={existComboSwatch?.swatch}
+              onPress={handleSwatchCard}
+            >
+              <Text style={styles.swatchButtonText}>
+                {existComboSwatch?.swatch ? "Already in Swatch Cart" : "Added to Swatch Cart"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      }
+
+      <View style={styles.innerContainer}>
+        <Text style={styles.commonTitleText}>Order</Text>
+        <View style={styles.colorSelectorContainer}>
+          <View style={styles.colorSelectorInnerContainer}>
+            <View style={styles.colorLabelText}>
+              <Text style={[styles.commonLabelText, { width: '50%' }]}>Color</Text>
+              <Text style={styles.dropdownInfoLabel}>{combo?.includes(selectColor?.skucode) ? (isAnyComboTrue ? 'Already in combo' : 'Combo')
+                : alreadyInCart[selectColor?.value]?.sample && alreadyInCart[selectColor?.value]?.wholeSale ? 'Already in Sample/WholeSale'
+                  : alreadyInCart[selectColor?.value]?.sample ? 'Already in Sample'
+                    : alreadyInCart[selectColor?.value]?.wholeSale ? 'Already in WholeSale' : null}
+              </Text>
+            </View>
+            <View style={styles.colorSelectorValueContainer} ref={buttonRef}>
+              <TouchableOpacity
+                style={styles.colorDropdownButton}
+                activeOpacity={0.8}
+                onPress={toggleExpanded}
+              >
+                <Text style={selectedLabel ? '' : styles.colorDropdownPlaceholderText}>
                   {selectedLabel ?
-                    <View style={styles.dropdownItems}>
-                      <View style={{ backgroundColor: `${selectedCode}`, width: 15, height: 15, borderRadius: '50%' }} />
+                    <View style={styles.dropdownColorItem}>
+                      <View style={{ backgroundColor: `${selectedCode}`, width: 15, height: 15, borderRadius: 15 / 2 }} />
                       <Text>{selectedLabel}</Text>
-                    </View> : "Select a color"}
+                    </View>
+                    : "Select a color"}
                 </Text>
-                <Icon style={selectedLabel ? '' : styles.dropdownPlaceholder} name={expanded ? 'caretup' : 'caretdown'} />
+                <Icon style={selectedLabel ? '' : styles.colorDropdownPlaceholderText} name={expanded ? 'caretup' : 'caretdown'} />
               </TouchableOpacity>
-              {
-                expanded ?
-                  (
-                    <View style={styles.dropdownOptions}>
-                      <ScrollView style={styles.dropdownList}>
-                        {colorOption.map((item) => (
-                          <TouchableOpacity
-                            key={item.value}
-                            activeOpacity={0.8}
-                            onPress={() => onSelect(item)}
-                            style={styles.dropdownItems}
-                          >
+              {expanded && (
+                <View style={styles.dropdownMenuContainer}>
+                  <ScrollView nestedScrollEnabled>
+                    {colorOption.map((item) => (
+                      <TouchableOpacity
+                        key={item.value}
+                        activeOpacity={0.8}
+                        onPress={() => onSelect(item)}
+                        style={styles.dropdownItem}
+                      >
+                        <View style={styles.dropdownItemContainer}>
+                          <View style={styles.dropdownColorItem}>
                             <View
                               style={{
                                 backgroundColor: item.code,
@@ -114,97 +168,156 @@ const ProductOrder = ({
                                 borderColor: 'silver'
                               }}
                             />
-                            <Text>{item.label}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    </View>
-                  )
-                  : null
-              }
-            </View>
-          </View>
-        </View>
-        {combo?.includes(selectedSku) && <Text style={{ marginLeft: '5rem', paddingBottom: '1rem', color: 'red' }}>The selected  Variant is in Combo comes with {combo.length} variant</Text>}
-        <View style={{ marginBottom: '1rem' }}>
-          <Text>Order by Roll </Text>
-          <View>
-            <View>
-              <Checkbox color={common.PRIMARY_COLOR} checked={sampleCheck} onPress={() => handleSampleCheck()} />
-              {<Text style={{ color: 'grey' }}>For WholeSale Order Only</Text>}
+                            <Text style={styles.dropdownItemLabelText}>{item.label}</Text>
+                          </View>
+                          <Text style={styles.dropdownItemInfoText}>{combo?.includes(item.skucode) ? (isAnyComboTrue ? 'Already in combo' : 'Combo')
+                            : alreadyInCart[item.value]?.sample && alreadyInCart[item.value]?.wholeSale ? 'Already in Sample/WholeSale'
+                              : alreadyInCart[item.value]?.sample ? 'Already in Sample'
+                                : alreadyInCart[item.value]?.wholeSale ? 'Already in WholeSale' : null}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
             </View>
           </View>
         </View>
 
-        {(minimumOrder <= cartOptions[selectedValue]?.Wholesale && alreadyInCart[selectedValue]?.sample) ||
-          (cartOptions[selectedValue]?.Wholesale <= minimumOrder && alreadyInCart[selectedValue]?.wholeSale) ||
-          (alreadyInCart[selectedValue]?.wholeSale && alreadyInCart[selectedValue]?.sample) ? (
-          <Button
-            style={{
-              height: '52px',
-              cursor: 'not-allowed',
-              backgroundColor: 'lightgray',
-            }}
-            onPress={handleAddToCart}
-            disabled={true}
-            title={(
-              totalQuantity < cartOptions[selectedValue]?.SampleMin && !backOrder || (!backOrder && totalQuantity === 0)
-                ? "Out of Stock"
-                : existComboSwatch?.combo ? "Already in Combo Cart" :
-                  alreadyInCart[selectedValue]?.sample && alreadyInCart[selectedValue]?.wholeSale ? "Already in Sample & Wholesale Cart" :
-                    (minimumOrder <= cartOptions[selectedValue]?.Wholesale && alreadyInCart[selectedValue]?.sample) ? "Already in Sample Cart" :
-                      alreadyInCart[selectedValue]?.wholeSale ? "Already in Wholesale Cart" : ""
-            )}
-          />
-        ) :
-          <Button
-            color='#ff6f61'
-            onPress={handleAddToCart}
-            disabled={(combo?.includes(selectedSku) && (isAnyComboTrue)) || (minimumOrder < cartOptions[selectedValue]?.Wholesale && sampleCheck) || minimumOrder < cartOptions[selectedValue]?.SampleMin || !selectedValue || (!backOrder && minimumOrder > totalQuantity) || (combo?.includes(selectedSku) && minimumOrder < cartOptions[selectedValue]?.Wholesale)}
-            title={
-              !backOrder && totalQuantity === 0 && selectedValue ? "Out of Stock" :
-                !backOrder && parseInt(minimumOrder) > totalQuantity ? `Maximum Quantity available: ${totalQuantity} Kg` :
-                  combo?.includes(selectedSku) ? (isAnyComboTrue ? "Already in Combo Cart" : "Add to Combo") :
-                    minimumOrder >= cartOptions[selectedValue]?.Wholesale ? "Add to WholeSale Cart" :
-                      "Add to Sample Cart"
+        {combo?.includes(selectedSku) && (
+          <Text style={styles.comboMessageText}>The selected variant is in a combo and comes with {combo.length} variants</Text>
+        )}
+
+        <View style={styles.wholesaleOrderContainer}>
+          <Text style={styles.commonLabelText}>Order Sample</Text>
+          <View style={styles.wholesaleCheckboxContainer}>
+            <Checkbox
+              color={combo?.includes(selectedSku) ? '#e3e3e3' : common.PRIMARY_COLOR}
+              status={!sampleCheck ? 'checked' : 'unChecked'}
+              onPress={handleSampleCheck}
+              disabled={combo?.includes(selectedSku)}
+              style={{
+                backgroundColor: combo?.includes(selectedSku) ? '#e3e3e3' : '#fff',
+                opacity: combo?.includes(selectedSku) ? 0.5 : 1,
+              }}
+            />
+            <Text style={styles.commonValueText}>Click for sample order</Text>
+          </View>
+          <View style={styles.orderFieldContainer}>
+            {sampleCheck &&
+              <View style={styles.orderInputField}>
+                <Text style={styles.orderInputLabelText}>Roll</Text>
+                <TextInput
+                  value={(minimumOrder / kgPerRoll) || ''}
+                  editable={(combo?.includes(selectedSku) && isAnyComboTrue) || !selectedValue || (!backOrder && totalQuantity === 0) || (alreadyInCart[selectedValue]?.sample && alreadyInCart[selectedValue]?.wholeSale) ? false : true}
+                  placeholder={`Min Qty: ${(cartOptions[selectedValue]?.SampleMax) / kgPerRoll || '1+'}`}
+                  onChangeText={(value) => { handleQuantityChange((value) * kgPerRoll); setError(false) }
+                  }
+                  min={Math.round(cartOptions[selectedValue]?.SampleMax / kgPerRoll)}
+                  max={!backOrder ? totalQuantity : undefined}
+                  style={[styles.inputField, {
+                    backgroundColor: (combo?.includes(selectedSku) && isAnyComboTrue) || !selectedValue || (!backOrder && totalQuantity === 0) || (alreadyInCart[selectedValue]?.sample && alreadyInCart[selectedValue]?.wholeSale) ? '#e3e3e3' : '#fff'
+                  }]}
+                  keyboardType='number-pad'
+                />
+              </View>
             }
-          />
-        }
+            <View style={styles.orderInputField}>
+              <Text style={styles.orderInputLabelText}>Kg</Text>
+              <TextInput
+                value={isNaN(minimumOrder) || minimumOrder === undefined ? '' : String(minimumOrder)}
+                placeholder={`Min Qty: ${cartOptions[selectedValue]?.SampleMin || '1+'}`}
+                onChangeText={(value) => { handleQuantityChange(value); setError(false) }}
+                min={cartOptions[selectedValue]?.SampleMin}
+                max={cartOptions[selectedValue]?.SampleMax}
+                rightSection={<p>Kg</p>}
+                style={[styles.inputField,
+                { backgroundColor: (combo?.includes(selectedSku) && isAnyComboTrue) || sampleCheck || !selectedValue || (!backOrder && totalQuantity === 0) || (alreadyInCart[selectedValue]?.sample && alreadyInCart[selectedValue]?.wholeSale) ? "#e3e3e3" : "#fff" }]}
+                keyboardType='number-pad'
+                editable={(combo?.includes(selectedSku) && isAnyComboTrue) || sampleCheck || !selectedValue || (!backOrder && totalQuantity === 0) || (alreadyInCart[selectedValue]?.sample && alreadyInCart[selectedValue]?.wholeSale) ? false : true}
+              />
+            </View>
+            <View style={styles.orderInputField}>
+              <Text style={styles.orderInputLabelText}>Meter</Text>
+              <TextInput
+                value={
+                  !isNaN(minimumOrder) && !isNaN((pimData?.product?.metrics?.meterPerKg))
+                    ? String((minimumOrder * pimData.product.metrics.meterPerKg).toFixed(2))
+                    : '0'
+                }
+                style={[styles.inputField, { backgroundColor: '#e3e3e3' }]}
+                editable={false}
+              />
+            </View>
+          </View>
+        </View>
+
+        {(minimumOrder <= cartOptions[selectedValue]?.Wholesale && (alreadyInCart[selectedValue]?.sample === true)) ||
+          (cartOptions[selectedValue]?.Wholesale <= minimumOrder && (alreadyInCart[selectedValue]?.wholeSale === true)) ||
+          ((alreadyInCart[selectedValue]?.wholeSale === true) && (alreadyInCart[selectedValue]?.sample === true)) ? (
+          <TouchableOpacity onPress={handleAddToCart} style={[styles.swatchButtonContainer, { backgroundColor: '#e3e3e3' }]} disabled={true}>
+            <Text style={styles.swatchButtonText}>{getButtonOneTitle()}</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={handleAddToCart} style={[styles.swatchButtonContainer, { backgroundColor: isButtonDisabled() ? '#e3e3e3' : '#ff6f61' }]} disabled={isButtonDisabled()}>
+            <Text style={styles.swatchButtonText}>{getButtonTwoTitle()}</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   )
 }
-
-export default ProductOrder
+export default ProductOrder;
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff",
-  },
-  orderDetailsContainer: {
+  productOrderContainer: {
     padding: 20,
-    backgroundColor: "#fff",
+    gap: 20,
   },
-  orderDetailsHeader: {
+  innerContainer: {
+    gap: 15,
+  },
+  commonTitleText: {
     fontSize: 20,
     fontFamily: font.bold,
-    paddingVertical: 5,
   },
-  colorFieldContainer: {
-    marginBottom: 16,
+  swatchContentContainer: {
+    gap: 15,
   },
-  colorFieldInnerContainer: {
+  swatchRow: {
+    flexDirection: 'row',
+  },
+  commonLabelText: {
+    fontSize: 16,
+    fontFamily: font.semiBold,
+  },
+  commonValueText: {
+    fontSize: 16,
+    fontFamily: font.regular,
+  },
+  swatchButtonContainer: {
+    backgroundColor: '#ff6f61',
+    borderRadius: 5,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  swatchButtonText: {
+    fontSize: 18,
+    fontFamily: font.bold,
+    color: 'white',
+  },
+  colorSelectorContainer: {
+    gap: 10,
+  },
+  colorSelectorInnerContainer: {
     flexDirection: 'column',
   },
-  colorFieldlabel: {
-    fontSize: 16,
-    marginRight: 8,
-    fontWeight: 'bold',
-  },
-  colorFieldvalue: {
+  colorSelectorValueContainer: {
     marginTop: 10,
   },
-  dropdownField: {
+  colorDropdownButton: {
     height: 50,
     width: '100%',
     justifyContent: 'space-between',
@@ -216,18 +329,25 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 15,
   },
-  dropdownPlaceholder: {
+  colorDropdownPlaceholderText: {
     fontSize: 15,
     color: '#ccc',
     opacity: 0.8,
+    fontFamily: font.medium,
   },
-  dropdownBackdrop: {
-    padding: 20,
-    justifyContent: 'center',
+  dropdownItemList: {
+    gap: 10,
+  },
+  dropdownColorItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    paddingHorizontal: 10,
+    gap: 8,
   },
-  dropdownOptions: {
+  colorLabelText: {
+    flexDirection: 'row',
+  },
+  dropdownMenuContainer: {
     position: 'absolute',
     top: 53,
     zIndex: 999,
@@ -240,44 +360,64 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
     elevation: 5,
-  },
-  dropdownList: {
-    overflow: 'scroll',
     maxHeight: 250,
   },
-  dropdownItems: {
-    height: 50,
+  dropdownItem: {
+    paddingVertical: 8,
+  },
+  dropdownItemContainer: {
+    gap: 5,
+  },
+  dropdownInfoLabel: {
+    fontSize: 14,
+    fontFamily: font.bold,
+    color: '#c67f06',
+    width: '50%',
+    textAlign: 'right',
+  },
+  dropdownItemLabelText: {
+    fontSize: 14,
+    fontFamily: font.medium,
+  },
+  dropdownItemInfoText: {
+    fontSize: 12,
+    fontFamily: font.semiBold,
+    color: '#c67f06',
+    marginLeft: 35,
+  },
+  comboMessageText: {
+    color: 'red',
+    lineHeight: 20,
+  },
+  wholesaleOrderContainer: {
+    gap: 10,
+  },
+  wholesaleCheckboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    gap: 15,
   },
-  separator: {
-    height: 4,
+  orderFieldContainer: {
+    gap: 20,
   },
-  textInputPicker: {
+  orderInputField: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  orderInputLabelText: {
+    fontSize: 16,
+    fontFamily: font.semiBold,
+    width: '25%',
+  },
+  inputField: {
     height: 50,
+    width: '75%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 4,
-    paddingLeft: 10,
-    width: '100%',
-  },
-  button: {
-    backgroundColor: "#FF6F61",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
     borderRadius: 5,
-    marginTop: 10,
-    height: 40,
-    width: "90%",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "0.2s",
-  },
-  buttonText: {
-    color: "#ffffff",
-    fontFamily: font.regular,
-    fontSize: 16,
-  },
+    paddingHorizontal: 15,
+  }
 })

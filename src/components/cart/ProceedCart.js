@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Button, Checkbox } from 'react-native-paper';
 import _ from 'lodash';
 import { common } from '../../Common/Common';
+import { font } from '../../Common/Theme';
 
 const ProceedCart = ({
     sampleCart, wholesaleCart, sampleSelected, wholesaleSelected, isToggled, handleToggle,
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     },
     proceedCartHeader: {
         fontSize: 22,
-        fontWeight: 'bold',
+        fontFamily: font.bold,
     },
     proceedCartContainer: {
         alignItems: 'center',
@@ -93,15 +94,16 @@ const styles = StyleSheet.create({
     },
     proceedLabel: {
         fontSize: 14,
+        fontFamily: font.medium,
         textAlign: 'center',
     },
     proceedValue: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: font.bold,
     },
     proceedCartTotalValue: {
         fontSize: 20,
-        fontWeight: 'bold',
+        fontFamily: font.bold,
     },
     checkbox: {
         flexDirection: 'row',
@@ -109,6 +111,7 @@ const styles = StyleSheet.create({
     },
     checkboxText: {
         fontSize: 14,
+        fontFamily: font.medium,
         width: '90%',
         lineHeight: 20,
     },
@@ -121,7 +124,7 @@ const styles = StyleSheet.create({
     },
     proceedBtnText: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: font.bold,
         color: 'white',
     },
 })

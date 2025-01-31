@@ -1,9 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
-import { backendUrl } from "../../Common/Common";
+import { backendUrl, storage } from "../../Common/Common";
 import { font } from "../../Common/Theme";
+import AlertBox from "../../Common/AlertBox";
+import api from "../../Service/api";
 
 const MainProductPage = ({ product, navigation }) => {
+    const [isError, setIsError] = useState({
+        message: "",
+        heading: "",
+        isRight: false,
+        rightButtonText: "OK",
+        triggerFunction: () => { },
+        setShowAlert: () => { },
+        showAlert: false,
+    });
+    const [profile, setProfile] = useState({});
+
+    useEffect(() => {
+        // fetch customer profile function
+        const fetchAllProfile = async () => {
+            try {
+                const res = await api.get(`customer/profile`);
+                setProfile(res?.response || {});
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+        if (storage.getString("token")) {
+            fetchAllProfile();
+        }
+    }, []);
+
     const imageUrl = backendUrl + product?.image?.replace("/api", "");
 
     const filterColorVariants = (products) => {
@@ -16,44 +44,89 @@ const MainProductPage = ({ product, navigation }) => {
     const colorVariants = filterColorVariants([product]);
     const pimId = product.pimId;
 
-    return (
-        <TouchableOpacity
-            style={styles.container}
-            onPress={() => {
+    const handleViewProduct = () => {
+        if (!profile.assignedSalesman) {
+            setIsError({
+                message: 'Salesman is not yet assigned to your account. Please contact support',
+                heading: "Salesman Not Assigned",
+                isRight: false,
+                rightButtonText: "OK",
+                triggerFunction: () => { },
+                setShowAlert: () => {
+                    isError.setShowAlert(false);
+                },
+                showAlert: true,
+            });
+        } else {
+            if (profile?.approveStatus === "APPROVED") {
                 navigation.navigate("fabrics", { pimId: pimId });
-            }}
-        >
-            <Image source={{ uri: imageUrl }} style={styles.productImage} />
-            <View style={styles.colorsContainer}>
-                {colorVariants?.slice(0, 14).map((color, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        style={[
-                            styles.colorCircle,
-                            { backgroundColor: color.hexaColorCode },
-                        ]}
-                    />
-                ))}
-            </View>
+            } else {
+                setIsError({
+                    message: `Please contact your sales representative ${profile.salesManName} : ${profile.salesMan.mobile} for more details`,
+                    heading: "Your Account is not approved yet",
+                    isRight: false,
+                    rightButtonText: "OK",
+                    triggerFunction: () => { },
+                    setShowAlert: () => {
+                        isError.setShowAlert(false);
+                    },
+                    showAlert: true,
+                });
+            }
+        }
+    }
 
-            <View style={styles.productInfo}>
-                <Text style={styles.productSku}>{product.articleCode}</Text>
-                <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">
-                    {product.articleName}
-                </Text>
-                <Text style={styles.productPrice}>₹ {product.channelPrice}</Text>
-                <Text style={styles.productVariant}>{product.fabricContent.value}</Text>
-                <Text style={styles.productGsm}>{product.metrics.weight}gsm</Text>
-                <View style={styles.colorsVariantContainer}>
-                    <Image
-                        source={require("../../../assets/images/color-wheel.png")}
-                        alt="color-wheel"
-                        style={{ width: 15, height: 15, marginRight: 5 }}
-                    />
-                    <Text style={styles.colorVariant}>{product.pimVariants.length}</Text>
+    const closeAlert = () => {
+        setIsError((prev) => ({ ...prev, showAlert: false }));
+    };
+
+    return (
+        <View>
+            <TouchableOpacity
+                style={styles.container}
+                onPress={handleViewProduct}
+            >
+                <Image source={{ uri: imageUrl }} style={styles.productImage} />
+                <View style={styles.colorsContainer}>
+                    {colorVariants?.slice(0, 14).map((color, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={[
+                                styles.colorCircle,
+                                { backgroundColor: color.hexaColorCode },
+                            ]}
+                        />
+                    ))}
                 </View>
-            </View>
-        </TouchableOpacity>
+
+                <View style={styles.productInfo}>
+                    <Text style={styles.productSku}>{product.articleCode}</Text>
+                    <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">
+                        {product.articleName}
+                    </Text>
+                    <Text style={styles.productPrice}>₹ {product.channelPrice}</Text>
+                    <Text style={styles.productVariant}>{product.fabricContent.value}</Text>
+                    <Text style={styles.productGsm}>{product.metrics.weight}gsm</Text>
+                    <View style={styles.colorsVariantContainer}>
+                        <Image
+                            source={require("../../../assets/images/color-wheel.png")}
+                            alt="color-wheel"
+                            style={{ width: 15, height: 15, marginRight: 5 }}
+                        />
+                        <Text style={styles.colorVariant}>{product.pimVariants.length}</Text>
+                    </View>
+                </View>
+            </TouchableOpacity>
+            <AlertBox
+                heading={isError.heading}
+                message={isError.message}
+                setShowAlert={closeAlert}
+                showAlert={isError.showAlert}
+                triggerFunction={isError.triggerFunction}
+                isRight={isError.isRight}
+                rightButtonText={isError.rightButtonText}
+            />
+        </View>
     );
 };
 
