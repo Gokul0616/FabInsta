@@ -5,11 +5,10 @@ import { Animated } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { common, storage } from "../Common/Common";
 import OptionsModal from "../Common/OptionsModal/OptionsModal";
-import CartDetails from "../components/cart/CartDetails";
+import CartTabLayout from "../components/layout/CartTabLayout";
+import ProfileLayout from "../components/layout/ProfileLayout";
 import Header from "../Screens/Header";
 import HomeTabLayout from "../Screens/HomeScreen/HomeTabLayout";
-import ProfileScreen from "../Screens/ProfileScreen";
-import CartTabLayout from "../components/layout/CartTabLayout";
 
 const Tab = createBottomTabNavigator();
 
@@ -129,7 +128,7 @@ function MyTabs() {
       >
         <Tab.Screen name="Home" component={HomeTabLayout} />
         <Tab.Screen name="Cart" component={CartTabLayout} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen name="Profile" component={ProfileLayout} />
       </Tab.Navigator>
     </>
   );

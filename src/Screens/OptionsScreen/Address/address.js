@@ -189,7 +189,6 @@ const Address = () => {
 
     try {
       const addressData = editAddress || address;
-
       await api.post(`/customer/location`, addressData);
       fetchData();
       closeEditModal();
@@ -652,7 +651,7 @@ const Address = () => {
           </View>
           <View style={styles.addressTextContainer}>
             <Text style={styles.addressText}>{data.address1}</Text>
-            {data.address2.length > 0 && (
+            {data.address2?.length > 0 && (
               <Text style={styles.addressText}>{data.address2}</Text>
             )}
             <Text style={styles.addressText}>

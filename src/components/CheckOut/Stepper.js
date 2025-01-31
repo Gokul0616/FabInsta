@@ -1,34 +1,43 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { common } from "../../Common/Common";
 import { font } from "../../Common/Theme";
 
-const Stepper = ({ steps, activeStep = 0 }) => {
+const Stepper = ({ steps, activeStep = 0, setActiveStep }) => {
   return (
     <View style={styles.stepperContainer}>
       {steps.map((step, index) => (
         <View key={index} style={styles.stepContainer}>
-          <View
-            style={[
-              styles.iconContainer,
-              index <= activeStep ? styles.activeIcon : styles.inactiveIcon,
-            ]}
+          <TouchableOpacity
+            style={styles.stepContainer}
+            onPress={() => {
+              if (index < activeStep) {
+                setActiveStep(index);
+              }
+            }}
           >
-            <Icon
-              name={step.icon}
-              size={20}
-              color={index <= activeStep ? "#fff" : "#ccc"}
-            />
-          </View>
-          <Text
-            style={[
-              styles.stepLabel,
-              index <= activeStep ? styles.activeLabel : styles.inactiveLabel,
-            ]}
-          >
-            {step.label}
-          </Text>
+            <View
+              style={[
+                styles.iconContainer,
+                index <= activeStep ? styles.activeIcon : styles.inactiveIcon,
+              ]}
+            >
+              <Icon
+                name={step.icon}
+                size={20}
+                color={index <= activeStep ? "#fff" : "#ccc"}
+              />
+            </View>
+            <Text
+              style={[
+                styles.stepLabel,
+                index <= activeStep ? styles.activeLabel : styles.inactiveLabel,
+              ]}
+            >
+              {step.label}
+            </Text>
+          </TouchableOpacity>
           {index < steps.length - 1 && (
             <View
               style={[

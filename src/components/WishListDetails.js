@@ -78,7 +78,6 @@ const WishListDetails = () => {
         }
     };
 
-    console.log('sel : ', selectAll);
 
 
     const confirmDelete = async () => {
