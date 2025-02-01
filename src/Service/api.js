@@ -35,14 +35,12 @@ api.interceptors.response.use(
 
     if (response && response.status === 401) {
       const navigation = useNavigation();
-
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{ name: "Signin" }],
         })
       );
-
       storage.remove("token");
     }
 

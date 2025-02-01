@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import { backendUrl } from '../Common/Common';
 import { getpayLoadFromToken } from '../Common/JwtPayload';
 import api from '../Service/api';
+import { font } from '../Common/Theme';
 
 
 const WishListDetails = () => {
@@ -120,7 +121,7 @@ const WishListDetails = () => {
                 <Text style={styles.wishListHeader}>Wishlist</Text>
                 <View style={{ flex: 1 }}>
                     {wishList?.length === 0 ? (
-                        <Text>There are no items.</Text>
+                        <Text style={{fontFamily:font.medium}}>There are no items.</Text>
                     ) : (
                         <View style={styles.wishListContainer}>
                             <View style={styles.selectWishList}>
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     },
     wishListHeader: {
         fontSize: 26,
-        fontWeight: 'bold',
+        fontFamily:font.semiBold,
         marginVertical: 10,
     },
     wishListContainer: {
