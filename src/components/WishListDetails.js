@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { backendUrl } from '../Common/Common';
+import { backendUrl, common } from '../Common/Common';
 import { getpayLoadFromToken } from '../Common/JwtPayload';
 import api from '../Service/api';
 import { font } from '../Common/Theme';
@@ -132,6 +132,7 @@ const WishListDetails = () => {
                   >
                     <Checkbox
                       status={selectAll ? "checked" : "unchecked"}
+                      color={common.PRIMARY_COLOR}
                       onPress={() => handleSelectAll()}
                     />
                     <Text style={styles.selectAllWishListLabel}>
@@ -163,6 +164,7 @@ const WishListDetails = () => {
                                   ? "checked"
                                   : "unchecked"
                               }
+                              color={common.PRIMARY_COLOR}
                               onPress={() => {
                                 const allIds = items.map((item) => item?.id);
                                 const isAllSelected = allIds.every((id) =>
@@ -205,6 +207,7 @@ const WishListDetails = () => {
                                         ? "checked"
                                         : "unchecked"
                                     }
+                                    color={common.PRIMARY_COLOR}
                                     onPress={() => {
                                       const updatedSelectedItems =
                                         selectedItems.includes(pimItem.id)

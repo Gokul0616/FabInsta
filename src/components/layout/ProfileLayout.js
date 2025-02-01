@@ -1,7 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import ProfileScreen from "../../Screens/ProfileScreen/ProfileScreen";
-import FabricOrder from "../fabricOrders/FabricOrder";
+import FabricOrder from "../OptionsScreen/fabricOrders/FabricOrder";
 
 const Stack = createStackNavigator();
 
