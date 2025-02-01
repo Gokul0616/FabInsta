@@ -443,8 +443,6 @@ const HomeScreen = ({ navigation }) => {
           )}
           onEndReachedThreshold={0.5}
           onEndReached={() => {
-            console.log("End of list reached!");
-            console.log(hasMore + "hasMore");
             if (hasMore) {
               setPage((prev) => prev + 1);
             }

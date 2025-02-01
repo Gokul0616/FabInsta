@@ -4,7 +4,9 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import { backendUrl } from '../../Common/Common';
 import { font } from '../../Common/Theme';
 
-const EditCart = ({ setEditItem, editItem, handleEditSave, cancelRemove, setError, sampleMoq, wholesaleMoq, error }) => {
+const EditCart = ({ editItem, setEditItem, handleEditSave, cancelRemove, error, setError, sampleMoq, wholesaleMoq, }) => {
+    console.log("editItem : ", editItem);
+
     return (
         <View style={styles.editContainerModal}>
             <View style={styles.editInnerContainerModal}>
@@ -37,18 +39,20 @@ const EditCart = ({ setEditItem, editItem, handleEditSave, cancelRemove, setErro
                     <View style={styles.inputContainer}>
                         <View style={styles.inputFieldContainer}>
                             <TextInput
+                                value={editItem?.quantity != null ? String(editItem?.quantity) : '0'}
                                 placeholder={editItem?.cartType === 'SAMPLE' ? `${editItem?.sampleMoq || sampleMoq}~${editItem?.wholesaleMoq || wholesaleMoq}` : `${editItem?.wholesaleMoq || wholesaleMoq}+`} min={editItem?.cartType === 'SAMPLE' ? (editItem?.sampleMoq || sampleMoq) : (editItem?.wholesaleMoq || wholesaleMoq)}
-                                pattern="\d*"
-                                value={editItem?.quantity}
-                                onChangeText={(value) => { setEditItem(value); setError('') }}
+                                onChangeText={(value) => {
+                                    setEditItem({ ...editItem, quantity: value, });
+                                    setError('');
+                                }}
                                 max={editItem?.cartType === 'SAMPLE' && (editItem?.wholesaleMoq || wholesaleMoq)}
                                 style={styles.inputField}
                                 keyboardType='number-pad'
                             />
                             <Text style={styles.inputInfoText}>kg</Text>
                         </View>
+                        {error && <Text style={{ color: 'red', fontSize: 12, textAlign:'left' }}>{error}</Text>}
                         {editItem?.cartType === 'WHOLESALE' && <Text style={styles.inputInfoText}>Quantity must be a multiple of {editItem?.kgPerRoll} kg</Text>}
-                        {error && <Text style={{ color: 'red', fontSize: 12 }}>{error}</Text>}
                         <Text style={styles.inputInfoText}>minimum {editItem?.cartType === 'SAMPLE' ? (editItem?.sampleMoq || sampleMoq) : (editItem?.wholesaleMoq || wholesaleMoq)} kg</Text>
                     </View>
                 </View>

@@ -72,7 +72,11 @@ function MyTabs() {
       order: 2,
       displayOrder: 1,
       label: "Fabric Orders",
-      onPress: () => console.log("Option 2 selected"),
+      onPress: () =>
+        navigate.navigate("Tabs", {
+          screen: "Profile",
+          params: { screen: "Fabric-Orders" },
+        }),
     },
     {
       order: 3,
