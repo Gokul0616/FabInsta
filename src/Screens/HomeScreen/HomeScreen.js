@@ -3,12 +3,13 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import AlertBox from "../../Common/AlertBox";
@@ -18,7 +19,6 @@ import {
   findKeyAndId,
   formateData,
 } from "../../Common/FilterData";
-import OptionsModal from "../../Common/OptionsModal/OptionsModal";
 import { font } from "../../Common/Theme";
 import MainProductPage from "../../components/product/MainProductPage";
 import api from "../../Service/api";
@@ -52,62 +52,7 @@ const HomeScreen = ({ navigation }) => {
   const [searchDisplayData, setSearchDisplayData] = useState([]);
   const [searchFilterRawData, setSearchFilterRawData] = useState([]);
   const [isFullScreenLoading, setFullScreenLoading] = useState(false);
-  const options = [
-    {
-      order: 1,
-      displayOrder: 1,
-      label: "Fabric Inquiries",
-      onPress: () => navigate.navigate("FabricInqiries"),
-    },
-    {
-      order: 1,
-      displayOrder: 2,
-      label: "Order Inquiries",
-      onPress: () => console.log("Option 1 selected"),
-    },
-    {
-      order: 1,
-      displayOrder: 3,
-      label: "Bulk Quotes",
-      onPress: () => console.log("Option 1 selected"),
-    },
-    {
-      order: 1,
-      displayOrder: 4,
-      label: `My ${common.title}`,
-      onPress: () => console.log("Option 2 selected"),
-    },
-    {
-      order: 1,
-      displayOrder: 5,
-      label: "WishList",
-      onPress: () => console.log("Option 2 selected"),
-    },
-    {
-      order: 2,
-      displayOrder: 1,
-      label: "Fabric Orders",
-      onPress: () => console.log("Option 2 selected"),
-    },
-    {
-      order: 3,
-      displayOrder: 1,
-      label: "Addresses",
-      onPress: () => console.log("Option 2 selected"),
-    },
-    // {
-    //   order: 3,
-    //   displayOrder: 2,
-    //   label: "Account",
-    //   onPress: () => navigate.navigate("Profile"),
-    // },
-    {
-      order: 4,
-      displayOrder: 1,
-      label: "Logout",
-      onPress: () => clearStackAndNavigate(),
-    },
-  ];
+
   const clearStackAndNavigate = () => {
     navigate.dispatch(
       CommonActions.reset({
@@ -375,11 +320,6 @@ const HomeScreen = ({ navigation }) => {
           },
         ]}
       >
-        <OptionsModal
-          isVisible={isOptionsVisible}
-          onClose={() => setIsOptionsVisible(false)}
-          options={options}
-        />
         {SearchAndFilterTab()}
         {isAppliedFiltersVisible && (
           <View style={styles.filterVisibleContainer}>
@@ -449,6 +389,13 @@ const HomeScreen = ({ navigation }) => {
           }}
           onRefresh={onRefresh}
           refreshing={refreshing}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              progressViewOffset={100}
+            />
+          }
           showsVerticalScrollIndicator={false}
           decelerationRate="fast"
         />

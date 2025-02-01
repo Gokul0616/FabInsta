@@ -1,7 +1,8 @@
+// api/axios.js
 import axios from "axios";
 import { backendUrl, storage } from "../Common/Common";
-import { CommonActions } from "@react-navigation/native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigationContext } from "./Context/NavigationContext";
+import { navigate } from "./Hook/navigationRef";
 
 const api = axios.create({
   baseURL: backendUrl,
@@ -11,6 +12,7 @@ const api = axios.create({
     Accept: ["application/json", "multipart/form-data"],
   },
 });
+
 api.interceptors.request.use(
   (config) => {
     const token = storage.getString("token");
@@ -25,7 +27,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
 api.interceptors.response.use(
   (response) => {
     return response.data;
@@ -34,14 +35,7 @@ api.interceptors.response.use(
     const { response } = error;
 
     if (response && response.status === 401) {
-      const navigation = useNavigation();
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: "Signin" }],
-        })
-      );
-      storage.remove("token");
+      navigate("Logout");
     }
 
     return Promise.reject(error);
