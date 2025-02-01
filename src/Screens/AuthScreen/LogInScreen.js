@@ -120,7 +120,7 @@ const AuthScreen = () => {
       storage.set("companyId", companyId == null ? "" : companyId);
       storage.set("token", token);
       storage.set("userId", userId);
-      navigation.navigate("Tabs");
+       clearStackAndNavigate();
     } catch (error) {
       console.error("Error fetching data:", error);
       setIsError({

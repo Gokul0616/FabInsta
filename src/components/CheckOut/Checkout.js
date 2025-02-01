@@ -4,7 +4,11 @@ import Stepper from "./Stepper";
 import Shipping from "./Shipping";
 import Policy from "./Policy";
 import ReviewOrder from "./ReviewOrder";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  CommonActions,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import _ from "lodash";
 import api from "../../Service/api";
 import AlertBox from "../../Common/AlertBox";
@@ -147,9 +151,12 @@ const Checkout = () => {
 
       // Call the API to save the order
       const response = await api.post("order/save", order);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Profile", params: { screen: "Fabric-Orders" } }],
+
+      //we need to change this order of routes
+      reloadCartScreen();
+      navigation.navigate("Tabs", {
+        screen: "Profile",
+        params: { screen: "Fabric-Orders" },
       });
     } catch (error) {
       console.error("Error placing order:", error);
@@ -167,6 +174,14 @@ const Checkout = () => {
     } finally {
       setIsFullscreenLoading(false);
     }
+  };
+  const reloadCartScreen = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "cart" }],
+      })
+    );
   };
   const closeAlert = () => {
     setIsError((prev) => ({ ...prev, showAlert: false }));

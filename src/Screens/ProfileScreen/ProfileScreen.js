@@ -278,7 +278,7 @@ const ProfileScreen = () => {
               </Text>
             </Text>
             <Text style={styles.salesmanDescriptionText}>
-              and I’m your personal sourcing manager at Ultron.
+              and I’m your personal sourcing manager at {common.title}.
             </Text>
           </View>
           <View>

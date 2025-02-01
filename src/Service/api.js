@@ -1,7 +1,6 @@
 // api/axios.js
 import axios from "axios";
 import { backendUrl, storage } from "../Common/Common";
-import { useNavigationContext } from "./Context/NavigationContext";
 import { navigate } from "./Hook/navigationRef";
 
 const api = axios.create({
