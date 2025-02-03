@@ -89,7 +89,6 @@ const FabricOrder = () => {
   const handleRowClick = (orderNo) => {
     // navigation(`/order-Details?orderNo=${orderNo}`, { state: orderStatus });
     console.log('hi');
-
   };
 
   const handleTrackingIdSubmit = async () => {
@@ -146,140 +145,140 @@ const FabricOrder = () => {
     <View style={styles.fabricContainer}>
       <View style={styles.fabricInnerContainer}>
         <Text style={styles.fabricHeader}>Fabric Orders</Text>
-        <View style={styles.fabricMainContainer}>
-          <View style={styles.fabricDropdownContainer}>
-            <Text style={styles.fabricOrderLabel}>{orderStatus}</Text>
-            <View style={styles.dropdownInputContainer} ref={buttonRef}>
-              <TouchableOpacity
-                style={styles.dropdownSelectField}
-                activeOpacity={0.8}
-                onPress={toggleExpanded}
-              >
-                <Text style={styles.dropdownPlaceholderText}>{orderStatus}</Text>
-                <Icon style={styles.dropdownPlaceholderText} name={expanded ? 'caretup' : 'caretdown'} />
-              </TouchableOpacity>
-              {expanded && (
-                <View style={styles.dropdownMenuContainer}>
-                  <ScrollView nestedScrollEnabled>
-                    {orderOptions?.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        activeOpacity={0.8}
-                        onPress={() => onSelect(item)}
-                        style={styles.dropdownItem}
-                      >
-                        <View style={orderStatus === item ? [styles.dropdownItemContainer, { backgroundColor: '#ffcbc6', }] : styles.dropdownItemContainer}>
-                          <Text style={orderStatus === item ? [styles.dropdownItemLabelText, { color: '#ff6f61' }] : styles.dropdownItemLabelText}>{item}</Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-          </View>
-          {count > 0 && (
-            <Text style={styles.packedInfo}>
-              {count} orders are awaiting Packing. Please review the Packed details and click 'Upload Transaction' to enter the payment details.
-            </Text>
-          )}
-          <View style={styles.fabricDetailsContainer}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {Object.keys(groupList).length > 0 ? (
-                Object.keys(groupList).map(orderNo => (
-                  <View key={orderNo} style={{ marginTop: '2rem' }}>
-                    {groupList[orderNo].map(order => (
-                      order.items.map((item, itemIndex) => (
-                        order.orderStatus === 'PACKED' && itemIndex === 0 && (
-                          <View key={order.orderNo}>
-                            <Modal
-                              visible={activeCancelOrder === order.orderNo}
-                              transparent={true}
-                              animationType="slide"
-                              onRequestClose={handleCloseCancelPopup}
-                            >
-                              <View style={styles.modalBackground}>
-                                <View style={styles.modalContainer}>
-                                  <View style={styles.header}>
-                                    <Text style={styles.editHeaderLabel}>Are you sure you want to cancel?</Text>
-                                    <Icon name="close" size={24} onPress={handleCloseCancelPopup} />
-                                  </View>
-                                  <Text style={styles.modalMessage}>
-                                    Are you sure you want to cancel this order? Once canceled, this action cannot be undone.
-                                  </Text>
-                                  <View style={styles.buttonsContainer}>
-                                    <TouchableOpacity style={styles.cancelButton} onPress={handleCloseCancelPopup}>
-                                      <Text style={styles.buttonText}>Cancel</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.confirmButton} onPress={() => handleConfirmCancel(order.orderNo)}>
-                                      <Text style={styles.buttonText}>Confirm</Text>
-                                    </TouchableOpacity>
-                                  </View>
-                                </View>
-                              </View>
-                            </Modal>
-                          </View>
-                        )
-                      ))
-                    ))}
-                    <Text style={styles.orderNumber}>{orderNo}</Text>
-                    {
-                      groupList[orderNo].map(order => (
-                        order.items.map((item, index) => (
-                          <TouchableOpacity key={index} style={styles.fabricOrderDetails} onPress={() => handleRowClick(orderNo)}>
-                            <View style={styles.fabricOrderInfo}>
-                              <Image source={{ uri: `${backendUrl}${item?.image?.replace("/api", "")}` }} alt={item?.productVariant?.name} style={styles.fabricImage} />
-                              <View style={styles.fabricOrderVariantInfo}>
-                                <Text style={styles.fabricOrderVariantName}>{item?.productVariant?.name}</Text>
-                                <Text style={styles.fabricOrderType}>{order?.orderType}</Text>
-                                <Text style={styles.fabricOrderText}>{order?.orderType !== 'SWATCH' ? 'Color' : 'Product Name'} : {order?.orderType !== 'SWATCH' ? `${item?.productVariant?.variants.filter(variant => variant?.type === 'Colour')[0]?.value || 'N/A'}` : `${item?.productName || 'N/A'}`}</Text>
-                              </View>
-                            </View>
-                            <View style={{ borderWidth: 0.5, borderColor: 'silver', marginTop: 15, }} />
-                            <View style={styles.fabricOrderPriceInfo}>
-                              <Text style={styles.fabricPrice}>₹ {(order?.grossTotal + (order?.shipmentCost || 0) + order?.totalGst + (order?.packing?.packingCharges || 0)).toFixed(2) || 0}</Text>
-                              <View style={styles.fabricOrderStatusContainer}>
-                                <View style={styles.statusContainer}>
-                                  <View style={styles.statusIcon} />
-                                  <Text style={styles.fabricOrderStatus}>{order?.orderStatus}</Text>
-                                </View>
-                                <Text style={styles.fabricStatusText}>{getDeliveryStatusMessage(order?.orderStatus)}</Text>
-                              </View>
-                            </View>
-                            {groupList[orderNo].map((order, index) => (
-                              ((order.orderStatus === 'CONFIRMED' && order.paymentBefore === true) || order.orderStatus === 'PACKED')
-                              && (
-                                <View style={styles.orderConfirmBtnContainer} key={index}>
-                                  <TouchableOpacity style={styles.orderCancelButton} onPress={() => handleOrderCancelClick(order?.orderNo)}>
-                                    <Text style={styles.orderConfirmBtnText}>Cancel Order</Text>
-                                  </TouchableOpacity>
-                                  <TouchableOpacity style={order?.utrNo ? [styles.orderConfirmButton, { backgroundColor: '#e3e3e3' }] : styles.orderConfirmButton}
-                                    onPress={() => {
-                                      setEditOrder(order);
-                                      setModalOpened(true);
-                                      setTransactionDetails(prevDetails => ({
-                                        ...prevDetails, depositAmount: Number(order?.grossTotal) + Number(order.packing?.packingCharges || 0) + Number(order?.totalGst) + Number(order?.shipmentCost)
-                                      }))
-                                    }}
-                                    disabled={order?.utrNo ? true : false}
-                                  >
-                                    <Text style={styles.orderConfirmBtnText}>{isTransactionUploaded[orderNo] ? "Transaction Uploaded" : "Upload Transaction"}</Text>
-                                  </TouchableOpacity>
-                                </View>
-                              )
-                            ))}
-                          </TouchableOpacity>
-                        ))
-                      ))
-                    }
-                  </View>
-                ))
-              ) : (
-                <Text style={styles.orderNotFound}>No orders found for {orderStatus} status.</Text>
-              )}
-            </ScrollView>
+        {count > 0 && (
+          <Text style={styles.packedInfo}>
+            {count} orders are awaiting Packing. Please review the Packed details and click 'Upload Transaction' to enter the payment details.
+          </Text>
+        )}
+        <View style={styles.fabricDropdownContainer}>
+          <Text style={styles.fabricOrderLabel}>{orderStatus}</Text>
+          <View style={styles.dropdownInputContainer} ref={buttonRef}>
+            <TouchableOpacity
+              style={styles.dropdownSelectField}
+              activeOpacity={0.8}
+              onPress={toggleExpanded}
+            >
+              <Text style={styles.dropdownPlaceholderText}>{orderStatus}</Text>
+              <Icon style={styles.dropdownPlaceholderText} name={expanded ? 'caretup' : 'caretdown'} />
+            </TouchableOpacity>
+            {expanded && (
+              <View style={styles.dropdownMenuContainer}>
+                <ScrollView nestedScrollEnabled>
+                  {orderOptions?.map((item, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      activeOpacity={0.8}
+                      onPress={() => onSelect(item)}
+                      style={styles.dropdownItem}
+                    >
+                      <View style={orderStatus === item ? [styles.dropdownItemContainer, { backgroundColor: '#ffcbc6', }] : styles.dropdownItemContainer}>
+                        <Text style={orderStatus === item ? [styles.dropdownItemLabelText, { color: '#ff6f61' }] : styles.dropdownItemLabelText}>{item}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
           </View>
         </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.fabricDetailsContainer}>
+          {Object.keys(groupList).length > 0 ? (
+            Object.keys(groupList).map(orderNo => (
+              <View key={orderNo} style={styles.fabricDetailsInnerContainer}>
+                {groupList[orderNo].map(order => (
+                  order.items.map((item, itemIndex) => (
+                    order.orderStatus === 'PACKED' && itemIndex === 0 && (
+                      <View key={order.orderNo}>
+                        <Modal
+                          visible={activeCancelOrder === order.orderNo}
+                          transparent={true}
+                          animationType="slide"
+                          onRequestClose={handleCloseCancelPopup}
+                        >
+                          <View style={styles.modalBackground}>
+                            <View style={styles.modalContainer}>
+                              <View style={styles.header}>
+                                <Text style={styles.editHeaderLabel}>Are you sure you want to cancel?</Text>
+                                <Icon name="close" size={24} onPress={handleCloseCancelPopup} />
+                              </View>
+                              <Text style={styles.modalMessage}>
+                                Are you sure you want to cancel this order? Once canceled, this action cannot be undone.
+                              </Text>
+                              <View style={styles.buttonsContainer}>
+                                <TouchableOpacity style={styles.cancelButton} onPress={handleCloseCancelPopup}>
+                                  <Text style={styles.buttonText}>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.confirmButton} onPress={() => handleConfirmCancel(order.orderNo)}>
+                                  <Text style={styles.buttonText}>Confirm</Text>
+                                </TouchableOpacity>
+                              </View>
+                            </View>
+                          </View>
+                        </Modal>
+                      </View>
+                    )
+                  ))
+                ))}
+                <Text style={styles.orderNumber}>{orderNo}</Text>
+                {groupList[orderNo].map((order, index) => (
+                  <Text style={styles.fabricPrice} key={index}><Text style={{ fontWeight: 'bold', fontSize: 16 }}>Total Price : </Text> ₹ {(order?.grossTotal + (order?.shipmentCost || 0) + order?.totalGst + (order?.packing?.packingCharges || 0)).toFixed(2) || 0}</Text>
+                ))}
+                {groupList[orderNo].map((order, index) => (
+                  ((order.orderStatus === 'CONFIRMED' && order.paymentBefore === true) || order.orderStatus === 'PACKED')
+                  && (
+                    <View style={styles.orderConfirmBtnContainer} key={index}>
+                      <TouchableOpacity style={styles.orderCancelButton} onPress={() => handleOrderCancelClick(order?.orderNo)}>
+                        <Text style={styles.orderConfirmBtnText}>Cancel Order</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={order?.utrNo ? [styles.orderConfirmButton, { backgroundColor: '#e3e3e3' }] : styles.orderConfirmButton}
+                        onPress={() => {
+                          setEditOrder(order);
+                          setModalOpened(true);
+                          setTransactionDetails(prevDetails => ({
+                            ...prevDetails, depositAmount: Number(order?.grossTotal) + Number(order.packing?.packingCharges || 0) + Number(order?.totalGst) + Number(order?.shipmentCost)
+                          }))
+                        }}
+                        disabled={order?.utrNo ? true : false}
+                      >
+                        <Text style={styles.orderConfirmBtnText}>{isTransactionUploaded[orderNo] ? "Transaction Uploaded" : "Upload Transaction"}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                ))}
+                {
+                  groupList[orderNo].map(order => (
+                    order.items.map((item, index) => (
+                      <TouchableOpacity key={index} style={styles.fabricOrderDetails} onPress={() => handleRowClick(orderNo)}>
+                        <View style={styles.fabricOrderInfo}>
+                          <Image source={{ uri: `${backendUrl}${item?.image?.replace("/api", "")}` }} alt={item?.productVariant?.name} style={styles.fabricImage} />
+                          <View style={styles.fabricOrderVariantInfo}>
+                            <Text style={styles.fabricOrderVariantName}>{item?.productVariant?.name}</Text>
+                            <Text style={styles.fabricOrderType}>{order?.orderType}</Text>
+                            <Text style={styles.fabricOrderText}>{order?.orderType !== 'SWATCH' ? 'Color' : 'Product Name'} : {order?.orderType !== 'SWATCH' ? `${item?.productVariant?.variants.filter(variant => variant?.type === 'Colour')[0]?.value || 'N/A'}` : `${item?.productName || 'N/A'}`}</Text>
+                          </View>
+                        </View>
+                        <View style={{ borderWidth: 0.5, borderColor: 'silver', marginTop: 15, }} />
+                        <View style={styles.fabricOrderPriceInfo}>
+                          <View style={styles.fabricOrderStatusContainer}>
+                            <View style={styles.statusContainer}>
+                              <View style={styles.statusIcon} />
+                              <Text style={styles.fabricOrderStatus}>{order?.orderStatus}</Text>
+                            </View>
+                            <Text style={styles.fabricStatusText}>{getDeliveryStatusMessage(order?.orderStatus)}</Text>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    ))
+                  ))
+                }
+              </View>
+            ))
+          ) : (
+            <Text style={styles.orderNotFound}>No orders found for {orderStatus} status.</Text>
+          )}
+        </ScrollView>
+
       </View>
 
       <Modal
@@ -308,11 +307,11 @@ const FabricOrder = () => {
                   value={field.name === 'depositAmount' ? parseFloat(transactionDetails[field.name]).toFixed(2) : transactionDetails[field.name]}
                   onChangeText={(value) => handleTransactionDetailChange(field.name, value)}
                   mt="xs"
-                  style={styles.inputField}
+                  style={field.disabled ? [styles.inputField, { backgroundColor: '#e3e3e3' }] : styles.inputField}
                 />
               </View>
             ))}
-            <View style={styles.inputFieldContainer}>
+            {/* <View style={styles.inputFieldContainer}>
               <Text style={styles.inputFieldText}>Deposit of Date</Text>
               <TextInput
                 value={transactionDetails?.dateOfDeposit || ''}
@@ -320,7 +319,7 @@ const FabricOrder = () => {
                 max={new Date().toISOString().split('T')[0]}
                 style={styles.inputField}
               />
-            </View>
+            </View> */}
             <TouchableOpacity style={
               (!transactionDetails?.bankName ||
                 !transactionDetails?.utrNo ||
@@ -346,26 +345,22 @@ const FabricOrder = () => {
   );
 };
 
-export default FabricOrder;
 
 const styles = StyleSheet.create({
   fabricContainer: {
     backgroundColor: "#F8F8F8",
     paddingVertical: 50,
+    marginTop: 20,
     flex: 1,
   },
   fabricInnerContainer: {
-    padding: 15,
-    paddingBottom: 60,
+    paddingHorizontal: 15,
+    gap: 5,
   },
   fabricHeader: {
     fontSize: 26,
     fontFamily: font.bold,
-  },
-  fabricMainContainer: {
-    marginTop: 20,
-    marginBottom: 90,
-    flexDirection: 'column',
+    marginBottom: 5,
   },
   fabricDropdownContainer: {
     flexDirection: 'row',
@@ -420,14 +415,20 @@ const styles = StyleSheet.create({
     fontFamily: font.semiBold,
   },
   packedInfo: {
-    fontSize: 18,
+    fontSize: 12,
     fontFamily: font.regular,
-    lineHeight: 25,
-    marginTop: 20,
+    lineHeight: 15,
   },
   fabricDetailsContainer: {
-    marginVertical: 20,
     flexDirection: 'column',
+    paddingBottom: 90,
+  },
+  fabricDetailsInnerContainer: {
+    backgroundColor: '#f2f2f2',
+    marginBottom: 20,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    gap: 10,
   },
   orderNumber: {
     fontSize: 18,
@@ -460,12 +461,12 @@ const styles = StyleSheet.create({
   },
   fabricOrderVariantInfo: {
     gap: 8,
+    width: '68%',
   },
   fabricOrderVariantName: {
     fontSize: 16,
     flexWrap: 'wrap',
     fontFamily: font.bold,
-    width: '70%',
     lineHeight: 20,
   },
   fabricOrderType: {
@@ -484,14 +485,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   fabricPrice: {
-    width: '38%',
     fontSize: 14,
     fontFamily: font.regular,
   },
   fabricOrderStatusContainer: {
     flexDirection: 'column',
     gap: 5,
-    width: '62%',
   },
   statusContainer: {
     flexDirection: 'row',
@@ -606,7 +605,6 @@ const styles = StyleSheet.create({
   // modal two btn styles
   orderConfirmBtnContainer: {
     flexDirection: 'row',
-    gap: 10,
     justifyContent: 'space-between',
   },
   orderCancelButton: {
@@ -627,3 +625,5 @@ const styles = StyleSheet.create({
     fontFamily: font.bold,
   },
 });
+
+export default FabricOrder;
