@@ -54,7 +54,6 @@ const SearchModal = ({ isVisible, onClose, searchData, data }) => {
     setShowAlert: () => {},
     showAlert: false,
   });
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -311,10 +310,26 @@ const SearchModal = ({ isVisible, onClose, searchData, data }) => {
     data.map((item) => {
       res.push(findKeyAndId(item, [...selectedItems, ...finalHardCodeArray]));
     });
-
+    console.log(res);
     setSelectedItems((prevSelectedItems) => {
       return res.reduce((acc, data) => {
         prevSelectedItems.forEach((item) => {
+          const selectedKey = Object.keys(item)[0];
+          const selectedValue = item[selectedKey];
+
+          if (data?.id === (selectedValue[0]?.id || selectedValue.categoryId)) {
+            if (!acc) {
+              acc = [];
+            }
+            acc.push({ [selectedKey]: selectedValue });
+          }
+        });
+        return acc;
+      }, []);
+    });
+    setSelectedItemsParent((prev) => {
+      return res.reduce((acc, data) => {
+        prev.forEach((item) => {
           const selectedKey = Object.keys(item)[0];
           const selectedValue = item[selectedKey];
 

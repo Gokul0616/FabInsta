@@ -578,7 +578,7 @@ const FabricOrderDetails = ({ route }) => {
               </View>
               {specificOrder?.items?.map((row, index) => {
                 return (
-                  <>
+                  <View key={index}>
                     {specificOrder?.orderStatus === "DELIVERED" &&
                       specificOrder.orderType !== "SWATCH" &&
                       specificOrder.orderType !== "SAMPLE" && (
@@ -675,7 +675,7 @@ const FabricOrderDetails = ({ route }) => {
                           )}
                       </View>
                     </View>
-                  </>
+                  </View>
                 );
               })}
               <View style={{ gap: 8, marginTop: 10 }}>

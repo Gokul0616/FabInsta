@@ -199,9 +199,8 @@ const HomeScreen = ({ navigation }) => {
     if (searchDisplayData.length === 0) {
       setIsAppliedFiltersVisible(false);
     }
-
-    const res = findKeyAndId(item, searchFilterRawData);
-
+    const item2 = item.split("(")[0];
+    const res = findKeyAndId(item2, searchFilterRawData);
     const updatedSearchData = { ...searchData };
 
     if (res?.key in updatedSearchData) {
@@ -209,7 +208,6 @@ const HomeScreen = ({ navigation }) => {
         (dataItem) => dataItem !== res?.id
       );
     }
-
     setSearchData(updatedSearchData);
   };
 
