@@ -78,6 +78,7 @@ function MyTabs() {
           params: { screen: "Fabric-Orders" },
         }),
     },
+
     {
       order: 3,
       displayOrder: 1,
@@ -129,6 +130,24 @@ function MyTabs() {
           tabBarInactiveTintColor: "#999",
         })}
         initialRouteName="Home"
+        screenListeners={({ navigation, route }) => ({
+          tabPress: (e) => {
+            // Prevent default tab press behavior
+            e.preventDefault();
+
+            // Reset the stack and navigate to the tab
+            // if (route.name === "Profile") {
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: route.name }],
+              })
+            );
+            // } else {
+            //   navigation.navigate(route.name);
+            // }
+          },
+        })}
       >
         <Tab.Screen name="Home" component={HomeTabLayout} />
         <Tab.Screen name="Cart" component={CartTabLayout} />

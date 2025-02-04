@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import ProfileScreen from "../../Screens/ProfileScreen/ProfileScreen";
 import FabricOrder from "../OptionsScreen/fabricOrders/FabricOrder";
+import FabricOrderDetails from "../OptionsScreen/fabricOrders/FabricOrderDetails";
 
 const Stack = createStackNavigator();
 
@@ -30,6 +31,10 @@ const ProfileLayout = () => {
     >
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
       <Stack.Screen name="Fabric-Orders" component={FabricOrder} />
+      <Stack.Screen
+        name="Fabric-Orders-Details"
+        component={FabricOrderDetails}
+      />
     </Stack.Navigator>
   );
 };

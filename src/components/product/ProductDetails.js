@@ -401,33 +401,24 @@ const ProductDetails = ({ route }) => {
 
     // Add to cart function
     const handleAddToCart = async () => {
-        if (minimumOrder % kgPerRoll !== 0 && minimumOrder >= cartOptions[selectedValue]?.Wholesale) {
-            setError(true)
-            return
+      if (
+        minimumOrder % kgPerRoll !== 0 &&
+        minimumOrder >= cartOptions[selectedValue]?.Wholesale
+      ) {
+        setError(true);
+        return;
+      }
+      if (profile?.approveStatus === "APPROVED") {
+        if (combo?.includes(selectedSku) === true) {
+          await api.post(`/cart/combo/save`, cart);
+        } else {
+          await api.post(`/cart/save`, cart);
         }
-        if (profile?.approveStatus === "APPROVED") {
-            if (combo?.includes(selectedSku) === true) {
-                await api.post(`/cart/combo/save`, cart)
-                reloadHomeScreen()
-            } else {
-                await api.post(`/cart/save`, cart)
-                reloadHomeScreen()
-            }
-            return navigation.navigate('Cart', { screen: 'cart', });
-        }
+        return navigation.navigate("Cart", { screen: "cart" });
+      }
     };
 
-    const reloadHomeScreen = () => {
-        navigation.dispatch(
-            CommonActions.reset({
-                index: 0,
-                routes: [
-                    { name: "HomeScreen" },
-                ],
-            })
-        );
-    };
-
+  
     return (
         <CreateProduct.Provider value={pim}>
             <SafeAreaView style={{ flex: 1, backgroundColor: "#fff", paddingTop: 50 }}>

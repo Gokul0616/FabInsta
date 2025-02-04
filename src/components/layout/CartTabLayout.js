@@ -1,8 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import React, { useCallback } from "react";
+import React from "react";
 import Checkout from "../../components/CheckOut/Checkout";
 import CartDetails from "../cart/CartDetails";
-import { useFocusEffect } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 

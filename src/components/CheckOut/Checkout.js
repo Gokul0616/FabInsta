@@ -1,17 +1,12 @@
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import Stepper from "./Stepper";
-import Shipping from "./Shipping";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import AlertBox from "../../Common/AlertBox";
+import api from "../../Service/api";
 import Policy from "./Policy";
 import ReviewOrder from "./ReviewOrder";
-import {
-  CommonActions,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native";
-import _ from "lodash";
-import api from "../../Service/api";
-import AlertBox from "../../Common/AlertBox";
+import Shipping from "./Shipping";
+import Stepper from "./Stepper";
 
 const Checkout = () => {
   const route = useRoute();
@@ -96,8 +91,6 @@ const Checkout = () => {
     setIsFullscreenLoading(true);
 
     try {
-      // Prepare the items array with the totalAmount for each item
-
       const items = cartItem.map((item) => {
         const kg = combo
           ? item?.combo?.quantity * item.variants.length
@@ -148,16 +141,14 @@ const Checkout = () => {
         swatchPoint: walletChecked ? addedWallet : 0,
         shipmentCost: shippingCost,
       };
-
-      // Call the API to save the order
       const response = await api.post("order/save", order);
-
-      //we need to change this order of routes
-      reloadCartScreen();
       navigation.navigate("Tabs", {
         screen: "Profile",
         params: { screen: "Fabric-Orders" },
       });
+
+      // Call this function after navigating to Fabric-Orders
+      // setOrderPlaced(true);
     } catch (error) {
       console.error("Error placing order:", error);
       setIsError({
@@ -174,14 +165,6 @@ const Checkout = () => {
     } finally {
       setIsFullscreenLoading(false);
     }
-  };
-  const reloadCartScreen = () => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: "cart" }],
-      })
-    );
   };
   const closeAlert = () => {
     setIsError((prev) => ({ ...prev, showAlert: false }));
@@ -215,19 +198,14 @@ const Checkout = () => {
   };
   const valueOption = ["PICKED BY CUSTOMER", "DELIVERED TO CUSTOMER"];
 
+  console.log(cartInfo, "cartInfo");
   const dropdownValues = [
     "Select Delivery Mode",
     "PICKED BY CUSTOMER",
     "DELIVERED TO CUSTOMER",
   ];
-
   return (
     <View style={styles.container}>
-      <Stepper
-        steps={stepperData.steps}
-        activeStep={activeStep}
-        setActiveStep={setActiveStep}
-      />
       {isFullscreenLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#FF6F61" />
@@ -242,51 +220,58 @@ const Checkout = () => {
         isRight={isError.isRight}
         rightButtonText={isError.rightButtonText}
       />
-      {activeStep === 0 && (
-        <Shipping
-          dropdownValues={dropdownValues}
-          setSelectedAddresses={setSelectedAddresses}
-          cartData={cartItem}
-          combo={combo}
-          delivery={delivery}
-          setDelivery={setDelivery}
-          cartInfo={cartInfo}
-          handleNextStep={handleNextStep}
-          selectedAddresses={selectedAddresses}
+      <>
+        <Stepper
+          steps={stepperData.steps}
+          activeStep={activeStep}
+          setActiveStep={setActiveStep}
         />
-      )}
-      {activeStep === 1 && (
-        <Policy
-          cartData={cartItem}
-          policyAccept={policyAccept}
-          setPolicyAccept={setPolicyAccept}
-          handleNextStep={handleNextStep}
-          cartInfo={cartInfo}
-          combo={combo}
-        />
-      )}
-      {activeStep === 2 && (
-        <ReviewOrder
-          payment={payment}
-          delivery={delivery}
-          setPayment={setPayment}
-          cartInfo={cartInfo}
-          cartData={cartItem}
-          priceSlab={priceSlab}
-          handlePlaceOrder={handlePlaceOrder}
-          selectedAddresses={selectedAddresses}
-          isLoading={isLoading}
-          activeStep={2}
-          handleNextStep={() => handleNextStep()}
-          combo={combo}
-          calculateShippingCharge={calculateShippingCharge()}
-          valueOption={valueOption}
-          walletChecked={walletChecked}
-          amount={amount}
-          handleWalletCheck={handleWalletCheckChange}
-          setAddedWallet={setAddedWallet}
-        />
-      )}
+        {activeStep === 0 && (
+          <Shipping
+            dropdownValues={dropdownValues}
+            setSelectedAddresses={setSelectedAddresses}
+            cartData={cartItem}
+            combo={combo}
+            delivery={delivery}
+            setDelivery={setDelivery}
+            cartInfo={cartInfo}
+            handleNextStep={handleNextStep}
+            selectedAddresses={selectedAddresses}
+          />
+        )}
+        {activeStep === 1 && (
+          <Policy
+            cartData={cartItem}
+            policyAccept={policyAccept}
+            setPolicyAccept={setPolicyAccept}
+            handleNextStep={handleNextStep}
+            cartInfo={cartInfo}
+            combo={combo}
+          />
+        )}
+        {activeStep === 2 && (
+          <ReviewOrder
+            payment={payment}
+            delivery={delivery}
+            setPayment={setPayment}
+            cartInfo={cartInfo}
+            cartData={cartItem}
+            priceSlab={priceSlab}
+            handlePlaceOrder={handlePlaceOrder}
+            selectedAddresses={selectedAddresses}
+            isLoading={isLoading}
+            activeStep={2}
+            handleNextStep={() => handleNextStep()}
+            combo={combo}
+            calculateShippingCharge={calculateShippingCharge()}
+            valueOption={valueOption}
+            walletChecked={walletChecked}
+            amount={amount}
+            handleWalletCheck={handleWalletCheckChange}
+            setAddedWallet={setAddedWallet}
+          />
+        )}
+      </>
     </View>
   );
 };
