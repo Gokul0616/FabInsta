@@ -8,6 +8,7 @@ import ProductInformation from './ProductInformation';
 import ProductOrder from './ProductOrder';
 import ProductSpecification from './ProductSpecification';
 import ProductStandardColor from './ProductStandardColor';
+import SimilarProducts from './SimilarProducts';
 
 export const CreateProduct = createContext();
 const ProductDetails = ({ route }) => {
@@ -42,6 +43,14 @@ const ProductDetails = ({ route }) => {
     const [error, setError] = useState(false);
     const [sampleCheck, setSampleCheck] = useState(true);
 
+    const scrollRef = useRef();
+
+    const onPressTouch = () => {
+        scrollRef.current?.scrollTo({
+            y: 0,
+            animated: true,
+        });
+    }
 
     // Fetch product information details useEffect
     useEffect(() => {
@@ -54,6 +63,7 @@ const ProductDetails = ({ route }) => {
             setLoading(false);
         };
         fetchAllProducts();
+        onPressTouch()
     }, [pimId]);
 
     useEffect(() => {
@@ -180,7 +190,7 @@ const ProductDetails = ({ route }) => {
                         hierarchy.push({
                             name: category.name,
                             hasParent: !!category.parentId,
-                            categoryId:category.categoryId
+                            categoryId: category.categoryId
                         });
                         currentId = category.parentId;
                     } else {
@@ -409,19 +419,19 @@ const ProductDetails = ({ route }) => {
 
     const reloadHomeScreen = () => {
         navigation.dispatch(
-          CommonActions.reset({
-            index: 0, 
-            routes: [
-              { name: "HomeScreen" },
-            ],
-          })
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: "HomeScreen" },
+                ],
+            })
         );
-      };
+    };
 
     return (
         <CreateProduct.Provider value={pim}>
             <SafeAreaView style={{ flex: 1, backgroundColor: "#fff", paddingTop: 50 }}>
-                <ScrollView style={{ flex: 1, flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+                <ScrollView style={{ flex: 1, flexGrow: 1 }} showsVerticalScrollIndicator={false} ref={scrollRef}>
                     <ProductInformation
                         pimData={pim}
                         loading={loading}
@@ -460,6 +470,9 @@ const ProductDetails = ({ route }) => {
                     <ProductStandardColor
                         pimData={pim}
                         colorOption={colorOption}
+                    />
+                    <SimilarProducts
+                        similarProduct={similarProduct}
                     />
                 </ScrollView>
             </SafeAreaView>

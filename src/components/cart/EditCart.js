@@ -5,8 +5,6 @@ import { backendUrl } from '../../Common/Common';
 import { font } from '../../Common/Theme';
 
 const EditCart = ({ editItem, setEditItem, handleEditSave, cancelRemove, error, setError, sampleMoq, wholesaleMoq, }) => {
-    console.log("editItem : ", editItem);
-
     return (
         <View style={styles.editContainerModal}>
             <View style={styles.editInnerContainerModal}>
