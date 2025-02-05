@@ -1,17 +1,21 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
+  BackHandler,
+  Image,
+  Modal,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
-  Modal,
   TouchableOpacity,
-  ScrollView,
-  BackHandler,
-  ActivityIndicator,
-  Image,
+  View,
 } from "react-native";
+import { Checkbox, List } from "react-native-paper";
 import Icon from "react-native-vector-icons/Feather";
-import { font } from "../../Common/Theme";
+import AlertBox from "../../Common/AlertBox";
+import { backendUrl, common } from "../../Common/Common";
+import { FiButton } from "../../Common/FiButton";
+import { FiInput } from "../../Common/FiInput";
 import {
   extractDisplayOrderData,
   findKeyAndId,
@@ -19,14 +23,16 @@ import {
   getChildren,
   processGroupedContent,
 } from "../../Common/FilterData";
-import { FiInput } from "../../Common/FiInput";
-import { Checkbox, List } from "react-native-paper";
-import { backendUrl, common } from "../../Common/Common";
+import { font } from "../../Common/Theme";
 import api from "../../Service/api";
-import AlertBox from "../../Common/AlertBox";
-import { FiButton } from "../../Common/FiButton";
 
-const SearchModal = ({ isVisible, onClose, searchData, data }) => {
+const SearchModal = ({
+  isVisible,
+  onClose,
+  searchData,
+  data,
+  filterFromProduct,
+}) => {
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
@@ -57,7 +63,6 @@ const SearchModal = ({ isVisible, onClose, searchData, data }) => {
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -100,6 +105,15 @@ const SearchModal = ({ isVisible, onClose, searchData, data }) => {
       setIsLoading(false);
     }
   };
+  const hasAppliedFilter = useRef(false);
+
+  useEffect(() => {
+    if (!hasAppliedFilter.current && selectedItems.length > 0) {
+      handleApplyFilter(selectedItems);
+      hasAppliedFilter.current = true;
+    }
+  }, [selectedItems]);
+
   const countSelectedItems = (name) => {
     const colourCount = selectedItems.filter((item) =>
       Object.keys(item).includes(name)
@@ -303,30 +317,31 @@ const SearchModal = ({ isVisible, onClose, searchData, data }) => {
     searchData({ data: [res] });
     onClose();
   };
-
   useEffect(() => {
     let res = [];
 
-    data.map((item) => {
+    data.forEach((item) => {
       res.push(findKeyAndId(item, [...selectedItems, ...finalHardCodeArray]));
     });
-    console.log(res);
+
     setSelectedItems((prevSelectedItems) => {
+      if (prevSelectedItems.length === 0 && filterFromProduct) {
+        return [filterFromProduct]; // Set filterFromProduct if selectedItems is empty
+      }
+
       return res.reduce((acc, data) => {
         prevSelectedItems.forEach((item) => {
           const selectedKey = Object.keys(item)[0];
           const selectedValue = item[selectedKey];
 
           if (data?.id === (selectedValue[0]?.id || selectedValue.categoryId)) {
-            if (!acc) {
-              acc = [];
-            }
             acc.push({ [selectedKey]: selectedValue });
           }
         });
         return acc;
       }, []);
     });
+
     setSelectedItemsParent((prev) => {
       return res.reduce((acc, data) => {
         prev.forEach((item) => {
@@ -334,16 +349,13 @@ const SearchModal = ({ isVisible, onClose, searchData, data }) => {
           const selectedValue = item[selectedKey];
 
           if (data?.id === (selectedValue[0]?.id || selectedValue.categoryId)) {
-            if (!acc) {
-              acc = [];
-            }
             acc.push({ [selectedKey]: selectedValue });
           }
         });
         return acc;
       }, []);
     });
-  }, [data]);
+  }, [data, filterFromProduct]);
 
   const closeAlert = () => {
     setIsError((prev) => ({ ...prev, showAlert: false }));

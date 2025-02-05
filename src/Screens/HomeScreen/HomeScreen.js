@@ -25,7 +25,7 @@ import api from "../../Service/api";
 import SearchModal from "./SearchModal";
 import SortingDropdown from "./SortingDropdown";
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, route }) => {
   const navigate = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollOffsetY = useRef(0);
@@ -39,6 +39,10 @@ const HomeScreen = ({ navigation }) => {
     showAlert: false,
   });
 
+  const catFilter = route.params;
+  let filterFromProduct = catFilter?.stateValue;
+
+  const filterValBool = filterFromProduct === undefined;
   const [totalItems, setTotalItems] = useState(0);
   const [productList, setProductList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -94,6 +98,7 @@ const HomeScreen = ({ navigation }) => {
         throw new Error("Invalid response structure");
       }
       const pim = response.response.content || [];
+
       setTotalItems(response.response.totalElements);
 
       const filteredPim = pim?.map((p) => ({
@@ -105,7 +110,13 @@ const HomeScreen = ({ navigation }) => {
       const totalPages = response.response.totalPages;
 
       if (render) {
-        setProductList((prev) => [...prev, ...filteredPim]);
+        setProductList((prev) => {
+          const newProducts = filteredPim.filter(
+            (newItem) =>
+              !prev.some((existingItem) => existingItem.pimId === newItem.pimId)
+          );
+          return [...prev, ...newProducts];
+        });
       } else {
         setProductList(filteredPim);
         setRender(true);
@@ -129,11 +140,6 @@ const HomeScreen = ({ navigation }) => {
       setFullScreenLoading(false);
     }
   };
-  useEffect(() => {
-    if (filterDropdownValue.length != 0) {
-      fetchProducts();
-    }
-  }, [page]);
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(0);
@@ -172,14 +178,6 @@ const HomeScreen = ({ navigation }) => {
     ) : (
       renderProduct({ item })
     );
-
-  useEffect(() => {
-    if (filterDropdownValue !== null) {
-      setProductList([]);
-      fetchProducts();
-    }
-  }, [filterDropdownValue, searchData]);
-
   const handleSearchData = (searchData) => {
     if (searchData.data && Object.keys(searchData.data[0]).length > 0) {
       setSearchFilterRawData(searchData.data[0]);
@@ -199,6 +197,7 @@ const HomeScreen = ({ navigation }) => {
     if (searchDisplayData.length === 0) {
       setIsAppliedFiltersVisible(false);
     }
+
     const item2 = item.split("(")[0];
     const res = findKeyAndId(item2, searchFilterRawData);
     const updatedSearchData = { ...searchData };
@@ -207,15 +206,95 @@ const HomeScreen = ({ navigation }) => {
       updatedSearchData[res?.key] = updatedSearchData[res?.key].filter(
         (dataItem) => dataItem !== res?.id
       );
+
+      // If the array for this key becomes empty, remove the key
+      if (updatedSearchData[res?.key].length === 0) {
+        delete updatedSearchData[res?.key];
+      }
     }
-    setSearchData(updatedSearchData);
+
+    console.log(updatedSearchData);
+
+    // Check if all keys in updatedSearchData are empty
+    const isAllEmpty = Object.values(updatedSearchData).every(
+      (arr) => arr.length === 0
+    );
+
+    if (isAllEmpty || Object.keys(updatedSearchData).length === 0) {
+      handleClearAll();
+    } else {
+      setSearchData(updatedSearchData);
+    }
   };
 
   const handleClearAll = () => {
     setSearchDisplayData([]);
     setSearchData(null);
     setIsAppliedFiltersVisible(false);
+    setProductList([]);
+    setPage(0);
+
+    // Reset filterFromProduct by updating route params
+    navigation.setParams({ stateValue: undefined });
+    setTotalItems(0);
+    fetchProducts();
   };
+
+  // const handleClearAll = () => {
+  //   setSearchDisplayData([]);
+  //   setSearchData(null);
+  //   setIsAppliedFiltersVisible(false);
+  //   // filterFromProduct = null;
+  //   // setProductList([]);
+  //   // setPage(0);
+  //   // fetchProducts();
+  // };
+
+  useEffect(() => {
+    if (filterDropdownValue.length != 0 && filterValBool) {
+      fetchProducts();
+    }
+  }, [page]);
+
+  // useEffect(() => {
+  //   if (filterDropdownValue.length != 0 && !filterValBool) {
+  //     fetchProducts();
+  //   }
+  // }, [page]);
+  useEffect(() => {
+    if (
+      filterDropdownValue !== null &&
+      filterFromProduct === undefined &&
+      !filterValBool
+    ) {
+      fetchProducts();
+    }
+  }, [filterDropdownValue]);
+
+  useEffect(() => {
+    if (searchData && !filterValBool) {
+      fetchProducts();
+    }
+  }, [searchData]);
+
+  useEffect(() => {
+    if (filterFromProduct !== null && !filterValBool) {
+      setProductList([]);
+    }
+  }, [filterFromProduct]);
+
+  useEffect(() => {
+    if (filterDropdownValue !== null && filterValBool) {
+      fetchProducts();
+    }
+  }, [filterDropdownValue, searchData]);
+
+  useEffect(() => {
+    if (filterFromProduct !== null && filterValBool) {
+      setProductList([]);
+    }
+  }, [filterFromProduct, searchData]);
+
   const renderSearchItems = () => {
     if (searchDisplayData.length === 0) {
       setIsAppliedFiltersVisible(false);
@@ -330,6 +409,7 @@ const HomeScreen = ({ navigation }) => {
           onClose={() => setModalVisible(false)}
           searchData={handleSearchData}
           data={searchDisplayData}
+          filterFromProduct={filterFromProduct}
         />
       </Animated.View>
       {productList.length === 0 && !isFullScreenLoading && (
@@ -495,8 +575,7 @@ const styles = StyleSheet.create({
     width: "50%",
     height: 50,
     justifyContent: "center",
-    // borderRightWidth: 1,
-    // borderColor: "#ccc",
+
     alignItems: "center",
     display: "flex",
   },

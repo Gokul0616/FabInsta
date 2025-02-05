@@ -37,10 +37,12 @@ const ProductSpecification = ({ pimData, categories, fabricCodes, priceSlab }) =
 
   const handleScubaClick = (category) => {
     for (const [key, value] of Object.entries(pimData?.attributes || {})) {
-      const stateValue = { [key]: [value] }
+      const stateValue = { [key]: value };
       if (key === "Fabric Type") {
-        const queryString = `fabrics?FabricType=${category.name}`;
-        // navigation.navigate(queryString);
+        navigation.navigate("Home", {
+          screen: "HomeScreen",
+          params: { stateValue },
+        });
       }
     }
   };
