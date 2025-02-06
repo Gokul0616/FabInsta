@@ -12,25 +12,13 @@ import { font } from "../Theme";
 import api from "../../Service/api";
 import { useNavigation } from "@react-navigation/native";
 
-const CustomDrawer = ({ options, closeDrawer }) => {
-  const [profile, setProfile] = useState({});
+const CustomDrawer = ({ options, closeDrawer, profile }) => {
   const groupedOptions = options.reduce((acc, option) => {
     acc[option.order] = acc[option.order] || [];
     acc[option.order].push(option);
     return acc;
   }, {});
   const navigate = useNavigation();
-  const fetchAllProfile = async () => {
-    try {
-      const res = await api.get(`customer/profile`);
-      setProfile(res?.response || []);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
-  useEffect(() => {
-    fetchAllProfile();
-  }, []);
   return (
     <View style={styles.drawerContainer}>
       <Pressable

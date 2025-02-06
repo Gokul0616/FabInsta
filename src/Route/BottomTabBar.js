@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { DrawerLayout } from "react-native-gesture-handler";
 import { CommonActions, useNavigation } from "@react-navigation/native";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { common, storage } from "../Common/Common";
@@ -10,6 +10,7 @@ import ProfileLayout from "../components/layout/ProfileLayout";
 import Header from "../Screens/Header";
 import HomeTabLayout from "../Screens/HomeScreen/HomeTabLayout";
 import CustomDrawer from "../Common/OptionsModal/CustomDrawer";
+import api from "../Service/api";
 
 const Tab = createBottomTabNavigator();
 
@@ -17,7 +18,19 @@ function MyTabs() {
   const navigate = useNavigation();
   const scrollY = new Animated.Value(0);
   const drawerRef = useRef(null);
+  const [profile, setProfile] = useState({});
 
+  const fetchAllProfile = async () => {
+    try {
+      const res = await api.get(`customer/profile`);
+      setProfile(res?.response || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+  useEffect(() => {
+    fetchAllProfile();
+  }, []);
   const openDrawer = () => {
     if (drawerRef.current) {
       drawerRef.current.openDrawer();
@@ -136,7 +149,11 @@ function MyTabs() {
       drawerWidth={Dimensions.get("window").width / 1.5}
       drawerPosition="left"
       renderNavigationView={() => (
-        <CustomDrawer options={options} closeDrawer={closeDrawer} />
+        <CustomDrawer
+          options={options}
+          closeDrawer={closeDrawer}
+          profile={profile}
+        />
       )}
     >
       <View style={{ flex: 1 }}>
