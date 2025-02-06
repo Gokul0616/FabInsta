@@ -16,6 +16,7 @@ import moment from "moment";
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
 import AlertBox from "../../../Common/AlertBox";
+import Icon from "react-native-vector-icons/Feather";
 
 const FabricInquiries = () => {
   const [data, setData] = useState([]);
@@ -125,6 +126,22 @@ const FabricInquiries = () => {
         rightButtonText={isError.rightButtonText}
       />
       <View style={styles.headerContainer}>
+        <TouchableOpacity
+          onPress={() => navigate.goBack()}
+          style={{
+            paddingVertical: 10,
+            paddingHorizontal: 5,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Icon name="arrow-left" size={24} color="#333" />
+          <Text
+            style={{ color: "#000", fontFamily: font.semiBold, fontSize: 18 }}
+          >
+            Back
+          </Text>
+        </TouchableOpacity>
         <View style={styles.headerRow}>
           <Text style={styles.headerText}>Fabric Inquiries</Text>
           <FiButton
@@ -169,7 +186,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F8F8",
-    paddingTop: 50,
     paddingHorizontal: 10,
   },
   headerContainer: {},

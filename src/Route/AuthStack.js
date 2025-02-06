@@ -6,6 +6,14 @@ import AuthScreen from "../Screens/AuthScreen/LogInScreen";
 import SignUpScreen from "../Screens/AuthScreen/SignUpScreen";
 import LogoutHandler from "../Service/LogoutHandler";
 import MyTabs from "./BottomTabBar";
+import FabricInquiries from "../components/OptionsScreen/FabricEnquiry/FabricInqiries";
+import NewInquiryScreen from "../components/OptionsScreen/FabricEnquiry/NewInquiryScreen";
+import Address from "../components/OptionsScreen/Address/address";
+import WishListDetails from "../components/WishListDetails";
+import FabricOrder from "../components/OptionsScreen/fabricOrders/FabricOrder";
+import FabricOrderDetails from "../components/OptionsScreen/fabricOrders/FabricOrderDetails";
+import FabricInquiryDetails from "../components/OptionsScreen/FabricEnquiry/FabricInquiryDetails";
+import Checkout from "../components/CheckOut/Checkout";
 
 const Stack = createStackNavigator();
 
@@ -42,6 +50,22 @@ const AuthStack = () => {
       <Stack.Screen name="Signup" component={SignUpScreen} />
       <Stack.Screen name="Tabs" component={MyTabs} />
       <Stack.Screen name="Logout" component={LogoutHandler} />
+
+      <Stack.Screen name="FabricInqiries" component={FabricInquiries} />
+      <Stack.Screen name="NewInquiryScreen" component={NewInquiryScreen} />
+      <Stack.Screen name="Address" component={Address} />
+      <Stack.Screen name="wishList-Details" component={WishListDetails} />
+
+      <Stack.Screen name="checkout" component={Checkout} />
+      <Stack.Screen name="Fabric-Orders" component={FabricOrder} />
+      <Stack.Screen
+        name="Fabric-Orders-Details"
+        component={FabricOrderDetails}
+      />
+      <Stack.Screen
+        name="FabricInquiryDetails"
+        component={FabricInquiryDetails}
+      />
     </Stack.Navigator>
   );
 };

@@ -120,7 +120,7 @@ const AuthScreen = () => {
       storage.set("companyId", companyId == null ? "" : companyId);
       storage.set("token", token);
       storage.set("userId", userId);
-       clearStackAndNavigate();
+      clearStackAndNavigate();
     } catch (error) {
       console.error("Error fetching data:", error);
       setIsError({
@@ -306,6 +306,7 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 10,
     fontFamily: font.regular,
+    color: "#000",
   },
   passwordContainer: {
     marginBottom: 10,

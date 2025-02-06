@@ -121,11 +121,8 @@ const FabricOrder = () => {
   };
 
   const handleRowClick = (orderNo) => {
-    navigation.navigate("Profile", {
-      screen: "Fabric-Orders-Details",
-      params: {
-        orderNo: orderNo,
-      },
+    navigation.navigate("Fabric-Orders-Details", {
+      orderNo: orderNo,
     });
   };
 
@@ -205,8 +202,25 @@ const FabricOrder = () => {
     }));
     hideDatePicker();
   };
+  const navigate = useNavigation();
   return (
     <View style={styles.fabricContainer}>
+      <TouchableOpacity
+        onPress={() => navigate.goBack()}
+        style={{
+          paddingVertical: 10,
+          paddingHorizontal: 10,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <Icon name="arrowleft" size={24} color="#333" />
+        <Text
+          style={{ color: "#000", fontFamily: font.semiBold, fontSize: 18 }}
+        >
+          Back
+        </Text>
+      </TouchableOpacity>
       <View style={styles.fabricInnerContainer}>
         <Text style={styles.fabricHeader}>Fabric Orders</Text>
         {count > 0 && (
@@ -615,12 +629,13 @@ const FabricOrder = () => {
 const styles = StyleSheet.create({
   fabricContainer: {
     backgroundColor: "#F8F8F8",
-    paddingVertical: 50,
-    marginTop: 20,
+    paddingVertical: 0,
+    marginTop: 5,
     flex: 1,
   },
   fabricInnerContainer: {
     paddingHorizontal: 15,
+    paddingTop: 10,
     gap: 5,
   },
   fabricHeader: {

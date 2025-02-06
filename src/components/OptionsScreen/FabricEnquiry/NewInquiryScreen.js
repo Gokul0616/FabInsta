@@ -675,17 +675,33 @@ const NewInquiryScreen = () => {
           <ActivityIndicator size="large" color="#FF6F61" />
         </View>
       )}
+      <AlertBox
+        heading={isError.heading}
+        message={isError.message}
+        setShowAlert={closeAlert}
+        showAlert={isError.showAlert}
+        triggerFunction={isError.triggerFunction}
+        isRight={isError.isRight}
+        rightButtonText={isError.rightButtonText}
+      />
       <ScrollView contentContainerStyle={styles.container}>
         <SafeAreaView>
-          <AlertBox
-            heading={isError.heading}
-            message={isError.message}
-            setShowAlert={closeAlert}
-            showAlert={isError.showAlert}
-            triggerFunction={isError.triggerFunction}
-            isRight={isError.isRight}
-            rightButtonText={isError.rightButtonText}
-          />
+          <TouchableOpacity
+            onPress={() => navigate.goBack()}
+            style={{
+              paddingVertical: 10,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Icon name="arrow-left" size={24} color="#333" />
+            <Text
+              style={{ color: "#000", fontFamily: font.semiBold, fontSize: 18 }}
+            >
+              Back
+            </Text>
+          </TouchableOpacity>
+
           <View style={styles.headerContainer}>
             <Text style={styles.headingText}>Fabric Inquiry</Text>
           </View>
@@ -732,7 +748,6 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: "#fff",
-    paddingTop: 50,
     paddingHorizontal: 15,
   },
   headerContainer: {
@@ -741,7 +756,7 @@ const styles = StyleSheet.create({
   },
   headingText: {
     fontFamily: font.semiBold,
-    paddingTop: 50,
+    paddingTop: 10,
     fontSize: 26,
   },
   detailsContainer: {

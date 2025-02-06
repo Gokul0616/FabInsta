@@ -29,7 +29,6 @@ const CartTabLayout = () => {
       }}
     >
       <Stack.Screen name="cart" component={CartDetails} />
-      <Stack.Screen name="checkout" component={Checkout} />
     </Stack.Navigator>
   );
 };

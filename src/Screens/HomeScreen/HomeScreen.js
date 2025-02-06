@@ -7,9 +7,9 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
+  Text,Dimensions,
   TouchableOpacity,
-  View,
+  View,useWindowDimensions
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import AlertBox from "../../Common/AlertBox";
@@ -148,36 +148,41 @@ const HomeScreen = ({ navigation, route }) => {
 
     setRefreshing(false);
   };
+const { width } = useWindowDimensions(); 
+const [numColumns, setNumColumns] = useState(Math.max(2, Math.floor(width / 160)));
 
-  const getGridData = () => {
-    const numColumns = 2;
-    const rows = Math.ceil(productList.length / numColumns);
-    const gridData = [...productList];
-    const emptyItems = rows * numColumns - productList.length;
+useEffect(() => {
+  const newNumColumns = Math.max(2, Math.floor(width / 160));
+  setNumColumns(newNumColumns);
+}, [width]); 
 
-    for (let i = 0; i < emptyItems; i++) {
-      gridData.push({ id: `empty-${i}`, empty: true });
-    }
+const getGridData = () => {
+  const rows = Math.ceil(productList.length / numColumns);
+  const gridData = [...productList];
+  const emptyItems = rows * numColumns - productList.length;
+  for (let i = 0; i < emptyItems; i++) {
+    gridData.push({ id: `empty-${i}`, empty: true });
+  }
+  return { gridData, numColumns };
+};
 
-    return gridData;
-  };
-
+const { gridData } = getGridData();
   const closeAlert = () => {
     setIsError((prev) => ({ ...prev, showAlert: false }));
   };
-
   const renderProduct = ({ item }) => (
     <View style={styles.itemContainer}>
       <MainProductPage product={item} navigation={navigation} />
     </View>
   );
 
-  const renderGridItem = ({ item }) =>
-    item.empty ? (
+  const renderGridItem = ({ item }) =>{
+return    item.empty ? (
       <View style={[styles.itemContainer, styles.emptyItem]} />
     ) : (
       renderProduct({ item })
     );
+  }
   const handleSearchData = (searchData) => {
     if (searchData.data && Object.keys(searchData.data[0]).length > 0) {
       setSearchFilterRawData(searchData.data[0]);
@@ -207,15 +212,14 @@ const HomeScreen = ({ navigation, route }) => {
         (dataItem) => dataItem !== res?.id
       );
 
-      // If the array for this key becomes empty, remove the key
+      
       if (updatedSearchData[res?.key].length === 0) {
         delete updatedSearchData[res?.key];
       }
     }
 
-    console.log(updatedSearchData);
 
-    // Check if all keys in updatedSearchData are empty
+    
     const isAllEmpty = Object.values(updatedSearchData).every(
       (arr) => arr.length === 0
     );
@@ -234,21 +238,21 @@ const HomeScreen = ({ navigation, route }) => {
     setProductList([]);
     setPage(0);
 
-    // Reset filterFromProduct by updating route params
+    
     navigation.setParams({ stateValue: undefined });
     setTotalItems(0);
     fetchProducts();
   };
 
-  // const handleClearAll = () => {
-  //   setSearchDisplayData([]);
-  //   setSearchData(null);
-  //   setIsAppliedFiltersVisible(false);
-  //   // filterFromProduct = null;
-  //   // setProductList([]);
-  //   // setPage(0);
-  //   // fetchProducts();
-  // };
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   useEffect(() => {
     if (filterDropdownValue.length != 0 && filterValBool) {
@@ -256,11 +260,11 @@ const HomeScreen = ({ navigation, route }) => {
     }
   }, [page]);
 
-  // useEffect(() => {
-  //   if (filterDropdownValue.length != 0 && !filterValBool) {
-  //     fetchProducts();
-  //   }
-  // }, [page]);
+  
+  
+  
+  
+  
   useEffect(() => {
     if (
       filterDropdownValue !== null &&
@@ -373,7 +377,7 @@ const HomeScreen = ({ navigation, route }) => {
       </View>
     );
   };
-
+  
   return (
     <SafeAreaView style={styles.container}>
       {isFullScreenLoading && (
@@ -418,6 +422,7 @@ const HomeScreen = ({ navigation, route }) => {
         </View>
       )}
       <AlertBox
+
         heading={isError.heading}
         message={isError.message}
         setShowAlert={closeAlert}
@@ -428,11 +433,14 @@ const HomeScreen = ({ navigation, route }) => {
       />
       {productList.length > 0 && (
         <Animated.FlatList
-          data={getGridData()}
+          data={gridData}
           renderItem={renderGridItem}
+          key={numColumns} 
           keyExtractor={(item) => {
             return item.pimId;
           }}
+          
+          columnWrapperStyle={numColumns > 1 ? { justifyContent: "space-between" } : {}} 
           ListHeaderComponent={
             <View style={styles.totalItemsContainer}>
               <Text style={styles.totalItemsText}>
@@ -449,7 +457,7 @@ const HomeScreen = ({ navigation, route }) => {
             styles.listContainer,
             { paddingTop: isAppliedFiltersVisible ? 150 : 100 },
           ]}
-          numColumns={2}
+          numColumns={numColumns}
           maxToRenderPerBatch={6}
           initialNumToRender={6}
           windowSize={5}

@@ -34,15 +34,6 @@ const HomeTabLayout = () => {
     >
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="fabrics" component={ProductDetails} />
-      <Stack.Screen name="FabricInqiries" component={FabricInqiries} />
-      <Stack.Screen name="NewInquiryScreen" component={NewInquiryScreen} />
-      <Stack.Screen name="Address" component={Address} />
-      <Stack.Screen name="wishList-Details" component={WishListDetails} />
-
-      <Stack.Screen
-        name="FabricInquiryDetails"
-        component={FabricInquiryDetails}
-      />
     </Stack.Navigator>
   );
 };

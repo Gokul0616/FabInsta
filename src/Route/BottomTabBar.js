@@ -1,30 +1,40 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { DrawerLayout } from "react-native-gesture-handler";
 import { CommonActions, useNavigation } from "@react-navigation/native";
-import { useRef, useState } from "react";
-import { Animated } from "react-native";
+import { useRef } from "react";
+import { Animated, Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { common, storage } from "../Common/Common";
-import OptionsModal from "../Common/OptionsModal/OptionsModal";
 import CartTabLayout from "../components/layout/CartTabLayout";
 import ProfileLayout from "../components/layout/ProfileLayout";
 import Header from "../Screens/Header";
 import HomeTabLayout from "../Screens/HomeScreen/HomeTabLayout";
+import CustomDrawer from "../Common/OptionsModal/CustomDrawer";
 
 const Tab = createBottomTabNavigator();
 
 function MyTabs() {
   const navigate = useNavigation();
-  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollY = new Animated.Value(0);
+  const drawerRef = useRef(null);
+
+  const openDrawer = () => {
+    if (drawerRef.current) {
+      drawerRef.current.openDrawer();
+    }
+  };
+
+  const closeDrawer = () => {
+    if (drawerRef.current) {
+      drawerRef.current.closeDrawer();
+    }
+  };
+
   const clearStackAndNavigate = () => {
     navigate.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [
-          {
-            name: "Signin",
-          },
-        ],
+        routes: [{ name: "Signin" }],
       })
     );
     storage.delete("token");
@@ -34,126 +44,136 @@ function MyTabs() {
       order: 1,
       displayOrder: 1,
       label: "Fabric Inquiries",
-      onPress: () =>
-        navigate.navigate("Tabs", {
-          screen: "Home",
-          params: { screen: "FabricInqiries" },
-        }),
+      onPress: () => {
+        closeDrawer();
+        setTimeout(() => {
+          navigate.navigate("FabricInqiries");
+        }, 100);
+      },
     },
     {
       order: 1,
       displayOrder: 2,
       label: "Order Inquiries",
-      onPress: () => console.log("Option 1 selected"),
+      onPress: () => {
+        closeDrawer();
+        setTimeout(() => {
+          console.log("Option 1 selected");
+        }, 100);
+      },
     },
     {
       order: 1,
       displayOrder: 3,
       label: "Bulk Quotes",
-      onPress: () => console.log("Option 1 selected"),
+      onPress: () => {
+        closeDrawer();
+        setTimeout(() => {
+          console.log("Option 2 selected");
+        }, 100);
+      },
     },
     {
       order: 1,
       displayOrder: 4,
       label: `My ${common.title}`,
-      onPress: () => console.log("Option 2 selected"),
+      onPress: () => {
+        closeDrawer();
+        setTimeout(() => {
+          console.log("Option 3 selected");
+        }, 100);
+      },
     },
     {
       order: 1,
       displayOrder: 5,
       label: "WishList",
-      onPress: () =>
-        navigate.navigate("Tabs", {
-          screen: "Home",
-          params: { screen: "wishList-Details" },
-        }),
+      onPress: () => {
+        closeDrawer();
+        setTimeout(() => {
+          navigate.navigate("wishList-Details");
+        }, 100);
+      },
     },
     {
       order: 2,
       displayOrder: 1,
       label: "Fabric Orders",
-      onPress: () =>
-        navigate.navigate("Tabs", {
-          screen: "Profile",
-          params: { screen: "Fabric-Orders" },
-        }),
+      onPress: () => {
+        closeDrawer();
+        setTimeout(() => {
+          navigate.navigate("Fabric-Orders");
+        }, 100);
+      },
     },
-
     {
       order: 3,
       displayOrder: 1,
       label: "Addresses",
-      onPress: () =>
-        navigate.navigate("Tabs", {
-          screen: "Home",
-          params: { screen: "Address" },
-        }),
+      onPress: () => {
+        closeDrawer();
+        setTimeout(() => {
+          navigate.navigate("Address");
+        }, 100);
+      },
     },
     {
       order: 4,
       displayOrder: 1,
       label: "Logout",
-      onPress: () => clearStackAndNavigate(),
+      onPress: () => {
+        closeDrawer();
+        setTimeout(() => {
+          clearStackAndNavigate();
+        }, 100);
+      },
     },
   ];
+
   return (
-    <>
-      <Header
-        scrollY={scrollY}
-        onOptionsPress={() => {
-          setIsOptionsVisible(true);
-        }}
-        isOptionsVisible={isOptionsVisible}
-      />
-      <OptionsModal
-        isVisible={isOptionsVisible}
-        onClose={() => setIsOptionsVisible(false)}
-        options={options}
-      />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => {
-            let iconName;
-
-            if (route.name === "Home") {
-              iconName = "home";
-            } else if (route.name === "Profile") {
-              iconName = "user";
-            } else if (route.name === "Cart") {
-              iconName = "shopping-bag";
-            }
-
-            return <Icon name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: "#FF6F61",
-          tabBarInactiveTintColor: "#999",
-        })}
-        initialRouteName="Home"
-        screenListeners={({ navigation, route }) => ({
-          tabPress: (e) => {
-            // Prevent default tab press behavior
-            e.preventDefault();
-
-            // Reset the stack and navigate to the tab
-            // if (route.name === "Profile") {
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: route.name }],
-              })
-            );
-            // } else {
-            //   navigation.navigate(route.name);
-            // }
-          },
-        })}
-      >
-        <Tab.Screen name="Home" component={HomeTabLayout} />
-        <Tab.Screen name="Cart" component={CartTabLayout} />
-        <Tab.Screen name="Profile" component={ProfileLayout} />
-      </Tab.Navigator>
-    </>
+    <DrawerLayout
+      ref={drawerRef}
+      drawerWidth={Dimensions.get("window").width / 1.5}
+      drawerPosition="left"
+      renderNavigationView={() => <CustomDrawer options={options} />}
+    >
+      <View style={{ flex: 1 }}>
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            header: () => (
+              <Header scrollY={scrollY} onOptionsPress={() => openDrawer()} />
+            ),
+            tabBarIcon: ({ color, size }) => {
+              let iconName =
+                route.name === "Home"
+                  ? "home"
+                  : route.name === "Profile"
+                  ? "user"
+                  : "shopping-bag";
+              return <Icon name={iconName} size={size} color={color} />;
+            },
+            tabBarActiveTintColor: "#FF6F61",
+            tabBarInactiveTintColor: "#999",
+          })}
+          initialRouteName="Home"
+          screenListeners={({ navigation, route }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: route.name }],
+                })
+              );
+            },
+          })}
+        >
+          <Tab.Screen name="Home" component={HomeTabLayout} />
+          <Tab.Screen name="Cart" component={CartTabLayout} />
+          <Tab.Screen name="Profile" component={ProfileLayout} />
+        </Tab.Navigator>
+      </View>
+    </DrawerLayout>
   );
 }
 

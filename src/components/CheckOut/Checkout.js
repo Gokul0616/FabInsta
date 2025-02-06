@@ -1,12 +1,20 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Text,
+} from "react-native";
 import AlertBox from "../../Common/AlertBox";
 import api from "../../Service/api";
 import Policy from "./Policy";
 import ReviewOrder from "./ReviewOrder";
 import Shipping from "./Shipping";
 import Stepper from "./Stepper";
+import Icon from "react-native-vector-icons/Feather";
+import { font } from "../../Common/Theme";
 
 const Checkout = () => {
   const route = useRoute();
@@ -142,10 +150,7 @@ const Checkout = () => {
         shipmentCost: shippingCost,
       };
       const response = await api.post("order/save", order);
-      navigation.navigate("Tabs", {
-        screen: "Profile",
-        params: { screen: "Fabric-Orders" },
-      });
+      navigation.navigate("Fabric-Orders");
 
       // Call this function after navigating to Fabric-Orders
       // setOrderPlaced(true);
@@ -206,6 +211,22 @@ const Checkout = () => {
   ];
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => navigate.goBack()}
+        style={{
+          paddingVertical: 10,
+          paddingHorizontal: 5,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <Icon name="arrow-left" size={24} color="#333" />
+        <Text
+          style={{ color: "#000", fontFamily: font.semiBold, fontSize: 18 }}
+        >
+          Back
+        </Text>
+      </TouchableOpacity>
       {isFullscreenLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#FF6F61" />
@@ -282,7 +303,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#F8F8F8",
     paddingHorizontal: 8,
-    paddingTop: 50,
+    paddingVertical: 10,
     flex: 1,
   },
   loadingOverlay: {

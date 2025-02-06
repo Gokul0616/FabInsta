@@ -11,7 +11,7 @@ const api = axios.create({
     Accept: ["application/json", "multipart/form-data"],
   },
 });
-
+let isNavigate = false;
 api.interceptors.request.use(
   (config) => {
     const token = storage.getString("token");
@@ -34,7 +34,10 @@ api.interceptors.response.use(
     const { response } = error;
 
     if (response && response.status === 401) {
-      navigate("Logout");
+      if (!isNavigate) {
+        navigate("Logout");
+        isNavigate = true;
+      }
     }
 
     return Promise.reject(error);

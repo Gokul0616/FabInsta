@@ -826,7 +826,8 @@ export default FabricOrderDetails;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    paddingVertical: 60,
+    paddingVertical: 10,
+    paddingBottom: 30,
     paddingHorizontal: 10,
     gap: 20,
   },

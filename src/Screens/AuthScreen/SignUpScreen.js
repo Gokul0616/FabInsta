@@ -420,6 +420,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     paddingHorizontal: 10,
+    color: "#000",
     fontFamily: font.regular,
   },
   passwordContainer: {

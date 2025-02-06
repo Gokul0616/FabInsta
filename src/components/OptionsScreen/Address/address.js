@@ -20,6 +20,7 @@ import { Checkbox } from "react-native-paper";
 import { FiInput } from "../../../Common/FiInput";
 import statesAndDistricts from "../../../Common/StatesAndDistricts.json";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 const Address = () => {
   const [data, setData] = useState([]);
@@ -688,6 +689,7 @@ const Address = () => {
       </View>
     );
   };
+  const navigate = useNavigation();
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <AlertBox
@@ -705,6 +707,22 @@ const Address = () => {
         </View>
       )}
       <View>
+        <TouchableOpacity
+          onPress={() => navigate.goBack()}
+          style={{
+            paddingVertical: 10,
+            paddingHorizontal: 5,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Icon name="arrow-left" size={24} color="#333" />
+          <Text
+            style={{ color: "#000", fontFamily: font.semiBold, fontSize: 18 }}
+          >
+            Back
+          </Text>
+        </TouchableOpacity>
         <View style={styles.innerContainer}>
           <View style={styles.headerRow}>
             <Text style={styles.headerText}>Addresses</Text>
@@ -738,7 +756,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     backgroundColor: "#F8F8F8",
     paddingHorizontal: 16,
-    paddingVertical: 50,
+    paddingBottom: 20,
     flexGrow: 1,
   },
   innerContainer: {

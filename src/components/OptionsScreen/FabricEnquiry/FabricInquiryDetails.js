@@ -4,19 +4,39 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import React from "react";
 import { font } from "../../../Common/Theme";
 import { backendUrl, common } from "../../../Common/Common";
 import moment from "moment";
+import Icon from "react-native-vector-icons/Feather";
+import { useNavigation } from "@react-navigation/native";
 
 const FabricInquiryDetails = ({ route }) => {
   const { item } = route.params;
+  const navigate = useNavigation();
   const imageUrl = backendUrl + item?.referenceImage?.replace("/api", "");
   return (
     <ScrollView>
       <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          onPress={() => navigate.goBack()}
+          style={{
+            paddingVertical: 10,
+            flexDirection: "row",
+            paddingHorizontal: 10,
+            alignItems: "center",
+          }}
+        >
+          <Icon name="arrow-left" size={24} color="#333" />
+          <Text
+            style={{ color: "#000", fontFamily: font.semiBold, fontSize: 18 }}
+          >
+            Back
+          </Text>
+        </TouchableOpacity>
         <View style={styles.headerRow}>
           <Text style={styles.headerText}>{item.endUse}</Text>
 
@@ -126,7 +146,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F8F8",
-    paddingTop: 50,
     paddingHorizontal: 10,
   },
 
