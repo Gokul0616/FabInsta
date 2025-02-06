@@ -125,7 +125,7 @@ function MyTabs() {
         closeDrawer();
         setTimeout(() => {
           clearStackAndNavigate();
-        }, 100);
+        }, 50);
       },
     },
   ];
@@ -135,7 +135,9 @@ function MyTabs() {
       ref={drawerRef}
       drawerWidth={Dimensions.get("window").width / 1.5}
       drawerPosition="left"
-      renderNavigationView={() => <CustomDrawer options={options} />}
+      renderNavigationView={() => (
+        <CustomDrawer options={options} closeDrawer={closeDrawer} />
+      )}
     >
       <View style={{ flex: 1 }}>
         <Tab.Navigator

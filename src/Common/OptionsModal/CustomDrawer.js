@@ -1,20 +1,66 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Pressable,
+} from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { font } from "../Theme";
+import api from "../../Service/api";
+import { useNavigation } from "@react-navigation/native";
 
-const CustomDrawer = ({ options }) => {
+const CustomDrawer = ({ options, closeDrawer }) => {
+  const [profile, setProfile] = useState({});
   const groupedOptions = options.reduce((acc, option) => {
     acc[option.order] = acc[option.order] || [];
     acc[option.order].push(option);
     return acc;
   }, {});
-
+  const navigate = useNavigation();
+  const fetchAllProfile = async () => {
+    try {
+      const res = await api.get(`customer/profile`);
+      setProfile(res?.response || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+  useEffect(() => {
+    fetchAllProfile();
+  }, []);
   return (
     <View style={styles.drawerContainer}>
+      <Pressable
+        style={styles.userHeader}
+        onPress={() => {
+          closeDrawer(),
+            setTimeout(() => {
+              navigate.navigate("Tabs", {
+                screen: "Profile",
+              });
+            }, 100);
+        }}
+      >
+        <Image
+          source={{
+            uri: "https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2264922221.jpg",
+          }}
+          style={styles.userImage}
+        />
+
+        <View style={styles.userInfo}>
+          <Text style={styles.greeting}>Welcome,</Text>
+          <Text style={styles.userName}>{profile.name}</Text>
+        </View>
+      </Pressable>
+
+      <View style={styles.separator} />
+
       {Object.keys(groupedOptions).map((orderKey, orderIndex) => {
         const items = groupedOptions[orderKey];
-
         return (
           <View key={orderKey}>
             {items.map((item, itemIndex) => (
@@ -43,6 +89,35 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
   },
+  userHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  userImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30, // Makes the image circular
+    marginRight: 15,
+  },
+  userInfo: {
+    flexDirection: "column",
+  },
+  greeting: {
+    fontSize: 14,
+    color: "#777",
+    fontFamily: font.regular,
+  },
+  userName: {
+    fontSize: 18,
+    color: "#333",
+    fontFamily: font.bold,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#ccc",
+    marginVertical: 10,
+  },
   optionItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -53,11 +128,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     fontFamily: font.semiBold,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 10,
   },
 });
 
