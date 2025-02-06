@@ -212,7 +212,7 @@ const ProfileScreen = () => {
         <View style={{ paddingVertical: 20 }}>
           <View style={styles.profileHeaderContainer}>
             <Text style={styles.profileHeaderText}>Profile</Text>
-            <View style={styles.profileHeader}>
+            <View style={[styles.profileHeader, { marginLeft: 5 }]}>
               <Text style={styles.profileStatusText}>
                 {profile.approveStatus === "DRAFT"
                   ? "Verification Pending"
@@ -411,7 +411,6 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     backgroundColor: "#228BE6",
     borderRadius: 10,
-    width: "30%",
   },
   profileTextContainer: {
     gap: 5,
@@ -419,7 +418,6 @@ const styles = StyleSheet.create({
   profileHeaderText: {
     fontFamily: font.semiBold,
     fontSize: 20,
-    width: "20%",
   },
   profileHeaderContainer: {
     flexDirection: "row",
