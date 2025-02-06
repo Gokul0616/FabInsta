@@ -263,14 +263,19 @@ const FabricOrderDetails = ({ route }) => {
       />
       <TouchableOpacity
         onPress={() => navigate.goBack()}
-        style={styles.headerContainer}
+        style={{
+          paddingVertical: 10,
+          paddingHorizontal: 10,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
       >
-        <Icon
-          name="arrow-left"
-          size={20}
-          style={{ width: "5%", color: "#fff" }}
-        />
-        <Text style={styles.backButtonText}>Back</Text>
+        <Icon name="arrow-left" size={24} color="#333" />
+        <Text
+          style={{ color: "#000", fontFamily: font.semiBold, fontSize: 18 }}
+        >
+          Back
+        </Text>
       </TouchableOpacity>
       <View style={styles.deliveryContainer}>
         <Text
