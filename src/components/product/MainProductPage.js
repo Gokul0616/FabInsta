@@ -140,7 +140,6 @@ export default MainProductPage;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#F1F1F1",
-    // width: 160,
     borderRadius: 8,
     padding: 8,
     alignItems: "center",
