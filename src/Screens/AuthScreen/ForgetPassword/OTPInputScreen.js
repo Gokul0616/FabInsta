@@ -8,9 +8,16 @@ import {
   Vibration,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { FiInput } from "../../../Common/FiInput";
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from "react-native-confirmation-code-field";
 import { font } from "../../../Common/Theme";
 import { FiButton } from "../../../Common/FiButton";
+
+const CELL_COUNT = 6;
 
 const OTPInputScreen = ({
   otp,
@@ -20,6 +27,7 @@ const OTPInputScreen = ({
   setOtpError,
   sendOTP,
   slideAnim,
+  email,
   handleOtpVerify,
 }) => {
   const [resendTimer, setResendTimer] = useState(30); // Countdown timer in seconds
@@ -37,8 +45,8 @@ const OTPInputScreen = ({
     if (resendTimer === 0) {
       setOtpError("");
     }
-    return () => clearInterval(timer); // Cleanup the interval on unmount or timer reset
-  }, [resendTimer, isResendDisabled]);
+    return () => clearInterval(timer); // Cleanup on unmount or timer reset
+  }, [resendTimer, isResendDisabled, setOtpError]);
 
   const handleResendOtp = () => {
     if (isResendDisabled) {
@@ -52,18 +60,44 @@ const OTPInputScreen = ({
     }
   };
 
+  // Hook from the package for auto-blur when all cells are filled
+  const ref = useBlurOnFulfill({ value: otp, cellCount: CELL_COUNT });
+  // Hook for managing focus and clearing cells
+  const [codeFieldProps, getCellOnLayoutHandler] = useClearByFocusCell({
+    value: otp,
+    setValue: setOtp,
+  });
+
   return (
     <Animated.View
       style={[styles.otpContainer, { transform: [{ translateX: slideAnim }] }]}
     >
-      <Text style={styles.otpTitle}>Enter OTP</Text>
-      <FiInput
-        style={[styles.input, otpError ? styles.errorInput : null]}
-        placeholder={"Enter OTP"}
-        keyboardType={"numeric"}
-        maxLength={6}
-        onChangeText={setOtp}
+      <View style={styles.titleContainer}>
+        <Text style={styles.otpTitle}>Enter OTP</Text>
+        <Text style={styles.otpSubTitle}>We sent a code to {email}</Text>
+      </View>
+
+      {/* OTP Input using react-native-confirmation-code-field */}
+      <CodeField
+        ref={ref}
+        {...codeFieldProps}
         value={otp}
+        onChangeText={setOtp}
+        cellCount={CELL_COUNT}
+        rootStyle={styles.codeFieldRoot}
+        keyboardType="number-pad"
+        textContentType="oneTimeCode"
+        renderCell={({ index, symbol, isFocused }) => (
+          <View
+            key={index}
+            style={[styles.cell, isFocused && styles.focusCell]}
+            onLayout={getCellOnLayoutHandler(index)}
+          >
+            <Text style={styles.cellText}>
+              {symbol || (isFocused ? <Cursor /> : null)}
+            </Text>
+          </View>
+        )}
       />
 
       {otpError ? (
@@ -91,8 +125,9 @@ const OTPInputScreen = ({
         title={"Verify OTP"}
         titleStyle={styles.buttonText}
       />
+
       <TouchableOpacity
-        style={{ flexDirection: "row", padding: 15 }}
+        style={styles.backContainer}
         onPress={slideToEmailScreen}
       >
         <Ionicons name="arrow-back" size={15} color="#999" />
@@ -113,22 +148,46 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "#fff",
   },
+  titleContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+    padding: 15,
+  },
   otpTitle: {
     fontFamily: font.light,
     fontSize: 30,
     fontWeight: "300",
     color: "#000",
-    padding: 15,
   },
-  input: {
-    width: "90%",
-    maxWidth: 300,
-    height: 40,
-    borderColor: "#ccc",
+  otpSubTitle: {
+    fontSize: 14,
+    fontFamily: font.semiBold,
+    color: "#8a9096",
+  },
+  codeFieldRoot: {
+    marginVertical: 20,
+  },
+  cell: {
+    width: 40,
+    height: 50,
+    lineHeight: 38,
+    marginHorizontal: 5,
+    fontSize: 20,
     borderWidth: 1,
     borderRadius: 5,
-    paddingHorizontal: 10,
-    backgroundColor: "#fff",
+    borderColor: "#ccc",
+    textAlign: "center",
+    fontFamily: font.regular,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  focusCell: {
+    borderColor: "#FF6F61",
+  },
+  cellText: {
+    fontSize: 20,
+    textAlign: "center",
     fontFamily: font.regular,
   },
   resendButton: {
@@ -169,13 +228,16 @@ const styles = StyleSheet.create({
     fontFamily: font.regular,
     fontSize: 16,
   },
+  backContainer: {
+    flexDirection: "row",
+    padding: 15,
+    alignItems: "center",
+  },
   backText: {
     fontFamily: font.regular,
     fontSize: 12,
     color: "#999",
-  },
-  errorInput: {
-    borderColor: "red",
+    marginLeft: 5,
   },
   errorContainer: {
     width: "90%",

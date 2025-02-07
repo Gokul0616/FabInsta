@@ -308,6 +308,7 @@ const ForgotPassword = () => {
           otpError={otpError}
           slideAnim={slideAnim}
           sendOTP={fetchData}
+          email={email}
           setOtpError={setOtpError}
           handleOtpVerify={handleOtpVerify}
         />
