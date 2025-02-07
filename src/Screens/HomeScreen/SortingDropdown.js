@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
   },
   itemTextStyle: {
     fontSize: 12,
+    fontFamily: font.regular,
   },
   label: {
     position: "absolute",

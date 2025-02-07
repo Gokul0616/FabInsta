@@ -7,9 +7,11 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,Dimensions,
+  Text,
+  Dimensions,
   TouchableOpacity,
-  View,useWindowDimensions
+  View,
+  useWindowDimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import AlertBox from "../../Common/AlertBox";
@@ -148,25 +150,27 @@ const HomeScreen = ({ navigation, route }) => {
 
     setRefreshing(false);
   };
-const { width } = useWindowDimensions(); 
-const [numColumns, setNumColumns] = useState(Math.max(2, Math.floor(width / 160)));
+  const { width } = useWindowDimensions();
+  const [numColumns, setNumColumns] = useState(
+    Math.max(2, Math.floor(width / 160))
+  );
 
-useEffect(() => {
-  const newNumColumns = Math.max(2, Math.floor(width / 160));
-  setNumColumns(newNumColumns);
-}, [width]); 
+  useEffect(() => {
+    const newNumColumns = Math.max(2, Math.floor(width / 160));
+    setNumColumns(newNumColumns);
+  }, [width]);
 
-const getGridData = () => {
-  const rows = Math.ceil(productList.length / numColumns);
-  const gridData = [...productList];
-  const emptyItems = rows * numColumns - productList.length;
-  for (let i = 0; i < emptyItems; i++) {
-    gridData.push({ id: `empty-${i}`, empty: true });
-  }
-  return { gridData, numColumns };
-};
+  const getGridData = () => {
+    const rows = Math.ceil(productList.length / numColumns);
+    const gridData = [...productList];
+    const emptyItems = rows * numColumns - productList.length;
+    for (let i = 0; i < emptyItems; i++) {
+      gridData.push({ id: `empty-${i}`, empty: true });
+    }
+    return { gridData, numColumns };
+  };
 
-const { gridData } = getGridData();
+  const { gridData } = getGridData();
   const closeAlert = () => {
     setIsError((prev) => ({ ...prev, showAlert: false }));
   };
@@ -176,13 +180,13 @@ const { gridData } = getGridData();
     </View>
   );
 
-  const renderGridItem = ({ item }) =>{
-return    item.empty ? (
+  const renderGridItem = ({ item }) => {
+    return item.empty ? (
       <View style={[styles.itemContainer, styles.emptyItem]} />
     ) : (
       renderProduct({ item })
     );
-  }
+  };
   const handleSearchData = (searchData) => {
     if (searchData.data && Object.keys(searchData.data[0]).length > 0) {
       setSearchFilterRawData(searchData.data[0]);
@@ -212,14 +216,11 @@ return    item.empty ? (
         (dataItem) => dataItem !== res?.id
       );
 
-      
       if (updatedSearchData[res?.key].length === 0) {
         delete updatedSearchData[res?.key];
       }
     }
 
-
-    
     const isAllEmpty = Object.values(updatedSearchData).every(
       (arr) => arr.length === 0
     );
@@ -238,21 +239,10 @@ return    item.empty ? (
     setProductList([]);
     setPage(0);
 
-    
     navigation.setParams({ stateValue: undefined });
     setTotalItems(0);
     fetchProducts();
   };
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
 
   useEffect(() => {
     if (filterDropdownValue.length != 0 && filterValBool) {
@@ -260,11 +250,6 @@ return    item.empty ? (
     }
   }, [page]);
 
-  
-  
-  
-  
-  
   useEffect(() => {
     if (
       filterDropdownValue !== null &&
@@ -377,7 +362,7 @@ return    item.empty ? (
       </View>
     );
   };
-  
+
   return (
     <SafeAreaView style={styles.container}>
       {isFullScreenLoading && (
@@ -422,7 +407,6 @@ return    item.empty ? (
         </View>
       )}
       <AlertBox
-
         heading={isError.heading}
         message={isError.message}
         setShowAlert={closeAlert}
@@ -435,12 +419,13 @@ return    item.empty ? (
         <Animated.FlatList
           data={gridData}
           renderItem={renderGridItem}
-          key={numColumns} 
+          key={numColumns}
           keyExtractor={(item) => {
             return item.pimId;
           }}
-          
-          columnWrapperStyle={numColumns > 1 ? { justifyContent: "space-between" } : {}} 
+          columnWrapperStyle={{
+            alignItems: "center",
+          }}
           ListHeaderComponent={
             <View style={styles.totalItemsContainer}>
               <Text style={styles.totalItemsText}>
@@ -455,7 +440,11 @@ return    item.empty ? (
           }
           contentContainerStyle={[
             styles.listContainer,
-            { paddingTop: isAppliedFiltersVisible ? 150 : 100 },
+            {
+              paddingTop: isAppliedFiltersVisible ? 150 : 100,
+
+              justifyContent: "space-evenly",
+            },
           ]}
           numColumns={numColumns}
           maxToRenderPerBatch={6}
@@ -499,6 +488,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 4,
+    justifyContent: "space-around",
   },
   itemContainer: {
     flex: 1,
