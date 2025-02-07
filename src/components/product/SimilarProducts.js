@@ -23,60 +23,64 @@ const SimilarProducts = ({ similarProduct }) => {
 
   return (
     <SafeAreaView>
-      <View style={styles.similarProductContainer}>
-        <Text style={styles.similarItemsHeader}>Similar Items</Text>
-        <View style={styles.similarItemsContainer}>
-          <SwiperFlatList
-            width={width}
-            autoplay={false}
-            autoplayLoop={false}
-            onChangeIndex={(index) => handleProgressChange(index.index)}
-            data={similarProduct}
-            contentContainerStyle={{ gap: 2, }}
-            renderItem={({ item, index }) => {
-              const imageSource = `${backendUrl}${item.image?.replace("/api", "")}`;
-              const hexaColorCodes = item?.pimVariants?.flatMap(item => item?.variants?.filter(variant => variant?.hexaColorCode));
+      {
+        similarProduct.length !== 0 && (
+          <View style={styles.similarProductContainer}>
+            <Text style={styles.similarItemsHeader}>Similar Items</Text>
+            <View style={styles.similarItemsContainer}>
+              <SwiperFlatList
+                width={width}
+                autoplay={false}
+                autoplayLoop={false}
+                onChangeIndex={(index) => handleProgressChange(index.index)}
+                data={similarProduct}
+                contentContainerStyle={{ gap: 2, }}
+                renderItem={({ item, index }) => {
+                  const imageSource = `${backendUrl}${item.image?.replace("/api", "")}`;
+                  const hexaColorCodes = item?.pimVariants?.flatMap(item => item?.variants?.filter(variant => variant?.hexaColorCode));
 
-              return (
-                <TouchableOpacity
-                  style={styles.similarItemsSlideContainer}
-                  onPress={() => handleViewProduct(item?.pimId)}
-                >
-                  <Image source={{ uri: imageSource }} style={styles.productImage} />
-                  <View style={styles.colorsContainer}>
-                    {_.map(hexaColorCodes, (hexa, index) => (
-                      <View
-                        key={index}
-                        style={[
-                          styles.colorCircle,
-                          { backgroundColor: hexa?.hexaColorCode },
-                        ]}
-                      />
-                    ))}
-                  </View>
-                  <View style={styles.productInfo}>
-                    <Text style={styles.productSku}>{item.articleCode}</Text>
-                    <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">
-                      {item.articleName}
-                    </Text>
-                    <Text style={styles.productPrice}>₹ {item.channelPrice}</Text>
-                    <Text style={styles.productVariant}>{item.fabricContent.value}</Text>
-                    <Text style={styles.productGsm}>{item.metrics.weight}gsm</Text>
-                    <View style={styles.colorsVariantContainer}>
-                      <Image
-                        source={require("../../../assets/images/color-wheel.png")}
-                        alt="color-wheel"
-                        style={{ width: 15, height: 15, marginRight: 5 }}
-                      />
-                      <Text style={styles.colorVariant}>{item.pimVariants.length}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        </View>
-      </View>
+                  return (
+                    <TouchableOpacity
+                      style={styles.similarItemsSlideContainer}
+                      onPress={() => handleViewProduct(item?.pimId)}
+                    >
+                      <Image source={{ uri: imageSource }} style={styles.productImage} />
+                      <View style={styles.colorsContainer}>
+                        {_.map(hexaColorCodes, (hexa, index) => (
+                          <View
+                            key={index}
+                            style={[
+                              styles.colorCircle,
+                              { backgroundColor: hexa?.hexaColorCode },
+                            ]}
+                          />
+                        ))}
+                      </View>
+                      <View style={styles.productInfo}>
+                        <Text style={styles.productSku}>{item.articleCode}</Text>
+                        <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">
+                          {item.articleName}
+                        </Text>
+                        <Text style={styles.productPrice}>₹ {item.channelPrice}</Text>
+                        <Text style={styles.productVariant}>{item.fabricContent.value}</Text>
+                        <Text style={styles.productGsm}>{item.metrics.weight}gsm</Text>
+                        <View style={styles.colorsVariantContainer}>
+                          <Image
+                            source={require("../../../assets/images/color-wheel.png")}
+                            alt="color-wheel"
+                            style={{ width: 15, height: 15, marginRight: 5 }}
+                          />
+                          <Text style={styles.colorVariant}>{item.pimVariants.length}</Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
+          </View>
+        )
+      }
     </SafeAreaView>
   )
 }

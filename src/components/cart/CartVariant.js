@@ -106,9 +106,7 @@ export default CartVariant
 
 const styles = StyleSheet.create({
     cartProducts: {
-        gap: 20,
-        marginBottom: 20,
-        marginTop: 10,
+        gap: 10,
     },
     productsGroup: {
         width: '100%',
@@ -121,7 +119,6 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 5,
         borderRadius: 10,
-        marginBottom: 5,
     },
     availableInfo: {
         flexDirection: 'row',
@@ -143,8 +140,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     cartProductInfo: {
-        paddingHorizontal: 10,
-        paddingTop: 10,
+        padding: 10,
         flexDirection: 'row',
         gap: 15,
     },

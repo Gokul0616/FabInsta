@@ -747,75 +747,61 @@ const CartDetails = () => {
 
   return (
     <SafeAreaView style={styles.topBottom}>
-      <View style={styles.container}>
-        <Text style={styles.cartHeader}>Cart</Text>
-        <View style={styles.cartContainer}>
-          <View style={styles.tabs}>
-            <TouchableOpacity
-              style={activeIndex === "sample" ? styles.selectedTab : styles.tab}
-              onPress={() => setActiveIndex("sample")}
-            >
-              <Text style={styles.tabText}>Sample</Text>
-              <Text style={styles.badgeCount}>
-                {calculateTotalCount(sample)}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={
-                activeIndex === "wholesale" ? styles.selectedTab : styles.tab
-              }
-              onPress={() => setActiveIndex("wholesale")}
-            >
-              <Text style={styles.tabText}>Wholesale</Text>
-              <Text style={styles.badgeCount}>
-                {calculateTotalCount(wholesale)}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={activeIndex === "swatch" ? styles.selectedTab : styles.tab}
-              onPress={() => setActiveIndex("swatch")}
-            >
-              <Text style={styles.tabText}>Swatch</Text>
-              <Text style={styles.badgeCount}>
-                {calculateTotalCount(swatch)}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={activeIndex === "combo" ? styles.selectedTab : styles.tab}
-              onPress={() => setActiveIndex("combo")}
-            >
-              <Text style={styles.tabText}>Combo</Text>
-              <Text style={styles.badgeCount}>
-                {calculateComboTotalCount(combo)}
-              </Text>
-            </TouchableOpacity>
-          </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
+          <Text style={styles.cartHeader}>Cart</Text>
+          <View style={styles.cartContainer}>
 
-          <View style={styles.selectAllTag}>
-            <TouchableOpacity style={styles.selectAllCheckbox}>
-              <Checkbox
-                status={selectAll ? "checked" : "unchecked"}
-                onPress={() => handleSelectAllChange()}
-                disabled={disableSelectAll}
-                color={common.PRIMARY_COLOR}
-              />
-              <Text style={styles.selectAllLabel}>Select All</Text>
-            </TouchableOpacity>
-            {(sampleCart || wholesaleCart || comboCart) && (
-              <Text style={styles.selectAllLabel}>
-                {getItemCountAndTotalPrice()}
-              </Text>
-            )}
-            <TouchableOpacity
-              onPress={() => removeAllCartItems(null)}
-              style={styles.deleteCart}
-            >
-              <Text style={styles.selectAllLabel}>Delete</Text>
-              <Icon name="delete" size={15} color="#000" />
-            </TouchableOpacity>
-          </View>
+            <View style={styles.tabs}>
+              <TouchableOpacity
+                style={activeIndex === 'sample' ? styles.selectedTab : styles.tab}
+                onPress={() => setActiveIndex('sample')}
+              >
+                <Text style={styles.tabText}>Sample</Text>
+                <Text style={styles.badgeCount}>{calculateTotalCount(sample)}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={activeIndex === 'wholesale' ? styles.selectedTab : styles.tab}
+                onPress={() => setActiveIndex('wholesale')}
+              >
+                <Text style={styles.tabText}>Wholesale</Text>
+                <Text style={styles.badgeCount}>{calculateTotalCount(wholesale)}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={activeIndex === 'swatch' ? styles.selectedTab : styles.tab}
+                onPress={() => setActiveIndex('swatch')}
+              >
+                <Text style={styles.tabText}>Swatch</Text>
+                <Text style={styles.badgeCount}>{calculateTotalCount(swatch)}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={activeIndex === 'combo' ? styles.selectedTab : styles.tab}
+                onPress={() => setActiveIndex('combo')}
+              >
+                <Text style={styles.tabText}>Combo</Text>
+                <Text style={styles.badgeCount}>{calculateComboTotalCount(combo)}</Text>
+              </TouchableOpacity>
+            </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.selectAllTag}>
+              <TouchableOpacity style={styles.selectAllCheckbox}>
+                <Checkbox
+                  status={selectAll ? "checked" : "unchecked"}
+                  onPress={() => handleSelectAllChange()}
+                  disabled={disableSelectAll}
+                  color={common.PRIMARY_COLOR}
+                />
+                <Text style={styles.selectAllLabel}>Select All</Text>
+              </TouchableOpacity>
+              {(sampleCart || wholesaleCart || comboCart) && (
+                <Text style={styles.selectAllLabel}>{getItemCountAndTotalPrice()}</Text>
+              )}
+              <TouchableOpacity onPress={() => removeAllCartItems(null)} style={styles.deleteCart}>
+                <Text style={styles.selectAllLabel}>Delete</Text>
+                <Icon name="delete" size={15} color="#000" />
+              </TouchableOpacity>
+            </View>
+
             <View style={styles.CartDetailsScroll}>
               {(sampleCart || wholesaleCart || comboCart || swatchCart) && (
                 <View style={styles.cartProducts}>
@@ -900,29 +886,29 @@ const CartDetails = () => {
                 comboSelected={comboSelected}
               />
             </View>
-          </ScrollView>
+          </View>
+          <Modal
+            visible={editOpenModal}
+            transparent
+            animationType="slide"
+            style={{
+              flex: 1,
+              maxHeight: "80%",
+            }}
+          >
+            <EditCart
+              editItem={editItem}
+              sampleMoq={sampleMoq}
+              setEditItem={setEditItem}
+              setError={setError}
+              wholesaleMoq={wholesaleMoq}
+              handleEditSave={handleEditSave}
+              cancelRemove={cancelRemove}
+              error={error}
+            />
+          </Modal>
         </View>
-        <Modal
-          visible={editOpenModal}
-          transparent
-          animationType="slide"
-          style={{
-            flex: 1,
-            maxHeight: "80%",
-          }}
-        >
-          <EditCart
-            editItem={editItem}
-            sampleMoq={sampleMoq}
-            setEditItem={setEditItem}
-            setError={setError}
-            wholesaleMoq={wholesaleMoq}
-            handleEditSave={handleEditSave}
-            cancelRemove={cancelRemove}
-            error={error}
-          />
-        </Modal>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

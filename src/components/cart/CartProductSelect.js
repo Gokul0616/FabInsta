@@ -62,7 +62,8 @@ export default CartProductSelect;
 
 const styles = StyleSheet.create({
     productsGroupHeader: {
-        paddingVertical: 10,
+        paddingTop: 10,
+        paddingBottom: 5,
         flexDirection: 'column',
     },
     productSelect: {

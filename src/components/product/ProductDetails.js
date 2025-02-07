@@ -1,7 +1,7 @@
-import { CommonActions, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import _ from "lodash";
 import React, { createContext, useEffect, useRef, useState } from "react";
-import { SafeAreaView, ScrollView, View, findNodeHandle } from "react-native";
+import { SafeAreaView, ScrollView, View } from "react-native";
 import { backendUrl, storage } from "../../Common/Common";
 import api from "../../Service/api";
 import ProductInformation from "./ProductInformation";
@@ -9,7 +9,6 @@ import ProductOrder from "./ProductOrder";
 import ProductSpecification from "./ProductSpecification";
 import ProductStandardColor from "./ProductStandardColor";
 import SimilarProducts from "./SimilarProducts";
-import { CloudLightning, X } from "react-native-feather";
 
 export const CreateProduct = createContext();
 const ProductDetails = ({ route }) => {
@@ -339,7 +338,7 @@ const ProductDetails = ({ route }) => {
         try {
           const res = await api.get(`cart?pimVariantId=${colorIds}`);
           setAlreadyInCart(res.response);
-        } catch (error) {}
+        } catch (error) { }
       }
     }
     if (storage.getString("token")) {
@@ -349,40 +348,40 @@ const ProductDetails = ({ route }) => {
 
   const totalQuantity = selectedValue
     ? (() => {
-        let orderType = "";
-        if (combo?.includes(selectedSku)) {
-          orderType = "COMBO";
-        } else if (minimumOrder >= cartOptions[selectedValue]?.Wholesale) {
-          orderType = "WHOLESALE";
-        } else if (
-          cartOptions[selectedValue]?.SampleMin <= minimumOrder &&
-          minimumOrder <= cartOptions[selectedValue]?.SampleMax
-        ) {
-          orderType = "SAMPLE";
-        }
-        if (orderType === "COMBO") {
-          const skuCodes = pim.combo.comboVariants;
-          const minStock = skuCodes.reduce((min, skuCode) => {
-            const stockAmount = stock[skuCode]?.wholeSaleQuantity || 0;
-            return Math.min(min, stockAmount);
-          }, Infinity);
-          return minStock;
-        } else {
-          const filteredOption = _.filter(
-            colorOption,
-            (c) => c.id === selectedValue
-          )[0];
-          const skuCode = filteredOption ? filteredOption.skucode : null;
-          if (skuCode) {
-            if (orderType === "WHOLESALE") {
-              return stock[skuCode]?.wholeSaleQuantity || 0;
-            } else if (orderType !== "WHOLESALE") {
-              return stock[skuCode]?.quantity || 0;
-            }
+      let orderType = "";
+      if (combo?.includes(selectedSku)) {
+        orderType = "COMBO";
+      } else if (minimumOrder >= cartOptions[selectedValue]?.Wholesale) {
+        orderType = "WHOLESALE";
+      } else if (
+        cartOptions[selectedValue]?.SampleMin <= minimumOrder &&
+        minimumOrder <= cartOptions[selectedValue]?.SampleMax
+      ) {
+        orderType = "SAMPLE";
+      }
+      if (orderType === "COMBO") {
+        const skuCodes = pim.combo.comboVariants;
+        const minStock = skuCodes.reduce((min, skuCode) => {
+          const stockAmount = stock[skuCode]?.wholeSaleQuantity || 0;
+          return Math.min(min, stockAmount);
+        }, Infinity);
+        return minStock;
+      } else {
+        const filteredOption = _.filter(
+          colorOption,
+          (c) => c.id === selectedValue
+        )[0];
+        const skuCode = filteredOption ? filteredOption.skucode : null;
+        if (skuCode) {
+          if (orderType === "WHOLESALE") {
+            return stock[skuCode]?.wholeSaleQuantity || 0;
+          } else if (orderType !== "WHOLESALE") {
+            return stock[skuCode]?.quantity || 0;
           }
-          return 0;
         }
-      })()
+        return 0;
+      }
+    })()
     : 0;
 
   const existingCart = async () => {
@@ -455,7 +454,7 @@ const ProductDetails = ({ route }) => {
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
-    };
+    }
     if (profile?.approveStatus === "APPROVED") fetchProducts();
   }, [categories]);
 
