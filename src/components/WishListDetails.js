@@ -201,9 +201,12 @@ const WishListDetails = () => {
                         </TouchableOpacity>
                         <Text
                           onPress={() => {
-                            navigation.navigate("Home", {
-                              screen: "fabrics",
-                              params: { pimId: items[0]?.pimId },
+                            navigation.navigate("Tabs", {
+                              screen: "Home",
+                              params: {
+                                screen: "fabrics",
+                                params: { pimId: items[0]?.pimId },
+                              },
                             });
                           }}
                           style={styles.wishListProductId}
@@ -255,11 +258,14 @@ const WishListDetails = () => {
                               <View style={styles.productInfoDetails}>
                                 <Text
                                   onPress={() =>
-                                    navigation.navigate("Home", {
-                                      screen: "fabrics",
+                                    navigation.navigate("Tabs", {
+                                      screen: "Home",
                                       params: {
-                                        pimId: items[0]?.pimId,
-                                        variantId: items?.variantSku,
+                                        screen: "fabrics",
+                                        params: {
+                                          pimId: items[0]?.pimId,
+                                          variantId: items?.variantSku,
+                                        },
                                       },
                                     })
                                   }

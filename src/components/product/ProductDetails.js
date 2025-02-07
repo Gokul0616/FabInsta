@@ -51,7 +51,7 @@ const ProductDetails = ({ route }) => {
   const onSpecClicked = () => {
     if (productSpecRef.current) {
       productSpecRef.current.measure((x, y, width, height, pageX, pageY) => {
-        scrollViewRef.current.scrollTo({ y: pageY + 500, animated: true });
+        scrollViewRef.current.scrollTo({ y: pageY + 350, animated: true });
       });
     }
   };
