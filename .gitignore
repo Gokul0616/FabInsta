@@ -21,8 +21,6 @@ DerivedData
 *.ipa
 *.xcuserstate
 **/.xcode.env.local
-package-lock.json
-yarn.lock
 # Android/IntelliJ
 #
 build/
@@ -73,3 +71,11 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+
+.vscode/
+# Ignore package-lock.json
+package-lock.json
+
+# Ignore yarn.lock
+yarn.lock

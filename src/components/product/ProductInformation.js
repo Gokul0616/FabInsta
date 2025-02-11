@@ -1,22 +1,19 @@
+import { useNavigation } from "@react-navigation/native";
 import _ from "lodash";
-import React, { useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
-  Dimensions,
-  Image,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
-import { useSharedValue } from "react-native-reanimated";
-import SwiperFlatList from "react-native-swiper-flatlist";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { common } from "../../Common/Common";
+import ImageSlider from "../../Common/ImageSlider";
 import { font } from "../../Common/Theme";
-import { useNavigation } from "@react-navigation/native";
 
 const ProductInformation = ({
   pimData,
@@ -74,7 +71,7 @@ const ProductInformation = ({
         });
       }
     }
-  };
+  };  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -89,50 +86,51 @@ const ProductInformation = ({
             <ActivityIndicator size="large" color={common.PRIMARY_COLOR} />
           </View>
         ) : (
-          <View style={{ flex: 1, width: width }}>
-            <SwiperFlatList
-              autoplay={true}
-              autoplayDelay={3}
-              autoplayLoop={true}
-              onChangeIndex={(index) => handleProgressChange(index.index)}
-              data={media}
-              renderItem={({ item, index }) => {
-                return (
-                  <View
-                    key={index}
-                    style={[styles.customSlide, { width: width }]}
-                  >
-                    {item.type === "image" ? (
-                      <Image
-                        source={{ uri: item.src }}
-                        style={styles.customImage}
-                      />
-                    ) : (
-                      <Video
-                        source={{ uri: item.src }}
-                        poster={item.poster}
-                        style={styles.customImage}
-                        controls
-                      />
-                    )}
-                  </View>
-                );
-              }}
-            />
-            <View style={styles.paginationContainer}>
-              {media.map((_, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.dot,
-                    currentIndex === index
-                      ? styles.activeDot
-                      : styles.inactiveDot,
-                  ]}
-                />
-              ))}
-            </View>
-          </View>
+          // <View style={{ flex: 1, width: width }}>
+          //   <SwiperFlatList
+          //     autoplay={true}
+          //     autoplayDelay={3}
+          //     autoplayLoop={true}
+          //     onChangeIndex={(index) => handleProgressChange(index.index)}
+          //     data={media}
+          //     renderItem={({ item, index }) => {
+          //       return (
+          //         <View
+          //           key={index}
+          //           style={[styles.customSlide, { width: width }]}
+          //         >
+          //           {item.type === "image" ? (
+          //             <Image
+          //               source={{ uri: item.src }}
+          //               style={styles.customImage}
+          //             />
+          //           ) : (
+          //             <Video
+          //               source={{ uri: item.src }}
+          //               poster={item.poster}
+          //               style={styles.customImage}
+          //               controls
+          //             />
+          //           )}
+          //         </View>
+          //       );
+          //     }}
+          //   />
+          //   <View style={styles.paginationContainer}>
+          //     {media.map((_, index) => (
+          //       <View
+          //         key={index}
+          //         style={[
+          //           styles.dot,
+          //           currentIndex === index
+          //             ? styles.activeDot
+          //             : styles.inactiveDot,
+          //         ]}
+          //       />
+          //     ))}
+          //   </View>
+          // </View>
+          <ImageSlider media={media} />
         )}
       </View>
       <View style={styles.detailsContainer}>
@@ -145,13 +143,13 @@ const ProductInformation = ({
         <View style={styles.seeSpecMapContainer}>
           {pimData?.product?.productCategories["Fabric Type"]
             ?.heirarchyLabel && (
-            <Text style={styles.seeSpecsMap}>
-              {
-                pimData?.product?.productCategories["Fabric Type"]
-                  ?.heirarchyLabel
-              }
-            </Text>
-          )}
+              <Text style={styles.seeSpecsMap}>
+                {
+                  pimData?.product?.productCategories["Fabric Type"]
+                    ?.heirarchyLabel
+                }
+              </Text>
+            )}
           {pimData?.product?.fabricContent?.value && (
             <Text style={styles.seeSpecsMap}>
               {pimData?.product?.fabricContent?.value}
