@@ -1,15 +1,15 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { DrawerLayout } from "react-native-gesture-handler";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, View } from "react-native";
+import { DrawerLayout } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/Feather";
 import { common, storage } from "../Common/Common";
+import CustomDrawer from "../Common/OptionsModal/CustomDrawer";
 import CartTabLayout from "../components/layout/CartTabLayout";
 import ProfileLayout from "../components/layout/ProfileLayout";
 import Header from "../Screens/Header";
 import HomeTabLayout from "../Screens/HomeScreen/HomeTabLayout";
-import CustomDrawer from "../Common/OptionsModal/CustomDrawer";
 import api from "../Service/api";
 
 const Tab = createBottomTabNavigator();
@@ -167,8 +167,8 @@ function MyTabs() {
                 route.name === "Home"
                   ? "home"
                   : route.name === "Profile"
-                  ? "user"
-                  : "shopping-bag";
+                    ? "user"
+                    : "shopping-bag";
               return <Icon name={iconName} size={size} color={color} />;
             },
             tabBarActiveTintColor: "#FF6F61",

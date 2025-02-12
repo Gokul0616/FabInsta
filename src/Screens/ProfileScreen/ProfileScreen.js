@@ -1,3 +1,5 @@
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   Linking,
@@ -5,20 +7,16 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import api from "../../Service/api";
-import { font } from "../../Common/Theme";
-import { FiButton } from "../../Common/FiButton";
-import { Avatar } from "react-native-paper";
-import { common, storage } from "../../Common/Common";
-import { FiInput } from "../../Common/FiInput";
 import AlertBox from "../../Common/AlertBox";
-import { CommonActions, useNavigation } from "@react-navigation/native";
+import { common, storage } from "../../Common/Common";
+import { FiButton } from "../../Common/FiButton";
+import { FiInput } from "../../Common/FiInput";
+import { font } from "../../Common/Theme";
+import api from "../../Service/api";
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState({});
@@ -30,8 +28,8 @@ const ProfileScreen = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   useEffect(() => {
@@ -55,7 +53,7 @@ const ProfileScreen = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -75,7 +73,7 @@ const ProfileScreen = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },

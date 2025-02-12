@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
 import { backendUrl, storage } from "../../Common/Common";
-import api from "../../Service/api";
 import { font } from "../../Common/Theme";
+import api from "../../Service/api";
 
 const ProductStandardColor = ({ pimData, colorOption }) => {
   const [pimVariantIds, setPimVariantIds] = useState([]);
@@ -37,7 +37,7 @@ const ProductStandardColor = ({ pimData, colorOption }) => {
     try {
       const res = await api.get("wishlist/pim-ids");
       setPimVariantIds(res.response);
-    } catch (error) {}
+    } catch (error) { }
   };
   const { width } = useWindowDimensions();
 

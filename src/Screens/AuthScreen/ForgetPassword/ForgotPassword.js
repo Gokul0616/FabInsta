@@ -1,23 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
+  Animated,
+  Dimensions,
+  Keyboard,
   StyleSheet,
+  Text,
   TouchableOpacity,
   Vibration,
-  Animated,
-  Keyboard,
-  Dimensions,
-  TextInput,
+  View
 } from "react-native";
-import { font } from "../../../Common/Theme";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { font } from "../../../Common/Theme";
 
-import { FiInput } from "../../../Common/FiInput";
-import { FiButton } from "../../../Common/FiButton";
 import { CommonActions, useNavigation } from "@react-navigation/native";
-import AlertBox from "../../../Common/AlertBox";
 import { ActivityIndicator } from "react-native-paper";
+import AlertBox from "../../../Common/AlertBox";
+import { FiButton } from "../../../Common/FiButton";
+import { FiInput } from "../../../Common/FiInput";
 import api from "../../../Service/api";
 import OTPInputScreen from "./OTPInputScreen";
 import PasswordEntry from "./PasswordEntry";
@@ -34,8 +33,8 @@ const ForgotPassword = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
     isLeft: true,
   });
@@ -110,7 +109,7 @@ const ForgotPassword = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isAlert.setShowAlert(false);
         },
@@ -197,7 +196,7 @@ const ForgotPassword = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isAlert.setShowAlert(false);
         },
@@ -238,7 +237,7 @@ const ForgotPassword = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isAlert.setShowAlert(false);
         },

@@ -122,7 +122,7 @@ const ImageSlider = ({ media }) => {
             },
           ]}>
           {image?.map((src, index) => (
-            <Image key={index} source={{ uri: src }} style={styles.image} />
+            <Image key={index} source={{ uri: src }} style={styles.image} resizeMode='contain' />
           ))}
         </Animated.View>
       </View>
@@ -158,10 +158,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 15,
   },
   carouselContainer: {
-    width: 300,
-    height: 300,
+    width: 200,
     overflow: 'hidden',
   },
   carouselWrapper: {
@@ -169,13 +169,14 @@ const styles = StyleSheet.create({
   },
   image: {
     width: deviceWidth,
-    height: 300,
+    height: 250,
+    right: 80,
   },
   innerContainer: {
-    marginTop: 10,
+    marginTop: 15,
     width: deviceWidth,
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sliderNav: {
     width: 100,

@@ -1,25 +1,21 @@
+import { useDisclosure } from "@mantine/hooks";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Modal as RNModal,
-  FlatList,
   KeyboardAvoidingView,
+  Modal as RNModal,
+  StyleSheet,
+  Text,
+  View
 } from "react-native";
-import { FiButton } from "./FiButton";
-import { useDisclosure } from "@mantine/hooks";
-import { font } from "./Theme";
 import { common } from "./Common";
+import { FiButton } from "./FiButton";
 import { FiInput } from "./FiInput";
-import { colors } from "react-native-swiper-flatlist/src/themes";
+import { font } from "./Theme";
 
 const Return = ({
   item,
   order,
-  handleChange = () => {},
+  handleChange = () => { },
   returnModalClose,
   comfirmReturn,
   setOrder,
@@ -35,13 +31,13 @@ const Return = ({
       items: prev.items.map((currentItem, idx) =>
         currentItem.id === item.id
           ? {
-              ...currentItem,
-              pickList: currentItem.pickList
-                ? currentItem.pickList.map((pickItem, pickIdx) =>
-                    pickIdx === index ? { ...pickItem, [key]: value } : pickItem
-                  )
-                : [{ [key]: value }],
-            }
+            ...currentItem,
+            pickList: currentItem.pickList
+              ? currentItem.pickList.map((pickItem, pickIdx) =>
+                pickIdx === index ? { ...pickItem, [key]: value } : pickItem
+              )
+              : [{ [key]: value }],
+          }
           : currentItem
       ),
     }));
@@ -289,10 +285,10 @@ const Return = ({
             error ||
             0 >= returnedRolls ||
             returnedRolls >
-              item?.pickList?.reduce(
-                (total, item) => total + (item?.noOfRoll || 0),
-                0
-              )
+            item?.pickList?.reduce(
+              (total, item) => total + (item?.noOfRoll || 0),
+              0
+            )
           }
           style={styles.returnButton}
           titleStyle={{

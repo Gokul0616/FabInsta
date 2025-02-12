@@ -1,4 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,10 +17,9 @@ import { common, storage } from "../../Common/Common";
 import { FiButton } from "../../Common/FiButton";
 import FIDropdown from "../../Common/FIDropdown";
 import { FiInput } from "../../Common/FiInput";
+import statesAndDistricts from "../../Common/StatesAndDistricts.json";
 import { font } from "../../Common/Theme";
 import api from "../../Service/api";
-import statesAndDistricts from "../../Common/StatesAndDistricts.json";
-import axios from "axios";
 
 const Shipping = ({
   dropdownValues,
@@ -59,8 +59,8 @@ const Shipping = ({
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   const handleStateChange = (state) => {
@@ -182,7 +182,7 @@ const Shipping = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -210,7 +210,7 @@ const Shipping = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -235,7 +235,7 @@ const Shipping = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -262,7 +262,7 @@ const Shipping = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -690,8 +690,8 @@ const Shipping = ({
                   {modalHeader === "billLocation"
                     ? "Bill Local Address"
                     : modalHeader === "shipLocation"
-                    ? "Ship Local Address"
-                    : "Error"}
+                      ? "Ship Local Address"
+                      : "Error"}
                 </Text>
                 <TouchableOpacity onPress={() => closeSelectAddressModal()}>
                   <Icon name="x" size={20} color="#000" />
@@ -720,10 +720,10 @@ const Shipping = ({
                           {lastOrderByCustomer[0]?.[
                             modalHeader === "billLocation" ? 0 : 1
                           ] === add?.id && (
-                            <View style={styles.lastUsedContainer}>
-                              <Text style={styles.lastUsedText}>Last Used</Text>
-                            </View>
-                          )}
+                              <View style={styles.lastUsedContainer}>
+                                <Text style={styles.lastUsedText}>Last Used</Text>
+                              </View>
+                            )}
                         </View>
                       </View>
                       <View style={{ paddingHorizontal: 16 }}>

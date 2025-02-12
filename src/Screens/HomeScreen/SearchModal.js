@@ -56,8 +56,8 @@ const SearchModal = ({
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   useEffect(() => {
@@ -95,7 +95,7 @@ const SearchModal = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -137,7 +137,7 @@ const SearchModal = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -149,7 +149,7 @@ const SearchModal = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -263,7 +263,7 @@ const SearchModal = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -593,7 +593,7 @@ const SearchModal = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -605,7 +605,7 @@ const SearchModal = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -838,7 +838,7 @@ const SearchModal = ({
                               (garment) =>
                                 garment[expandedSection]?.categoryId &&
                                 garment[expandedSection]?.categoryId ===
-                                  child.categoryId
+                                child.categoryId
                             )
                               ? "checked"
                               : "unchecked"
@@ -932,8 +932,8 @@ const SearchModal = ({
                             fontFamily: font.regular,
                             ...(expandedSection == item.name
                               ? {
-                                  fontFamily: font.semiBold,
-                                }
+                                fontFamily: font.semiBold,
+                              }
                               : {}),
                           })
                         }
@@ -970,49 +970,49 @@ const SearchModal = ({
                 "Width",
                 null,
               ].includes(expandedSection) && (
-                <View style={styles.filterSection}>
-                  <Text style={[styles.filterLabel]}>{expandedSection}</Text>
-                  <Text style={[styles.categoryText]}>
-                    Selected (
-                    {getSelectedLengthForSection(categoryFilterChildren)})
-                  </Text>
-                  <FiInput
-                    style={styles.searchInput}
-                    placeholder={`Search ${expandedSection}`}
-                    value={searchText}
-                    onChangeText={setSearchText}
-                  />
+                  <View style={styles.filterSection}>
+                    <Text style={[styles.filterLabel]}>{expandedSection}</Text>
+                    <Text style={[styles.categoryText]}>
+                      Selected (
+                      {getSelectedLengthForSection(categoryFilterChildren)})
+                    </Text>
+                    <FiInput
+                      style={styles.searchInput}
+                      placeholder={`Search ${expandedSection}`}
+                      value={searchText}
+                      onChangeText={setSearchText}
+                    />
 
-                  {categoryFilterChildren.length > 0 &&
-                    filterItems(categoryFilterChildren).map((item) => (
-                      <View key={item.name} style={{ overflow: "hidden" }}>
-                        {item.child && item.child.length > 0 ? (
-                          renderAccordion(item, 0)
-                        ) : (
-                          <TouchableOpacity
-                            onPress={() => handleChildToggle(item)}
-                            style={styles.checkboxRow}
-                          >
-                            <Checkbox
-                              color={common.PRIMARY_COLOR}
-                              status={
-                                selectedItems.some(
-                                  (garment) =>
-                                    garment[expandedSection]?.categoryId &&
-                                    garment[expandedSection]?.categoryId ===
+                    {categoryFilterChildren.length > 0 &&
+                      filterItems(categoryFilterChildren).map((item) => (
+                        <View key={item.name} style={{ overflow: "hidden" }}>
+                          {item.child && item.child.length > 0 ? (
+                            renderAccordion(item, 0)
+                          ) : (
+                            <TouchableOpacity
+                              onPress={() => handleChildToggle(item)}
+                              style={styles.checkboxRow}
+                            >
+                              <Checkbox
+                                color={common.PRIMARY_COLOR}
+                                status={
+                                  selectedItems.some(
+                                    (garment) =>
+                                      garment[expandedSection]?.categoryId &&
+                                      garment[expandedSection]?.categoryId ===
                                       item.categoryId
-                                )
-                                  ? "checked"
-                                  : "unchecked"
-                              }
-                            />
-                            <Text style={styles.listItem}>{item.name}</Text>
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    ))}
-                </View>
-              )}
+                                  )
+                                    ? "checked"
+                                    : "unchecked"
+                                }
+                              />
+                              <Text style={styles.listItem}>{item.name}</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      ))}
+                  </View>
+                )}
               {expandedSection === "Colour" &&
                 categoryFilter.name === "Colour" && (
                   <View style={styles.filterSection}>

@@ -1,22 +1,22 @@
+import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
   FlatList,
   Image,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/Feather";
+import AlertBox from "../../../Common/AlertBox";
+import { backendUrl, common } from "../../../Common/Common";
+import { FiButton } from "../../../Common/FiButton";
 import { font } from "../../../Common/Theme";
 import api from "../../../Service/api";
-import { FiButton } from "../../../Common/FiButton";
-import { backendUrl, common } from "../../../Common/Common";
-import moment from "moment";
-import { useNavigation } from "@react-navigation/native";
-import { ActivityIndicator } from "react-native-paper";
-import AlertBox from "../../../Common/AlertBox";
-import Icon from "react-native-vector-icons/Feather";
 
 const FabricInquiries = () => {
   const [data, setData] = useState([]);
@@ -28,8 +28,8 @@ const FabricInquiries = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
 
@@ -46,7 +46,7 @@ const FabricInquiries = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },

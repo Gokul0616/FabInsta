@@ -1,10 +1,5 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import WishListDetails from "../../components/WishListDetails";
 import ProductDetails from "../../components/product/ProductDetails";
-import Address from "../../components/OptionsScreen/Address/address";
-import FabricInqiries from "../../components/OptionsScreen/FabricEnquiry/FabricInqiries";
-import FabricInquiryDetails from "../../components/OptionsScreen/FabricEnquiry/FabricInquiryDetails";
-import NewInquiryScreen from "../../components/OptionsScreen/FabricEnquiry/NewInquiryScreen";
 import HomeScreen from "./HomeScreen";
 
 const Stack = createStackNavigator();

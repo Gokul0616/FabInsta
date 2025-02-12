@@ -1,26 +1,25 @@
+import { Picker } from "@react-native-picker/picker";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Keyboard,
   KeyboardAvoidingView,
   Modal,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { font } from "../../../Common/Theme";
+import { Checkbox } from "react-native-paper";
 import Icon from "react-native-vector-icons/Feather";
 import AlertBox from "../../../Common/AlertBox";
-import api from "../../../Service/api";
 import { common } from "../../../Common/Common";
-import { Picker } from "@react-native-picker/picker";
-import { Checkbox } from "react-native-paper";
 import { FiInput } from "../../../Common/FiInput";
 import statesAndDistricts from "../../../Common/StatesAndDistricts.json";
-import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
+import { font } from "../../../Common/Theme";
+import api from "../../../Service/api";
 
 const Address = () => {
   const [data, setData] = useState([]);
@@ -32,8 +31,8 @@ const Address = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -109,7 +108,7 @@ const Address = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -128,7 +127,7 @@ const Address = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -155,7 +154,7 @@ const Address = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -597,14 +596,14 @@ const Address = () => {
                           <Icon
                             name={
                               editAddress?.isGstVerified ||
-                              address.isGstVerified
+                                address.isGstVerified
                                 ? "check-circle"
                                 : "x-circle"
                             }
                             size={20}
                             color={
                               editAddress?.isGstVerified ||
-                              address.isGstVerified
+                                address.isGstVerified
                                 ? "green"
                                 : "red"
                             }

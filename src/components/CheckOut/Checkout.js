@@ -3,18 +3,18 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
-  Text,
 } from "react-native";
+import Icon from "react-native-vector-icons/Feather";
 import AlertBox from "../../Common/AlertBox";
+import { font } from "../../Common/Theme";
 import api from "../../Service/api";
 import Policy from "./Policy";
 import ReviewOrder from "./ReviewOrder";
 import Shipping from "./Shipping";
 import Stepper from "./Stepper";
-import Icon from "react-native-vector-icons/Feather";
-import { font } from "../../Common/Theme";
 
 const Checkout = () => {
   const route = useRoute();
@@ -35,8 +35,8 @@ const Checkout = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   const navigation = useNavigation();
@@ -69,8 +69,8 @@ const Checkout = () => {
           return (
             initial +
             sellingPrice *
-              (current.combo.quantity || 1) *
-              (current?.variants?.length || 1)
+            (current.combo.quantity || 1) *
+            (current?.variants?.length || 1)
           );
         }, 0);
       }
@@ -161,7 +161,7 @@ const Checkout = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },

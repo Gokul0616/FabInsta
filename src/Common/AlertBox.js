@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  StyleSheet,
   Dimensions,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const AlertBox = ({
@@ -23,7 +23,7 @@ const AlertBox = ({
   return (
     <Modal
       transparent
-      animationType="fade"
+      animationType="none"
       visible={showAlert}
       style={styles.modal}
       onRequestClose={() => setShowAlert(false)}

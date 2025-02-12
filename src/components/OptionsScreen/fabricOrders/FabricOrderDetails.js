@@ -1,3 +1,5 @@
+import { useNavigation } from "@react-navigation/native";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -8,16 +10,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
-import api from "../../../Service/api";
-import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/Feather";
-import { backendUrl, common } from "../../../Common/Common";
-import { font } from "../../../Common/Theme";
-import AlertBox from "../../../Common/AlertBox";
 import { Checkbox } from "react-native-paper";
+import Icon from "react-native-vector-icons/Feather";
+import AlertBox from "../../../Common/AlertBox";
+import { backendUrl, common } from "../../../Common/Common";
 import Return from "../../../Common/Return";
-import { useDisclosure } from "@mantine/hooks";
+import { font } from "../../../Common/Theme";
+import api from "../../../Service/api";
 
 const FabricOrderDetails = ({ route }) => {
   const orderNo = route.params.orderNo;
@@ -51,8 +50,8 @@ const FabricOrderDetails = ({ route }) => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   const closeAlert = () => {
@@ -139,7 +138,7 @@ const FabricOrderDetails = ({ route }) => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -336,8 +335,8 @@ const FabricOrderDetails = ({ route }) => {
                 : "Product Name:"}{" "}
               {specificOrder.orderType !== "SWATCH"
                 ? item.productVariant?.variants.filter(
-                    (variant) => variant.type === "Colour"
-                  )[0].value || "N/A"
+                  (variant) => variant.type === "Colour"
+                )[0].value || "N/A"
                 : item.productName || "N/A"}
             </Text>
             <Text style={styles.contentPriceText}>
@@ -371,262 +370,262 @@ const FabricOrderDetails = ({ route }) => {
       {!["NEW", "CONFIRMED", "CANCELLED", "PACKED"].includes(
         specificOrder?.orderStatus
       ) && (
-        <>
-          <View style={{ gap: 20 }}>
-            <View>
-              <Text
-                style={{
-                  fontFamily: font.semiBold,
-                  fontSize: 18,
-                  paddingVertical: 16,
-                }}
-              >
-                Order Details
-              </Text>
-            </View>
-            <View style={styles.deliveryContainer}>
-              {specificOrder?.packing && (
-                <>
-                  <View>
-                    <Text style={styles.headerText}>Payment Summary</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-
-                      alignItems: "center",
-                      padding: 1,
-                    }}
-                  >
-                    <Text
+          <>
+            <View style={{ gap: 20 }}>
+              <View>
+                <Text
+                  style={{
+                    fontFamily: font.semiBold,
+                    fontSize: 18,
+                    paddingVertical: 16,
+                  }}
+                >
+                  Order Details
+                </Text>
+              </View>
+              <View style={styles.deliveryContainer}>
+                {specificOrder?.packing && (
+                  <>
+                    <View>
+                      <Text style={styles.headerText}>Payment Summary</Text>
+                    </View>
+                    <View
                       style={{
-                        fontFamily: font.semiBold,
+                        flexDirection: "row",
 
-                        paddingVertical: 5,
-                        alignSelf: "flex-start",
+                        alignItems: "center",
+                        padding: 1,
                       }}
                     >
-                      Invoice No:
-                    </Text>
-                    <Text
-                      style={{
-                        backgroundColor: "#000",
-                        color: "#fff",
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        borderRadius: 5,
-                        marginLeft: 5,
-                      }}
-                    >
-                      {specificOrder?.invoice?.invoiceNo || "NOT YET INVOICED"}
-                    </Text>
-                  </View>
-                  <View style={styles.tableContainer}>
-                    <View style={styles.cellRow}>
-                      <Text style={styles.cellRowLeftText}>
-                        Products Total (Incl.Tax)
-                      </Text>
-                      <Text style={styles.cellRowRightText}>
-                        {formatCurrency(
-                          parseFloat(getGrossTotal()) +
-                            parseFloat(specificOrder.totalGst || 0)
-                        )}
-                      </Text>
-                    </View>
-                    <View style={styles.cellRow}>
-                      <Text style={styles.cellRowLeftText}>
-                        Packing Charges
-                      </Text>
-                      <Text style={styles.cellRowRightText}>
-                        {formatCurrency(packingCharges)}
-                      </Text>
-                    </View>
-                    <View style={styles.cellRow}>
-                      <Text style={styles.cellRowLeftText}>
-                        Shipment Charges
-                      </Text>
-                      <Text style={styles.cellRowRightText}>
-                        {formatCurrency(
-                          parseFloat(specificOrder?.shipmentCost || 0)
-                        )}
-                      </Text>
-                    </View>
-                    <View style={styles.cellRow}>
-                      <Text style={styles.cellRowLeftText}>Wallet Amount</Text>
-                      <Text style={styles.cellRowRightText}>
-                        {formatCurrency(parseFloat(specificOrder?.swatchPoint))}
-                      </Text>
-                    </View>
-                    <View style={styles.cellRow}>
-                      <Text style={styles.cellRowLeftText}>
-                        Cone Weight Price
-                      </Text>
-                      <Text style={styles.cellRowRightText}>
-                        {formatCurrency(
-                          parseFloat(specificOrder?.grossConeWieghtPrice)
-                        )}
-                      </Text>
-                    </View>
-                    <View style={styles.cellRow}>
-                      <Text style={styles.cellRowLeftText}>Other Charges</Text>
-                      <Text style={styles.cellRowRightText}>
-                        {formatCurrency(0)}
-                      </Text>
-                    </View>
-                    <View style={styles.cellRow}>
-                      <Text style={[styles.cellRowLeftText, { color: "blue" }]}>
-                        Total Amount
+                      <Text
+                        style={{
+                          fontFamily: font.semiBold,
+
+                          paddingVertical: 5,
+                          alignSelf: "flex-start",
+                        }}
+                      >
+                        Invoice No:
                       </Text>
                       <Text
-                        style={[styles.cellRowRightText, { color: "blue" }]}
+                        style={{
+                          backgroundColor: "#000",
+                          color: "#fff",
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          borderRadius: 5,
+                          marginLeft: 5,
+                        }}
                       >
-                        {formatCurrency(
-                          parseFloat(getGrossTotal()) +
+                        {specificOrder?.invoice?.invoiceNo || "NOT YET INVOICED"}
+                      </Text>
+                    </View>
+                    <View style={styles.tableContainer}>
+                      <View style={styles.cellRow}>
+                        <Text style={styles.cellRowLeftText}>
+                          Products Total (Incl.Tax)
+                        </Text>
+                        <Text style={styles.cellRowRightText}>
+                          {formatCurrency(
+                            parseFloat(getGrossTotal()) +
+                            parseFloat(specificOrder.totalGst || 0)
+                          )}
+                        </Text>
+                      </View>
+                      <View style={styles.cellRow}>
+                        <Text style={styles.cellRowLeftText}>
+                          Packing Charges
+                        </Text>
+                        <Text style={styles.cellRowRightText}>
+                          {formatCurrency(packingCharges)}
+                        </Text>
+                      </View>
+                      <View style={styles.cellRow}>
+                        <Text style={styles.cellRowLeftText}>
+                          Shipment Charges
+                        </Text>
+                        <Text style={styles.cellRowRightText}>
+                          {formatCurrency(
+                            parseFloat(specificOrder?.shipmentCost || 0)
+                          )}
+                        </Text>
+                      </View>
+                      <View style={styles.cellRow}>
+                        <Text style={styles.cellRowLeftText}>Wallet Amount</Text>
+                        <Text style={styles.cellRowRightText}>
+                          {formatCurrency(parseFloat(specificOrder?.swatchPoint))}
+                        </Text>
+                      </View>
+                      <View style={styles.cellRow}>
+                        <Text style={styles.cellRowLeftText}>
+                          Cone Weight Price
+                        </Text>
+                        <Text style={styles.cellRowRightText}>
+                          {formatCurrency(
+                            parseFloat(specificOrder?.grossConeWieghtPrice)
+                          )}
+                        </Text>
+                      </View>
+                      <View style={styles.cellRow}>
+                        <Text style={styles.cellRowLeftText}>Other Charges</Text>
+                        <Text style={styles.cellRowRightText}>
+                          {formatCurrency(0)}
+                        </Text>
+                      </View>
+                      <View style={styles.cellRow}>
+                        <Text style={[styles.cellRowLeftText, { color: "blue" }]}>
+                          Total Amount
+                        </Text>
+                        <Text
+                          style={[styles.cellRowRightText, { color: "blue" }]}
+                        >
+                          {formatCurrency(
+                            parseFloat(getGrossTotal()) +
                             parseFloat(packingCharges || 0) +
                             parseFloat(specificOrder.totalGst || 0) +
                             parseFloat(specificOrder?.shipmentCost || 0) -
                             parseFloat(
                               specificOrder?.grossConeWieghtPrice +
-                                specificOrder?.swatchPoint || 0
+                              specificOrder?.swatchPoint || 0
                             )
-                        )}
-                      </Text>
+                          )}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                  <View style={styles.paymentStatusContainer}>
-                    <Text style={styles.paymentStatusText}>Payment Status</Text>
-                    <View style={styles.paymentStatusValuePaid}>
-                      <Text style={styles.paymentStatusValuePaidText}>
-                        {specificOrder?.paymentStatus || "N/A"}
-                      </Text>
+                    <View style={styles.paymentStatusContainer}>
+                      <Text style={styles.paymentStatusText}>Payment Status</Text>
+                      <View style={styles.paymentStatusValuePaid}>
+                        <Text style={styles.paymentStatusValuePaidText}>
+                          {specificOrder?.paymentStatus || "N/A"}
+                        </Text>
+                      </View>
+                      <View style={styles.paymentStatusValueVerified}>
+                        <Text style={styles.paymentStatusValueVerifiedText}>
+                          {specificOrder?.paymentStatus === "PAID"
+                            ? "VERIFIED"
+                            : "NOT VERIFIED"}
+                        </Text>
+                      </View>
                     </View>
-                    <View style={styles.paymentStatusValueVerified}>
-                      <Text style={styles.paymentStatusValueVerifiedText}>
-                        {specificOrder?.paymentStatus === "PAID"
-                          ? "VERIFIED"
-                          : "NOT VERIFIED"}
-                      </Text>
-                    </View>
-                  </View>
-                  <View>
                     <View>
-                      <Text style={styles.headerText}>Payment Details</Text>
-                    </View>
-                    <View style={styles.paymentDeailsCellContainer}>
-                      <Text style={styles.paymentDeailsCellHeader}>
-                        Bank Name
-                      </Text>
-                      <View style={styles.paymentDeailsCellValue}>
-                        <Text style={styles.paymentDeailsCellValueText}>
-                          {specificOrder?.bankName || "N/A"}
+                      <View>
+                        <Text style={styles.headerText}>Payment Details</Text>
+                      </View>
+                      <View style={styles.paymentDeailsCellContainer}>
+                        <Text style={styles.paymentDeailsCellHeader}>
+                          Bank Name
                         </Text>
+                        <View style={styles.paymentDeailsCellValue}>
+                          <Text style={styles.paymentDeailsCellValueText}>
+                            {specificOrder?.bankName || "N/A"}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.paymentDeailsCellContainer}>
+                        <Text style={styles.paymentDeailsCellHeader}>
+                          Deposit Amt.
+                        </Text>
+                        <View style={styles.paymentDeailsCellValue}>
+                          <Text style={styles.paymentDeailsCellValueText}>
+                            {formatCurrency(specificOrder?.depositAmount || 0)}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.paymentDeailsCellContainer}>
+                        <Text style={styles.paymentDeailsCellHeader}>UTR No</Text>
+                        <View style={styles.paymentDeailsCellValue}>
+                          <Text style={styles.paymentDeailsCellValueText}>
+                            {specificOrder?.utrNo || "N/A"}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.paymentDeailsCellContainer}>
+                        <Text style={styles.paymentDeailsCellHeader}>
+                          Deposit Date
+                        </Text>
+                        <View style={styles.paymentDeailsCellValue}>
+                          <Text style={styles.paymentDeailsCellValueText}>
+                            {formatDate(specificOrder?.dateOfDeposit)}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                    <View style={styles.paymentDeailsCellContainer}>
-                      <Text style={styles.paymentDeailsCellHeader}>
-                        Deposit Amt.
-                      </Text>
-                      <View style={styles.paymentDeailsCellValue}>
-                        <Text style={styles.paymentDeailsCellValueText}>
-                          {formatCurrency(specificOrder?.depositAmount || 0)}
-                        </Text>
-                      </View>
-                    </View>
-                    <View style={styles.paymentDeailsCellContainer}>
-                      <Text style={styles.paymentDeailsCellHeader}>UTR No</Text>
-                      <View style={styles.paymentDeailsCellValue}>
-                        <Text style={styles.paymentDeailsCellValueText}>
-                          {specificOrder?.utrNo || "N/A"}
-                        </Text>
-                      </View>
-                    </View>
-                    <View style={styles.paymentDeailsCellContainer}>
-                      <Text style={styles.paymentDeailsCellHeader}>
-                        Deposit Date
-                      </Text>
-                      <View style={styles.paymentDeailsCellValue}>
-                        <Text style={styles.paymentDeailsCellValueText}>
-                          {formatDate(specificOrder?.dateOfDeposit)}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </>
-              )}
-            </View>
-            <View style={styles.deliveryContainer}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  padding: 1,
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={styles.headerText}>Billed Products</Text>
-                {specificOrder?.orderStatus !== "NEW" && variantId && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setVisible(true);
-                    }}
-                    style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 10,
-                      backgroundColor: "green",
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text style={{ color: "#fff", fontFamily: font.semiBold }}>
-                      {returnStatus ? "View Returns" : "Process Return"}
-                    </Text>
-                  </TouchableOpacity>
+                  </>
                 )}
               </View>
-              {specificOrder?.items?.map((row, index) => {
-                return (
-                  <View key={index}>
-                    {specificOrder?.orderStatus === "DELIVERED" &&
-                      specificOrder.orderType !== "SWATCH" &&
-                      specificOrder.orderType !== "SAMPLE" && (
-                        <Checkbox
-                          status={
-                            variantId === row?.id ? "checked" : "unchecked"
-                          }
-                          color={common.PRIMARY_COLOR}
-                          onPress={() => {
-                            setVariantId(row?.id);
-                            setReturnStatus(row?.returnStatus);
-                          }}
-                        />
-                      )}
-                    <View style={styles.tableContainer}>
-                      <View style={styles.cellRowBilledProducts}>
-                        <View style={styles.cellRowLeftContainerBilledProducts}>
-                          <Text style={styles.cellRowLeftTextBilledProducts}>
-                            Product Name
+              <View style={styles.deliveryContainer}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    padding: 1,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={styles.headerText}>Billed Products</Text>
+                  {specificOrder?.orderStatus !== "NEW" && variantId && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setVisible(true);
+                      }}
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 10,
+                        backgroundColor: "green",
+                        borderRadius: 5,
+                      }}
+                    >
+                      <Text style={{ color: "#fff", fontFamily: font.semiBold }}>
+                        {returnStatus ? "View Returns" : "Process Return"}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                {specificOrder?.items?.map((row, index) => {
+                  return (
+                    <View key={index}>
+                      {specificOrder?.orderStatus === "DELIVERED" &&
+                        specificOrder.orderType !== "SWATCH" &&
+                        specificOrder.orderType !== "SAMPLE" && (
+                          <Checkbox
+                            status={
+                              variantId === row?.id ? "checked" : "unchecked"
+                            }
+                            color={common.PRIMARY_COLOR}
+                            onPress={() => {
+                              setVariantId(row?.id);
+                              setReturnStatus(row?.returnStatus);
+                            }}
+                          />
+                        )}
+                      <View style={styles.tableContainer}>
+                        <View style={styles.cellRowBilledProducts}>
+                          <View style={styles.cellRowLeftContainerBilledProducts}>
+                            <Text style={styles.cellRowLeftTextBilledProducts}>
+                              Product Name
+                            </Text>
+                          </View>
+                          <Text style={styles.cellRowRightTextBilledProducts}>
+                            {specificOrder.orderType !== "SWATCH"
+                              ? row?.productVariant?.name
+                              : row.productName}
+                            {specificOrder.orderType !== "SWATCH"
+                              ? `Order Kg: ${row.qty} kg`
+                              : `Order Quantity: ${row.qty} point`}
                           </Text>
                         </View>
-                        <Text style={styles.cellRowRightTextBilledProducts}>
-                          {specificOrder.orderType !== "SWATCH"
-                            ? row?.productVariant?.name
-                            : row.productName}
-                          {specificOrder.orderType !== "SWATCH"
-                            ? `Order Kg: ${row.qty} kg`
-                            : `Order Quantity: ${row.qty} point`}
-                        </Text>
-                      </View>
-                      <View style={styles.cellRowBilledProducts}>
-                        <View style={styles.cellRowLeftContainerBilledProducts}>
-                          <Text style={styles.cellRowLeftTextBilledProducts}>
-                            {specificOrder?.orderType !== "SWATCH"
-                              ? "Rolls"
-                              : "Points"}
-                          </Text>
-                        </View>
+                        <View style={styles.cellRowBilledProducts}>
+                          <View style={styles.cellRowLeftContainerBilledProducts}>
+                            <Text style={styles.cellRowLeftTextBilledProducts}>
+                              {specificOrder?.orderType !== "SWATCH"
+                                ? "Rolls"
+                                : "Points"}
+                            </Text>
+                          </View>
 
-                        <Text style={styles.cellRowRightTextBilledProducts}>
-                          {specificOrder.orderType !== "SWATCH"
-                            ? row?.pickList
-                              ? Math.ceil(
+                          <Text style={styles.cellRowRightTextBilledProducts}>
+                            {specificOrder.orderType !== "SWATCH"
+                              ? row?.pickList
+                                ? Math.ceil(
                                   row?.pickList
                                     ?.reduce(
                                       (total, item) =>
@@ -635,193 +634,193 @@ const FabricOrderDetails = ({ route }) => {
                                     )
                                     .toFixed(2)
                                 )
-                              : "-"
-                            : row.qty}
-                        </Text>
-                      </View>
-                      <View style={styles.cellRowBilledProducts}>
-                        <View style={styles.cellRowLeftContainerBilledProducts}>
-                          <Text style={styles.cellRowLeftTextBilledProducts}>
-                            Sell Price/Kg
+                                : "-"
+                              : row.qty}
                           </Text>
                         </View>
-                        <Text style={styles.cellRowRightTextBilledProducts}>
-                          Rs. {row.sellingPrice}
-                        </Text>
-                      </View>
-                      <View style={styles.cellRowBilledProducts}>
-                        <View style={styles.cellRowLeftContainerBilledProducts}>
-                          <Text style={styles.cellRowLeftTextBilledProducts}>
-                            Total Amt.
-                          </Text>
-                        </View>
-                        <Text style={styles.cellRowRightTextBilledProducts}>
-                          {(+row.qty * +row.sellingPrice).toFixed(2)}
-                        </Text>
-                      </View>
-                      <View style={styles.cellRowBilledProducts}>
-                        {specificOrder?.orderType !== "SWATCH" &&
-                          specificOrder?.orderType !== "SAMPLE" && (
-                            <View
-                              style={styles.cellRowLeftContainerBilledProducts}
-                            >
-                              <Text
-                                style={styles.cellRowLeftTextBilledProducts}
-                              >
-                                Return Status
-                              </Text>
-                            </View>
-                          )}
-                        {specificOrder?.orderType !== "SWATCH" &&
-                          specificOrder?.orderType !== "SAMPLE" && (
-                            <Text style={styles.cellRowRightTextBilledProducts}>
-                              {row?.returnStatus ? "Returned" : "Not Returned"}
+                        <View style={styles.cellRowBilledProducts}>
+                          <View style={styles.cellRowLeftContainerBilledProducts}>
+                            <Text style={styles.cellRowLeftTextBilledProducts}>
+                              Sell Price/Kg
                             </Text>
-                          )}
+                          </View>
+                          <Text style={styles.cellRowRightTextBilledProducts}>
+                            Rs. {row.sellingPrice}
+                          </Text>
+                        </View>
+                        <View style={styles.cellRowBilledProducts}>
+                          <View style={styles.cellRowLeftContainerBilledProducts}>
+                            <Text style={styles.cellRowLeftTextBilledProducts}>
+                              Total Amt.
+                            </Text>
+                          </View>
+                          <Text style={styles.cellRowRightTextBilledProducts}>
+                            {(+row.qty * +row.sellingPrice).toFixed(2)}
+                          </Text>
+                        </View>
+                        <View style={styles.cellRowBilledProducts}>
+                          {specificOrder?.orderType !== "SWATCH" &&
+                            specificOrder?.orderType !== "SAMPLE" && (
+                              <View
+                                style={styles.cellRowLeftContainerBilledProducts}
+                              >
+                                <Text
+                                  style={styles.cellRowLeftTextBilledProducts}
+                                >
+                                  Return Status
+                                </Text>
+                              </View>
+                            )}
+                          {specificOrder?.orderType !== "SWATCH" &&
+                            specificOrder?.orderType !== "SAMPLE" && (
+                              <Text style={styles.cellRowRightTextBilledProducts}>
+                                {row?.returnStatus ? "Returned" : "Not Returned"}
+                              </Text>
+                            )}
+                        </View>
                       </View>
                     </View>
+                  );
+                })}
+                <View style={{ gap: 8, marginTop: 10 }}>
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalTextHeader}>TOTAL (Items):</Text>
+                    <Text style={styles.totalTextDescription}>
+                      {getGrossTotal() || 0}
+                    </Text>
                   </View>
-                );
-              })}
-              <View style={{ gap: 8, marginTop: 10 }}>
-                <View style={styles.totalContainer}>
-                  <Text style={styles.totalTextHeader}>TOTAL (Items):</Text>
-                  <Text style={styles.totalTextDescription}>
-                    {getGrossTotal() || 0}
-                  </Text>
-                </View>
-                <View style={styles.totalContainer}>
-                  <Text style={styles.totalTextHeader}>Packing Fee:</Text>
-                  <Text style={styles.totalTextDescription}>
-                    Rs.{packingCharges}
-                  </Text>
-                </View>
-                <View style={styles.totalContainer}>
-                  <Text style={styles.totalTextHeader}>Shipment Fee:</Text>
-                  <Text style={styles.totalTextDescription}>
-                    {specificOrder?.shipmentCost || 0}
-                  </Text>
-                </View>
-                <View style={styles.totalContainer}>
-                  <Text style={styles.totalTextHeader}>Wallet Amount:</Text>
-                  <Text style={styles.totalTextDescription}>
-                    {specificOrder?.swatchPoint || 0}
-                  </Text>
-                </View>
-                <View style={styles.totalContainer}>
-                  <Text style={styles.totalTextHeader}>Cone Weight Price:</Text>
-                  <Text style={styles.totalTextDescription}>
-                    {specificOrder?.grossConeWieghtPrice || 0}
-                  </Text>
-                </View>
-                <View style={styles.totalContainer}>
-                  <Text style={[styles.totalTextHeader, { color: "blue" }]}>
-                    TOTAL(Excl.Taxes):
-                  </Text>
-                  <Text
-                    style={[styles.totalTextDescription, { color: "blue" }]}
-                  >
-                    {(
-                      parseFloat(getGrossTotal()) +
-                      parseFloat(packingCharges) +
-                      parseFloat(specificOrder?.shipmentCost || 0) -
-                      parseFloat(
-                        specificOrder?.grossConeWieghtPrice +
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalTextHeader}>Packing Fee:</Text>
+                    <Text style={styles.totalTextDescription}>
+                      Rs.{packingCharges}
+                    </Text>
+                  </View>
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalTextHeader}>Shipment Fee:</Text>
+                    <Text style={styles.totalTextDescription}>
+                      {specificOrder?.shipmentCost || 0}
+                    </Text>
+                  </View>
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalTextHeader}>Wallet Amount:</Text>
+                    <Text style={styles.totalTextDescription}>
+                      {specificOrder?.swatchPoint || 0}
+                    </Text>
+                  </View>
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalTextHeader}>Cone Weight Price:</Text>
+                    <Text style={styles.totalTextDescription}>
+                      {specificOrder?.grossConeWieghtPrice || 0}
+                    </Text>
+                  </View>
+                  <View style={styles.totalContainer}>
+                    <Text style={[styles.totalTextHeader, { color: "blue" }]}>
+                      TOTAL(Excl.Taxes):
+                    </Text>
+                    <Text
+                      style={[styles.totalTextDescription, { color: "blue" }]}
+                    >
+                      {(
+                        parseFloat(getGrossTotal()) +
+                        parseFloat(packingCharges) +
+                        parseFloat(specificOrder?.shipmentCost || 0) -
+                        parseFloat(
+                          specificOrder?.grossConeWieghtPrice +
                           specificOrder?.swatchPoint || 0
-                      )
-                    ).toFixed(2)}
-                  </Text>
+                        )
+                      ).toFixed(2)}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-              <View style={{ gap: 20, marginTop: 10 }}>
-                <View style={styles.totalContainer}>
-                  <Text style={styles.totalTextHeader}>IGST Charges:</Text>
-                  <Text style={styles.totalTextDescription}>-</Text>
-                </View>
-                <View style={styles.totalContainer}>
-                  <Text style={styles.totalTextHeader}>CGST Charges:</Text>
-                  <Text style={styles.totalTextDescription}>
-                    {(specificOrder?.totalGst / 2).toFixed(2)}
-                  </Text>
-                </View>
-                <View style={styles.totalContainer}>
-                  <Text style={styles.totalTextHeader}>SGST Charges:</Text>
-                  <Text style={styles.totalTextDescription}>
-                    {(specificOrder?.totalGst / 2).toFixed(2)}
-                  </Text>
-                </View>
-                <View style={styles.totalContainer}>
-                  <Text style={[styles.totalTextHeader, { color: "blue" }]}>
-                    TOTAL AMOUNT:
-                  </Text>
-                  <Text
-                    style={[styles.totalTextDescription, { color: "blue" }]}
-                  >
-                    {(
-                      parseFloat(getGrossTotal()) +
-                      parseFloat(packingCharges) +
-                      parseFloat(specificOrder?.totalGst || 0) +
-                      parseFloat(specificOrder?.shipmentCost || 0) -
-                      parseFloat(
-                        specificOrder?.grossConeWieghtPrice +
+                <View style={{ gap: 20, marginTop: 10 }}>
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalTextHeader}>IGST Charges:</Text>
+                    <Text style={styles.totalTextDescription}>-</Text>
+                  </View>
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalTextHeader}>CGST Charges:</Text>
+                    <Text style={styles.totalTextDescription}>
+                      {(specificOrder?.totalGst / 2).toFixed(2)}
+                    </Text>
+                  </View>
+                  <View style={styles.totalContainer}>
+                    <Text style={styles.totalTextHeader}>SGST Charges:</Text>
+                    <Text style={styles.totalTextDescription}>
+                      {(specificOrder?.totalGst / 2).toFixed(2)}
+                    </Text>
+                  </View>
+                  <View style={styles.totalContainer}>
+                    <Text style={[styles.totalTextHeader, { color: "blue" }]}>
+                      TOTAL AMOUNT:
+                    </Text>
+                    <Text
+                      style={[styles.totalTextDescription, { color: "blue" }]}
+                    >
+                      {(
+                        parseFloat(getGrossTotal()) +
+                        parseFloat(packingCharges) +
+                        parseFloat(specificOrder?.totalGst || 0) +
+                        parseFloat(specificOrder?.shipmentCost || 0) -
+                        parseFloat(
+                          specificOrder?.grossConeWieghtPrice +
                           specificOrder?.swatchPoint || 0
-                      )
-                    ).toFixed(2)}
-                  </Text>
+                        )
+                      ).toFixed(2)}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-          {
-            <Modal
-              visible={visible}
-              animationType="slide"
-              style={{ maxHeight: "75%" }}
-              transparent={true}
-              onRequestClose={() => setVisible(false)}
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  <View
-                    style={{
-                      width: "100%",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: 5,
-                    }}
-                  >
-                    <Text style={{ fontFamily: font.semiBold, fontSize: 18 }}>
-                      Return DashBoard
-                    </Text>
-                    {/* Close Button */}
-                    <TouchableOpacity
-                      onPress={() => setVisible(false)}
-                      style={styles.closeButton}
+            {
+              <Modal
+                visible={visible}
+                animationType="slide"
+                style={{ maxHeight: "75%" }}
+                transparent={true}
+                onRequestClose={() => setVisible(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <View
+                      style={{
+                        width: "100%",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: 5,
+                      }}
                     >
-                      <Text style={styles.closeButtonText}>Close</Text>
-                    </TouchableOpacity>
-                  </View>
+                      <Text style={{ fontFamily: font.semiBold, fontSize: 18 }}>
+                        Return DashBoard
+                      </Text>
+                      {/* Close Button */}
+                      <TouchableOpacity
+                        onPress={() => setVisible(false)}
+                        style={styles.closeButton}
+                      >
+                        <Text style={styles.closeButtonText}>Close</Text>
+                      </TouchableOpacity>
+                    </View>
 
-                  {/* Return Component */}
-                  <Return
-                    item={
-                      specificOrder?.items?.filter(
-                        (i) => i.id === variantId
-                      )?.[0]
-                    }
-                    setOrder={setSpecificOrder}
-                    order={specificOrder}
-                    handleChange={handleChange}
-                    comfirmReturn={comfirmReturn}
-                    returnModalClose={returnModalClose}
-                  />
+                    {/* Return Component */}
+                    <Return
+                      item={
+                        specificOrder?.items?.filter(
+                          (i) => i.id === variantId
+                        )?.[0]
+                      }
+                      setOrder={setSpecificOrder}
+                      order={specificOrder}
+                      handleChange={handleChange}
+                      comfirmReturn={comfirmReturn}
+                      returnModalClose={returnModalClose}
+                    />
+                  </View>
                 </View>
-              </View>
-            </Modal>
-          }
-        </>
-      )}
+              </Modal>
+            }
+          </>
+        )}
     </ScrollView>
   );
 };

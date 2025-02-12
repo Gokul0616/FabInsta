@@ -4,13 +4,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import Icon from "react-native-vector-icons/AntDesign";
-import { common, storage } from '../../Common/Common';
+import { common } from '../../Common/Common';
 import { font } from '../../Common/Theme';
 import api from '../../Service/api';
 
 const ProductOrder = ({
   pimData, colorOption, cartOptions, selectedValue, setSelectedValue, minimumOrder, handleAddToCart,
-  setMinimumOrder, setError, backOrder, totalQuantity, kgPerRoll, combo, selectedSku, 
+  setMinimumOrder, setError, backOrder, totalQuantity, kgPerRoll, combo, selectedSku,
   sampleCheck, alreadyInCart, setSelectedSku, setSampleCheck, swatchAvailable, existComboSwatch,
 }) => {
   const [expanded, setExpanded] = useState(false);

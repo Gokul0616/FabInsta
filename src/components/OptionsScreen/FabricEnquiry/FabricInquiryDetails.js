@@ -1,3 +1,6 @@
+import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
+import React from "react";
 import {
   Image,
   SafeAreaView,
@@ -7,12 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
-import { font } from "../../../Common/Theme";
-import { backendUrl, common } from "../../../Common/Common";
-import moment from "moment";
 import Icon from "react-native-vector-icons/Feather";
-import { useNavigation } from "@react-navigation/native";
+import { backendUrl, common } from "../../../Common/Common";
+import { font } from "../../../Common/Theme";
 
 const FabricInquiryDetails = ({ route }) => {
   const { item } = route.params;

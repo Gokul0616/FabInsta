@@ -1,10 +1,9 @@
 import {
-  CommonActions,
   useNavigation,
-  useRoute,
+  useRoute
 } from "@react-navigation/native";
 import _ from "lodash";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Modal,
@@ -15,17 +14,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Button, Checkbox } from "react-native-paper";
+import { Checkbox } from "react-native-paper";
 import Icon from "react-native-vector-icons/AntDesign";
 import FeatherIcon from "react-native-vector-icons/Feather";
+import { common } from "../../Common/Common";
+import { font } from "../../Common/Theme";
 import api from "../../Service/api";
 import CartProductSelect from "./CartProductSelect";
 import CartVariant from "./CartVariant";
 import ComboCartVariant from "./ComboCartVariant";
-import ProceedCart from "./ProceedCart";
-import { common } from "../../Common/Common";
-import { font } from "../../Common/Theme";
 import EditCart from "./EditCart";
+import ProceedCart from "./ProceedCart";
 
 const CartDetails = () => {
   const [selectAll, setSelectAll] = useState(false);
@@ -738,12 +737,12 @@ const CartDetails = () => {
   const cartItems = sampleCart
     ? sample
     : wholesaleCart
-    ? wholesale
-    : comboCart
-    ? combo
-    : swatchCart
-    ? swatch
-    : [];
+      ? wholesale
+      : comboCart
+        ? combo
+        : swatchCart
+          ? swatch
+          : [];
 
   return (
     <SafeAreaView style={styles.topBottom}>
@@ -806,9 +805,9 @@ const CartDetails = () => {
               {(sampleCart || wholesaleCart || comboCart || swatchCart) && (
                 <View style={styles.cartProducts}>
                   {(sampleCart && calculateTotalCount(sample) !== 0) ||
-                  (wholesaleCart && calculateTotalCount(wholesale) !== 0) ||
-                  (comboCart && calculateComboTotalCount(combo) !== 0) ||
-                  (swatchCart && calculateTotalCount(swatch) !== 0) ? (
+                    (wholesaleCart && calculateTotalCount(wholesale) !== 0) ||
+                    (comboCart && calculateComboTotalCount(combo) !== 0) ||
+                    (swatchCart && calculateTotalCount(swatch) !== 0) ? (
                     <View style={styles.cartItems}>
                       {_.map(cartItems, (items, articleCode) => (
                         <View

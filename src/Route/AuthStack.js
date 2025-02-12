@@ -1,19 +1,19 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
+import Checkout from "../components/CheckOut/Checkout";
+import Address from "../components/OptionsScreen/Address/address";
+import FabricInquiries from "../components/OptionsScreen/FabricEnquiry/FabricInqiries";
+import FabricInquiryDetails from "../components/OptionsScreen/FabricEnquiry/FabricInquiryDetails";
+import NewInquiryScreen from "../components/OptionsScreen/FabricEnquiry/NewInquiryScreen";
+import FabricOrder from "../components/OptionsScreen/fabricOrders/FabricOrder";
+import FabricOrderDetails from "../components/OptionsScreen/fabricOrders/FabricOrderDetails";
+import WishListDetails from "../components/WishListDetails";
 import ForgotPassword from "../Screens/AuthScreen/ForgetPassword/ForgotPassword";
 import OTPInputScreen from "../Screens/AuthScreen/ForgetPassword/OTPInputScreen";
 import AuthScreen from "../Screens/AuthScreen/LogInScreen";
 import SignUpScreen from "../Screens/AuthScreen/SignUpScreen";
 import LogoutHandler from "../Service/LogoutHandler";
 import MyTabs from "./BottomTabBar";
-import FabricInquiries from "../components/OptionsScreen/FabricEnquiry/FabricInqiries";
-import NewInquiryScreen from "../components/OptionsScreen/FabricEnquiry/NewInquiryScreen";
-import Address from "../components/OptionsScreen/Address/address";
-import WishListDetails from "../components/WishListDetails";
-import FabricOrder from "../components/OptionsScreen/fabricOrders/FabricOrder";
-import FabricOrderDetails from "../components/OptionsScreen/fabricOrders/FabricOrderDetails";
-import FabricInquiryDetails from "../components/OptionsScreen/FabricEnquiry/FabricInquiryDetails";
-import Checkout from "../components/CheckOut/Checkout";
 
 const Stack = createStackNavigator();
 

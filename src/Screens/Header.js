@@ -1,14 +1,14 @@
 import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Animated,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { font } from "../Common/Theme";
-import { common } from "../Common/Common";
 import Icon from "react-native-vector-icons/Feather";
+import { common } from "../Common/Common";
+import { font } from "../Common/Theme";
 
 const Header = ({ scrollY, onOptionsPress, isOptionsVisible }) => {
   const translateY = scrollY.interpolate({

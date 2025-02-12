@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Button, Checkbox } from 'react-native-paper';
 import _ from 'lodash';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Checkbox } from 'react-native-paper';
 import { common } from '../../Common/Common';
 import { font } from '../../Common/Theme';
 

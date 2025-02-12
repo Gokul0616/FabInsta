@@ -1,7 +1,7 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import AuthStack from "./src/Route/AuthStack";
+import { SafeAreaView, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import AuthStack from "./src/Route/AuthStack";
 
 const App = () => {
   return (

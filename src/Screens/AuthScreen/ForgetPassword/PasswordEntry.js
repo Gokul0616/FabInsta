@@ -1,17 +1,17 @@
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   Animated,
   StyleSheet,
-  TouchableOpacity,
-  View,
   Text,
+  TouchableOpacity,
   Vibration,
+  View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { FiButton } from "../../../Common/FiButton";
 import { FiInput } from "../../../Common/FiInput";
 import { font } from "../../../Common/Theme";
-import { FiButton } from "../../../Common/FiButton";
-import { CommonActions, useNavigation } from "@react-navigation/native";
 
 const PasswordEntry = ({ userData, onSubmit }) => {
   const navigation = useNavigation();

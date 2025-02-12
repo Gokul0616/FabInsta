@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   Image,
   Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { font } from "../Theme";
-import api from "../../Service/api";
-import { useNavigation } from "@react-navigation/native";
 
 const CustomDrawer = ({ options, closeDrawer, profile }) => {
   const groupedOptions = options.reduce((acc, option) => {

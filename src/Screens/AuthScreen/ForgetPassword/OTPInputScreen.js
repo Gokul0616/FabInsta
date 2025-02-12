@@ -2,20 +2,20 @@ import React, { useEffect, useState } from "react";
 import {
   Animated,
   StyleSheet,
-  TouchableOpacity,
-  View,
   Text,
+  TouchableOpacity,
   Vibration,
+  View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import {
   CodeField,
   Cursor,
   useBlurOnFulfill,
   useClearByFocusCell,
 } from "react-native-confirmation-code-field";
-import { font } from "../../../Common/Theme";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { FiButton } from "../../../Common/FiButton";
+import { font } from "../../../Common/Theme";
 
 const CELL_COUNT = 6;
 

@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -6,11 +7,10 @@ import {
   Vibration,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { font } from "../../Common/Theme";
-import { common } from "../../Common/Common";
 import { Checkbox } from "react-native-paper";
+import { common } from "../../Common/Common";
 import { FiButton } from "../../Common/FiButton";
+import { font } from "../../Common/Theme";
 
 const Policy = ({
   cartData,

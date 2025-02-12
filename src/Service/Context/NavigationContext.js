@@ -1,7 +1,6 @@
 // context/NavigationContext.js
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import React, { createContext, useContext, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { CommonActions } from "@react-navigation/native";
 
 const NavigationContext = createContext();
 

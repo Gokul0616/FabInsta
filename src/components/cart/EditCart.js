@@ -1,5 +1,5 @@
-import React from 'react'
-import { Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React from 'react';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { backendUrl } from '../../Common/Common';
 import { font } from '../../Common/Theme';
@@ -49,7 +49,7 @@ const EditCart = ({ editItem, setEditItem, handleEditSave, cancelRemove, error, 
                             />
                             <Text style={styles.inputInfoText}>kg</Text>
                         </View>
-                        {error && <Text style={{ color: 'red', fontSize: 12, textAlign:'left' }}>{error}</Text>}
+                        {error && <Text style={{ color: 'red', fontSize: 12, textAlign: 'left' }}>{error}</Text>}
                         {editItem?.cartType === 'WHOLESALE' && <Text style={styles.inputInfoText}>Quantity must be a multiple of {editItem?.kgPerRoll} kg</Text>}
                         <Text style={styles.inputInfoText}>minimum {editItem?.cartType === 'SAMPLE' ? (editItem?.sampleMoq || sampleMoq) : (editItem?.wholesaleMoq || wholesaleMoq)} kg</Text>
                     </View>

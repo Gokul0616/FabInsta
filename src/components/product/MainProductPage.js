@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AlertBox from "../../Common/AlertBox";
 import { backendUrl, storage } from "../../Common/Common";
 import { font } from "../../Common/Theme";
-import AlertBox from "../../Common/AlertBox";
 import api from "../../Service/api";
 
 const MainProductPage = ({ product, navigation }) => {
@@ -11,8 +11,8 @@ const MainProductPage = ({ product, navigation }) => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   const [profile, setProfile] = useState({});
@@ -52,7 +52,7 @@ const MainProductPage = ({ product, navigation }) => {
         heading: "Salesman Not Assigned",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -67,7 +67,7 @@ const MainProductPage = ({ product, navigation }) => {
           heading: "Your Account is not approved yet",
           isRight: false,
           rightButtonText: "OK",
-          triggerFunction: () => {},
+          triggerFunction: () => { },
           setShowAlert: () => {
             isError.setShowAlert(false);
           },

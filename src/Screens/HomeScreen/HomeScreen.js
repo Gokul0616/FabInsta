@@ -8,10 +8,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  Dimensions,
   TouchableOpacity,
   View,
-  useWindowDimensions,
+  useWindowDimensions
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import AlertBox from "../../Common/AlertBox";
@@ -36,8 +35,8 @@ const HomeScreen = ({ navigation, route }) => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
 
@@ -88,9 +87,8 @@ const HomeScreen = ({ navigation, route }) => {
     try {
       let url = "";
       if (storage.getString("token")) {
-        url = `pim/searchFilter?page=${
-          fromsearch ? 0 : page
-        }&size=${14}&sortData=${filterDropdownValue}`;
+        url = `pim/searchFilter?page=${fromsearch ? 0 : page
+          }&size=${14}&sortData=${filterDropdownValue}`;
       } else {
         url = `pim/sampleProduct`;
       }
@@ -132,7 +130,7 @@ const HomeScreen = ({ navigation, route }) => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },

@@ -1,29 +1,28 @@
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  View,
-  KeyboardAvoidingView,
-  Platform,
   TouchableOpacity,
-  Image,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { font } from "../../../Common/Theme";
-import { FiInput } from "../../../Common/FiInput";
-import Icon from "react-native-vector-icons/Feather";
-import { backendUrl, common, storage } from "../../../Common/Common";
-import LargeTextBox from "../../../Common/LargeTextBox";
+import { launchImageLibrary } from "react-native-image-picker";
 import { Checkbox } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/Feather";
+import AlertBox from "../../../Common/AlertBox";
+import { backendUrl, common, storage } from "../../../Common/Common";
 import { FiButton } from "../../../Common/FiButton";
 import FIDropdown from "../../../Common/FIDropdown";
-import { launchImageLibrary } from "react-native-image-picker";
-import AlertBox from "../../../Common/AlertBox";
-import api from "../../../Service/api";
-import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
+import { FiInput } from "../../../Common/FiInput";
+import LargeTextBox from "../../../Common/LargeTextBox";
+import { font } from "../../../Common/Theme";
 const initialState = {
   endUse: "",
   season: "",
@@ -73,8 +72,8 @@ const NewInquiryScreen = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   const handleSeasonSelect = (value) => {
@@ -125,7 +124,7 @@ const NewInquiryScreen = () => {
           heading: "Error",
           isRight: false,
           rightButtonText: "OK",
-          triggerFunction: () => {},
+          triggerFunction: () => { },
           setShowAlert: () => {
             isError.setShowAlert(false);
           },
@@ -303,7 +302,7 @@ const NewInquiryScreen = () => {
           heading: "Error",
           isRight: false,
           rightButtonText: "OK",
-          triggerFunction: () => {},
+          triggerFunction: () => { },
           setShowAlert: () => {
             isError.setShowAlert(false);
           },
@@ -316,7 +315,7 @@ const NewInquiryScreen = () => {
             heading: "Error",
             isRight: false,
             rightButtonText: "OK",
-            triggerFunction: () => {},
+            triggerFunction: () => { },
             setShowAlert: () => {
               isError.setShowAlert(false);
             },
@@ -329,7 +328,7 @@ const NewInquiryScreen = () => {
             heading: "Error",
             isRight: false,
             rightButtonText: "OK",
-            triggerFunction: () => {},
+            triggerFunction: () => { },
             setShowAlert: () => {
               isError.setShowAlert(false);
             },
@@ -342,7 +341,7 @@ const NewInquiryScreen = () => {
             heading: "Error",
             isRight: false,
             rightButtonText: "OK",
-            triggerFunction: () => {},
+            triggerFunction: () => { },
             setShowAlert: () => {
               isError.setShowAlert(false);
             },

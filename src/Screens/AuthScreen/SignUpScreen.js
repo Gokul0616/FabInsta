@@ -1,24 +1,23 @@
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  View,
-  Text,
-  Alert,
+  ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
   Vibration,
-  Keyboard,
-  ActivityIndicator,
+  View
 } from "react-native";
-import { FiInput } from "../../Common/FiInput";
-import { FiButton } from "../../Common/FiButton";
-import { font } from "../../Common/Theme";
-import { CommonActions, useNavigation } from "@react-navigation/native";
 import { Eye, EyeOff } from "react-native-feather";
-import { Checkbox } from "react-native-paper";
-import { common, storage, title } from "../../Common/Common";
 import { ScrollView } from "react-native-gesture-handler";
+import { Checkbox } from "react-native-paper";
 import AlertBox from "../../Common/AlertBox";
+import { common } from "../../Common/Common";
+import { FiButton } from "../../Common/FiButton";
+import { FiInput } from "../../Common/FiInput";
+import { font } from "../../Common/Theme";
 import api from "../../Service/api";
 
 const SignUpScreen = () => {
@@ -29,8 +28,8 @@ const SignUpScreen = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
 
@@ -165,7 +164,7 @@ const SignUpScreen = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isAlert.setShowAlert(false);
         },

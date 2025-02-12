@@ -10,12 +10,11 @@ import {
   View,
 } from "react-native";
 import { Eye, EyeOff } from "react-native-feather";
+import AlertBox from "../../Common/AlertBox";
 import { common, storage } from "../../Common/Common";
 import { FiButton } from "../../Common/FiButton";
 import { FiInput } from "../../Common/FiInput";
 import { font } from "../../Common/Theme";
-import axiosInstance from "../../Service/api";
-import AlertBox from "../../Common/AlertBox";
 import api from "../../Service/api";
 
 const AuthScreen = () => {
@@ -30,8 +29,8 @@ const AuthScreen = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => {},
-    setShowAlert: () => {},
+    triggerFunction: () => { },
+    setShowAlert: () => { },
     showAlert: false,
   });
   const [isLoading, setLoading] = useState(false);
@@ -128,7 +127,7 @@ const AuthScreen = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => {},
+        triggerFunction: () => { },
         setShowAlert: () => {
           isError.setShowAlert(false);
         },

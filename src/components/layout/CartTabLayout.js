@@ -1,6 +1,5 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import Checkout from "../../components/CheckOut/Checkout";
 import CartDetails from "../cart/CartDetails";
 
 const Stack = createStackNavigator();

@@ -16,8 +16,8 @@ import { Checkbox } from "react-native-paper";
 import Icon from "react-native-vector-icons/AntDesign";
 import { backendUrl, common } from "../Common/Common";
 import { getpayLoadFromToken } from "../Common/JwtPayload";
-import api from "../Service/api";
 import { font } from "../Common/Theme";
+import api from "../Service/api";
 
 const WishListDetails = () => {
   const [wishList, setWishList] = useState([]);
@@ -192,8 +192,8 @@ const WishListDetails = () => {
                               );
                               const newSelectedItems = isAllSelected
                                 ? selectedItems.filter(
-                                    (id) => !allIds.includes(id)
-                                  )
+                                  (id) => !allIds.includes(id)
+                                )
                                 : [...selectedItems, ...allIds];
                               setSelectedItems(_.uniq(newSelectedItems));
                             }}
@@ -232,8 +232,8 @@ const WishListDetails = () => {
                                     const updatedSelectedItems =
                                       selectedItems.includes(pimItem.id)
                                         ? selectedItems.filter(
-                                            (id) => id !== pimItem.id
-                                          )
+                                          (id) => id !== pimItem.id
+                                        )
                                         : [...selectedItems, pimItem.id];
                                     setSelectedItems(updatedSelectedItems);
                                   }}
@@ -284,9 +284,8 @@ const WishListDetails = () => {
                                   />
                                   <Text
                                     style={{ fontFamily: font.medium }}
-                                  >{`#${index + 1} ∙ ${
-                                    pimItem?.value || "N/A"
-                                  }`}</Text>
+                                  >{`#${index + 1} ∙ ${pimItem?.value || "N/A"
+                                    }`}</Text>
                                 </View>
                                 <Text style={styles.priceText}>
                                   &#8377; {(pimItem?.sellingPrice).toFixed(2)}

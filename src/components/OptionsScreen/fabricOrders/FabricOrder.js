@@ -10,13 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { TextInput } from "react-native-paper";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Icon from "react-native-vector-icons/AntDesign";
-import { backendUrl, common } from "../../../Common/Common";
+import { backendUrl } from "../../../Common/Common";
+import { FiInput } from "../../../Common/FiInput";
 import { font } from "../../../Common/Theme";
 import api from "../../../Service/api";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { FiInput } from "../../../Common/FiInput";
 
 const FabricOrder = () => {
   const initialTransaction = {
@@ -257,9 +256,9 @@ const FabricOrder = () => {
                         style={
                           orderStatus === item
                             ? [
-                                styles.dropdownItemContainer,
-                                { backgroundColor: "#ffcbc6" },
-                              ]
+                              styles.dropdownItemContainer,
+                              { backgroundColor: "#ffcbc6" },
+                            ]
                             : styles.dropdownItemContainer
                         }
                       >
@@ -267,9 +266,9 @@ const FabricOrder = () => {
                           style={
                             orderStatus === item
                               ? [
-                                  styles.dropdownItemLabelText,
-                                  { color: "#ff6f61" },
-                                ]
+                                styles.dropdownItemLabelText,
+                                { color: "#ff6f61" },
+                              ]
                               : styles.dropdownItemLabelText
                           }
                         >
@@ -379,9 +378,9 @@ const FabricOrder = () => {
                           style={
                             order?.utrNo
                               ? [
-                                  styles.orderConfirmButton,
-                                  { backgroundColor: "#e3e3e3" },
-                                ]
+                                styles.orderConfirmButton,
+                                { backgroundColor: "#e3e3e3" },
+                              ]
                               : styles.orderConfirmButton
                           }
                           onPress={() => {
@@ -438,11 +437,10 @@ const FabricOrder = () => {
                               : "Product Name"}{" "}
                             :{" "}
                             {order?.orderType !== "SWATCH"
-                              ? `${
-                                  item?.productVariant?.variants.filter(
-                                    (variant) => variant?.type === "Colour"
-                                  )[0]?.value || "N/A"
-                                }`
+                              ? `${item?.productVariant?.variants.filter(
+                                (variant) => variant?.type === "Colour"
+                              )[0]?.value || "N/A"
+                              }`
                               : `${item?.productName || "N/A"}`}
                           </Text>
                         </View>
@@ -530,8 +528,8 @@ const FabricOrder = () => {
                       <Text style={{ width: "85%", fontFamily: font.medium }}>
                         {transactionDetails.dateOfDeposit
                           ? new Date(
-                              transactionDetails.dateOfDeposit
-                            ).toLocaleDateString("en-GB")
+                            transactionDetails.dateOfDeposit
+                          ).toLocaleDateString("en-GB")
                           : "Select deposit date"}
                       </Text>
 
@@ -568,8 +566,8 @@ const FabricOrder = () => {
                       value={
                         field.name === "depositAmount"
                           ? parseFloat(transactionDetails[field.name]).toFixed(
-                              2
-                            )
+                            2
+                          )
                           : transactionDetails[field.name]
                       }
                       onChangeText={(value) =>
@@ -598,15 +596,15 @@ const FabricOrder = () => {
             <TouchableOpacity
               style={
                 !transactionDetails?.bankName ||
-                !transactionDetails?.utrNo ||
-                !transactionDetails?.depositAmount ||
-                !transactionDetails?.dateOfDeposit
+                  !transactionDetails?.utrNo ||
+                  !transactionDetails?.depositAmount ||
+                  !transactionDetails?.dateOfDeposit
                   ? [
-                      styles.confirmButton,
-                      {
-                        backgroundColor: "#e3e3e3",
-                      },
-                    ]
+                    styles.confirmButton,
+                    {
+                      backgroundColor: "#e3e3e3",
+                    },
+                  ]
                   : styles.confirmButton
               }
               onPress={() => handleTrackingIdSubmit()}
@@ -795,6 +793,8 @@ const styles = StyleSheet.create({
   orderNotFound: {
     fontSize: 18,
     fontFamily: font.medium,
+    marginTop: 30,
+    lineHeight: 30,
   },
 
   // Modal Styles

@@ -71,7 +71,7 @@ const ProductInformation = ({
         });
       }
     }
-  };  
+  };
 
   return (
     <SafeAreaView style={styles.container}>

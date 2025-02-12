@@ -1,8 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import _ from 'lodash';
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { backendUrl } from '../../Common/Common';
-import { useNavigation } from '@react-navigation/native';
 import { font } from '../../Common/Theme';
 
 const ComboCartVariant = ({ items }) => {
