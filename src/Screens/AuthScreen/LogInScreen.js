@@ -16,6 +16,7 @@ import { FiButton } from "../../Common/FiButton";
 import { FiInput } from "../../Common/FiInput";
 import { font } from "../../Common/Theme";
 import api from "../../Service/api";
+import { getFcmToken } from "../../Service/Notification";
 
 const AuthScreen = () => {
   const navigation = useNavigation();
@@ -29,8 +30,8 @@ const AuthScreen = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
   });
   const [isLoading, setLoading] = useState(false);
@@ -103,17 +104,19 @@ const AuthScreen = () => {
       fetchData();
     } else {
       Vibration.vibrate(100);
-      console.log("Login Failed");
+      // console.log("Login Failed");
     }
   };
 
   const fetchData = async () => {
+    const fcmToken = await getFcmToken();
     try {
       Keyboard.dismiss();
       setLoading(true);
       const response = await api.post("/customer/login", {
         emailId: email,
         password: password,
+        fcmToken: fcmToken,
       });
       const { companyId, token, userId } = response.response;
       storage.set("companyId", companyId == null ? "" : companyId);
@@ -127,7 +130,7 @@ const AuthScreen = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },

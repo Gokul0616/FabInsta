@@ -10,7 +10,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
 import Icon from "react-native-vector-icons/Feather";
@@ -31,8 +31,8 @@ const Address = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
   });
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -108,7 +108,7 @@ const Address = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -127,7 +127,7 @@ const Address = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -148,13 +148,13 @@ const Address = () => {
       );
       setData(sortedData);
     } catch (err) {
-      console.log("Error at Fetching Data :", err);
+      // console.log("Error at Fetching Data :", err);
       setIsError({
         message: err.response?.data?.message || "An Unexpected error occurred",
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -596,14 +596,14 @@ const Address = () => {
                           <Icon
                             name={
                               editAddress?.isGstVerified ||
-                                address.isGstVerified
+                              address.isGstVerified
                                 ? "check-circle"
                                 : "x-circle"
                             }
                             size={20}
                             color={
                               editAddress?.isGstVerified ||
-                                address.isGstVerified
+                              address.isGstVerified
                                 ? "green"
                                 : "red"
                             }

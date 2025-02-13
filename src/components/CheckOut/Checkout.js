@@ -35,8 +35,8 @@ const Checkout = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
   });
   const navigation = useNavigation();
@@ -69,8 +69,8 @@ const Checkout = () => {
           return (
             initial +
             sellingPrice *
-            (current.combo.quantity || 1) *
-            (current?.variants?.length || 1)
+              (current.combo.quantity || 1) *
+              (current?.variants?.length || 1)
           );
         }, 0);
       }
@@ -161,7 +161,7 @@ const Checkout = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -203,7 +203,6 @@ const Checkout = () => {
   };
   const valueOption = ["PICKED BY CUSTOMER", "DELIVERED TO CUSTOMER"];
 
-  console.log(cartInfo, "cartInfo");
   const dropdownValues = [
     "Select Delivery Mode",
     "PICKED BY CUSTOMER",
@@ -212,7 +211,7 @@ const Checkout = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={() => navigate.goBack()}
+        onPress={() => navigation.goBack()}
         style={{
           paddingVertical: 10,
           paddingHorizontal: 5,

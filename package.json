@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "@mantine/hooks": "^7.16.2",
+    "@notifee/react-native": "^9.1.8",
     "@react-native-community/checkbox": "^0.5.17",
+    "@react-native-firebase/app": "^21.10.0",
+    "@react-native-firebase/messaging": "^21.10.0",
     "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-native-picker/picker": "^2.11.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
@@ -19,6 +22,7 @@
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
     "axios": "^1.7.9",
+    "firebase": "^11.3.1",
     "moment": "^2.30.1",
     "react": "18.3.1",
     "react-native": "0.76.5",

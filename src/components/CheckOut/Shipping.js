@@ -59,8 +59,8 @@ const Shipping = ({
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
   });
   const handleStateChange = (state) => {
@@ -182,7 +182,7 @@ const Shipping = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -210,7 +210,7 @@ const Shipping = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -228,14 +228,14 @@ const Shipping = ({
       const res = await api.get(`order/get-last-customer/${loginUser}`);
       setLastOrderByCustomer(res.response);
     } catch (e) {
-      console.log("Fail to Fetch Last customer", e);
+      // console.log("Fail to Fetch Last customer", e);
       setIsError({
         message:
           error.response?.data?.message || "An Unexpected error occurred",
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -262,7 +262,7 @@ const Shipping = ({
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -690,8 +690,8 @@ const Shipping = ({
                   {modalHeader === "billLocation"
                     ? "Bill Local Address"
                     : modalHeader === "shipLocation"
-                      ? "Ship Local Address"
-                      : "Error"}
+                    ? "Ship Local Address"
+                    : "Error"}
                 </Text>
                 <TouchableOpacity onPress={() => closeSelectAddressModal()}>
                   <Icon name="x" size={20} color="#000" />
@@ -720,10 +720,10 @@ const Shipping = ({
                           {lastOrderByCustomer[0]?.[
                             modalHeader === "billLocation" ? 0 : 1
                           ] === add?.id && (
-                              <View style={styles.lastUsedContainer}>
-                                <Text style={styles.lastUsedText}>Last Used</Text>
-                              </View>
-                            )}
+                            <View style={styles.lastUsedContainer}>
+                              <Text style={styles.lastUsedText}>Last Used</Text>
+                            </View>
+                          )}
                         </View>
                       </View>
                       <View style={{ paddingHorizontal: 16 }}>

@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   Vibration,
-  View
+  View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { font } from "../../../Common/Theme";
@@ -33,8 +33,8 @@ const ForgotPassword = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
     isLeft: true,
   });
@@ -72,7 +72,7 @@ const ForgotPassword = () => {
       fetchData();
     } else {
       Vibration.vibrate(100);
-      console.log("Please enter a valid email address.");
+      // console.log("Please enter a valid email address.");
     }
   };
 
@@ -85,7 +85,7 @@ const ForgotPassword = () => {
           email: email,
         },
       });
-      // console.log(response);
+      // // console.log(response);
       setisAlert({
         message: response.message,
         heading: "OTP Send",
@@ -109,7 +109,7 @@ const ForgotPassword = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isAlert.setShowAlert(false);
         },
@@ -196,7 +196,7 @@ const ForgotPassword = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isAlert.setShowAlert(false);
         },
@@ -237,7 +237,7 @@ const ForgotPassword = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isAlert.setShowAlert(false);
         },

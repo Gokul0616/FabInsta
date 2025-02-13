@@ -71,7 +71,7 @@ function MyTabs() {
       onPress: () => {
         closeDrawer();
         setTimeout(() => {
-          console.log("Option 1 selected");
+          // console.log("Option 1 selected");
         }, 100);
       },
     },
@@ -82,7 +82,7 @@ function MyTabs() {
       onPress: () => {
         closeDrawer();
         setTimeout(() => {
-          console.log("Option 2 selected");
+          // console.log("Option 2 selected");
         }, 100);
       },
     },
@@ -93,7 +93,7 @@ function MyTabs() {
       onPress: () => {
         closeDrawer();
         setTimeout(() => {
-          console.log("Option 3 selected");
+          // console.log("Option 3 selected");
         }, 100);
       },
     },
@@ -167,8 +167,8 @@ function MyTabs() {
                 route.name === "Home"
                   ? "home"
                   : route.name === "Profile"
-                    ? "user"
-                    : "shopping-bag";
+                  ? "user"
+                  : "shopping-bag";
               return <Icon name={iconName} size={size} color={color} />;
             },
             tabBarActiveTintColor: "#FF6F61",

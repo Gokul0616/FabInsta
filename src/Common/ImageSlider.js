@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -6,10 +6,10 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  View
-} from 'react-native';
+  View,
+} from "react-native";
 
-const deviceWidth = Dimensions.get('window').width;
+const deviceWidth = Dimensions.get("window").width;
 
 const ImageSlider = ({ media }) => {
   const autoPlay = true;
@@ -26,9 +26,9 @@ const ImageSlider = ({ media }) => {
   // Update the image list whenever media prop changes
   useEffect(() => {
     if (media && media.length > 0) {
-      const imageArray = media.map(item => item?.src);
+      const imageArray = media.map((item) => item?.src);
       setImage(imageArray);
-      setCurrentSlide(0);  // Reset to first slide when media changes
+      setCurrentSlide(0); // Reset to first slide when media changes
     }
   }, [media]);
 
@@ -99,7 +99,9 @@ const ImageSlider = ({ media }) => {
     }).start();
   }, [shiftValue, shiftAnimated]);
 
-  const translateX = useRef(new Animated.Value(-currentSlide * deviceWidth)).current;
+  const translateX = useRef(
+    new Animated.Value(-currentSlide * deviceWidth)
+  ).current;
 
   useEffect(() => {
     Animated.timing(translateX, {
@@ -120,9 +122,15 @@ const ImageSlider = ({ media }) => {
               width: deviceWidth,
               transform: [{ translateX }],
             },
-          ]}>
+          ]}
+        >
           {image?.map((src, index) => (
-            <Image key={index} source={{ uri: src }} style={styles.image} resizeMode='contain' />
+            <Image
+              key={index}
+              source={{ uri: src }}
+              style={styles.image}
+              resizeMode="contain"
+            />
           ))}
         </Animated.View>
       </View>
@@ -133,7 +141,8 @@ const ImageSlider = ({ media }) => {
             style={[
               styles.sliderNavLists,
               { transform: [{ translateX: shiftAnimated }] },
-            ]}>
+            ]}
+          >
             {media?.map((_, i) => (
               <TouchableOpacity
                 key={i}
@@ -155,17 +164,17 @@ export default ImageSlider;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f9f9f9',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#f9f9f9",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 15,
   },
   carouselContainer: {
     width: 200,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   carouselWrapper: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   image: {
     width: deviceWidth,
@@ -175,26 +184,26 @@ const styles = StyleSheet.create({
   innerContainer: {
     marginTop: 15,
     width: deviceWidth,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   sliderNav: {
     width: 100,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   sliderNavLists: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   sliderBtn: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: 'gray',
+    backgroundColor: "gray",
     margin: 5,
     transform: [{ scale: 0.6 }],
   },
   activeSliderBtn: {
-    backgroundColor: '#ff6f61',
+    backgroundColor: "#ff6f61",
     transform: [{ scale: 1.2 }],
   },
 });

@@ -28,8 +28,8 @@ const FabricInquiries = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
   });
 
@@ -40,13 +40,13 @@ const FabricInquiries = () => {
       const res = await api.get("/fabricInquiry");
       setData(res.response || []);
     } catch (err) {
-      console.log("Error at Fetching Data :", err);
+      // console.log("Error at Fetching Data :", err);
       setIsError({
         message: err.response?.data?.message || "An Unexpected error occurred",
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },

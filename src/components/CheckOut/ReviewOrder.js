@@ -313,7 +313,7 @@ const ReviewOrder = ({
                   {selectedAddresses?.shipLocation?.transporterCharges
                     ?.transporter?.name
                     ? selectedAddresses?.shipLocation?.transporterCharges
-                      ?.transporter?.name
+                        ?.transporter?.name
                     : "-"}
                 </Text>
               </View>
@@ -346,7 +346,7 @@ const ReviewOrder = ({
                   ₹{" "}
                   {selectedAddresses?.shipLocation?.transporterCharges?.charges
                     ? selectedAddresses?.shipLocation?.transporterCharges
-                      ?.charges
+                        ?.charges
                     : "0"}
                 </Text>
               </View>
@@ -378,221 +378,221 @@ const ReviewOrder = ({
         >
           {!combo
             ? cartData.map((item) => (
-              <View key={item.variantSku} style={styles.itemContainer}>
-                <View style={styles.cartProduct}>
-                  <View style={styles.flexContainer}>
-                    <View style={styles.cartProductLayout}>
-                      <View style={styles.adaptiveLayout}>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            width: "100%",
-                          }}
-                        >
-                          <View style={styles.productInfoContainer}>
-                            <View style={styles.imageContainer}>
-                              <Image
-                                source={{
-                                  uri: `${backendUrl}${item.image?.replace(
-                                    "/api",
-                                    ""
-                                  )}`,
-                                }}
-                                style={styles.productImage}
-                                resizeMode="cover"
-                              />
-                            </View>
-                            <View style={styles.productDetails}>
-                              <View style={styles.flexRow}>
-                                <Text style={styles.articleCode}>
-                                  {item.articleCode}
-                                </Text>
-                              </View>
-                              <View style={styles.colorInfo}>
-                                <Text>
-                                  <Text style={styles.colorName}>
-                                    {item.variantSku}
-                                  </Text>{" "}
-                                  ∙{" "}
-                                  <Text style={styles.colorValue}>
-                                    {item.value}
-                                  </Text>
-                                </Text>
-                              </View>
-                              <View style={styles.orderInfo}>
-                                <View style={styles.attr}>
-                                  <Text style={styles.key}>Price</Text>
-                                  <Text style={styles.value}>
-                                    ₹{" "}
-                                    {(
-                                      item.sellingPrice *
-                                      (1 -
-                                        (priceSlab[item.pimVariantId]?.[0]
-                                          .discount || 0) /
-                                        100)
-                                    ).toFixed(2) || 0}{" "}
-                                    /kg
-                                  </Text>
-                                </View>
-                                <View style={styles.attr}>
-                                  <Text style={styles.key}>Shipping</Text>
-                                  <Text style={styles.value}>
-                                    ₹{" "}
-                                    {delivery === "DELIVERED TO CUSTOMER"
-                                      ? calculateShippingCharge
-                                      : "-"}
-                                  </Text>
-                                </View>
-                                <View style={styles.attr}>
-                                  <Text style={styles.key}>Est. Time</Text>
-                                  <Text style={styles.value}> 8-12 days</Text>
-                                </View>
-                              </View>
-                            </View>
-                          </View>
-                          <View style={styles.quantityAndPrice}>
-                            <View style={styles.quantityContainer}>
-                              <Text style={styles.quantityText}>
-                                {item.quantity}{" "}
-                                {item.cartType === "SWATCH" ? "point" : "Kg"}
-                              </Text>
-                            </View>
-                            <View style={styles.priceContainer}>
-                              <Text style={styles.subtotalText}>
-                                ₹{" "}
-                                {(
-                                  item.sellingPrice *
-                                  (1 -
-                                    (priceSlab[item.pimVariantId]?.[0]
-                                      .discount || 0) /
-                                    100) *
-                                  item.quantity
-                                ).toFixed(2)}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            ))
-            : cartData.map((items) => (
-              <View
-                key={items.combo.articleCode}
-                style={{
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  borderColor: "#ccc",
-                  padding: 5,
-                }}
-              >
-                <View style={styles.cartProductPayload}>
-                  <View style={styles.comboHeader}>
-                    <Text style={styles.comboArticleCode}>
-                      {items.combo.articleCode}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 10,
-                      alignItems: "center",
-                      paddingTop: 10,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: font.medium,
-                        color: "#666",
-                        fontSize: 12,
-                      }}
-                    >
-                      {items.combo.quantity * items?.variants?.length} kg
-                    </Text>
-                    <View style={styles.comboPrice}>
-                      <Text style={styles.comboTotalPrice}>
-                        ₹
-                        {items.combo.quantity *
-                          items?.variants?.length *
-                          items.combo.sellingPrice}
-                      </Text>
-                      <Text style={styles.comboPricePerKg}>
-                        ₹{items.combo.sellingPrice}/kg
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                <View style={styles.cartItemContainer}>
-                  {items.variants.length > 0 ? (
-                    _.map(items.variants, (variant, _index) => (
-                      <View
-                        key={variant.variantSku}
-                        style={[
-                          styles.variantContainer,
-                          {
-                            borderBottomWidth:
-                              _index === items.variants.length - 1 ? 0 : 1,
-                            borderColor: "#ccc",
-                          },
-                        ]}
-                      >
-                        <View style={styles.variantImageContainer}>
-                          <Image
-                            source={{
-                              uri: `${backendUrl}${variant.image?.replace(
-                                "/api",
-                                ""
-                              )}`,
-                            }}
-                            style={styles.variantImage}
-                            resizeMode="cover"
-                          />
-                        </View>
-                        <View style={styles.variantDetails}>
-                          <Text style={styles.variantArticleCode}>
-                            {items.combo.articleCode}
-                          </Text>
-                          <TouchableOpacity
-                            onPress={() => {
-                              // if (items.combo.published === "true") {
-                              //   navigate(
-                              //     `${items.combo.pimUrl}?variantId=${variant.variantSku}`
-                              //   );
-                              // }
-                              console.log("Variant Sku:", variant.variantSku);
+                <View key={item.variantSku} style={styles.itemContainer}>
+                  <View style={styles.cartProduct}>
+                    <View style={styles.flexContainer}>
+                      <View style={styles.cartProductLayout}>
+                        <View style={styles.adaptiveLayout}>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              width: "100%",
                             }}
                           >
-                            <Text style={styles.variantSku}>
-                              {variant.variantSku}
-                            </Text>
-                          </TouchableOpacity>
-                          {items.combo.published === "false" && (
-                            <Text style={styles.unavailableText}>
-                              (Product unavailable)
-                            </Text>
-                          )}
-                          <Text style={styles.colorValue}>
-                            #
-                            {
-                              variant.variants.filter(
-                                (item) => item.type === "Colour"
-                              )[0].value
-                            }
-                          </Text>
+                            <View style={styles.productInfoContainer}>
+                              <View style={styles.imageContainer}>
+                                <Image
+                                  source={{
+                                    uri: `${backendUrl}${item.image?.replace(
+                                      "/api",
+                                      ""
+                                    )}`,
+                                  }}
+                                  style={styles.productImage}
+                                  resizeMode="cover"
+                                />
+                              </View>
+                              <View style={styles.productDetails}>
+                                <View style={styles.flexRow}>
+                                  <Text style={styles.articleCode}>
+                                    {item.articleCode}
+                                  </Text>
+                                </View>
+                                <View style={styles.colorInfo}>
+                                  <Text>
+                                    <Text style={styles.colorName}>
+                                      {item.variantSku}
+                                    </Text>{" "}
+                                    ∙{" "}
+                                    <Text style={styles.colorValue}>
+                                      {item.value}
+                                    </Text>
+                                  </Text>
+                                </View>
+                                <View style={styles.orderInfo}>
+                                  <View style={styles.attr}>
+                                    <Text style={styles.key}>Price</Text>
+                                    <Text style={styles.value}>
+                                      ₹{" "}
+                                      {(
+                                        item.sellingPrice *
+                                        (1 -
+                                          (priceSlab[item.pimVariantId]?.[0]
+                                            .discount || 0) /
+                                            100)
+                                      ).toFixed(2) || 0}{" "}
+                                      /kg
+                                    </Text>
+                                  </View>
+                                  <View style={styles.attr}>
+                                    <Text style={styles.key}>Shipping</Text>
+                                    <Text style={styles.value}>
+                                      ₹{" "}
+                                      {delivery === "DELIVERED TO CUSTOMER"
+                                        ? calculateShippingCharge
+                                        : "-"}
+                                    </Text>
+                                  </View>
+                                  <View style={styles.attr}>
+                                    <Text style={styles.key}>Est. Time</Text>
+                                    <Text style={styles.value}> 8-12 days</Text>
+                                  </View>
+                                </View>
+                              </View>
+                            </View>
+                            <View style={styles.quantityAndPrice}>
+                              <View style={styles.quantityContainer}>
+                                <Text style={styles.quantityText}>
+                                  {item.quantity}{" "}
+                                  {item.cartType === "SWATCH" ? "point" : "Kg"}
+                                </Text>
+                              </View>
+                              <View style={styles.priceContainer}>
+                                <Text style={styles.subtotalText}>
+                                  ₹{" "}
+                                  {(
+                                    item.sellingPrice *
+                                    (1 -
+                                      (priceSlab[item.pimVariantId]?.[0]
+                                        .discount || 0) /
+                                        100) *
+                                    item.quantity
+                                  ).toFixed(2)}
+                                </Text>
+                              </View>
+                            </View>
+                          </View>
                         </View>
                       </View>
-                    ))
-                  ) : (
-                    <Text style={styles.unavailableText}>
-                      (Combo unavailable)
-                    </Text>
-                  )}
+                    </View>
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))
+            : cartData.map((items) => (
+                <View
+                  key={items.combo.articleCode}
+                  style={{
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    borderColor: "#ccc",
+                    padding: 5,
+                  }}
+                >
+                  <View style={styles.cartProductPayload}>
+                    <View style={styles.comboHeader}>
+                      <Text style={styles.comboArticleCode}>
+                        {items.combo.articleCode}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        gap: 10,
+                        alignItems: "center",
+                        paddingTop: 10,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: font.medium,
+                          color: "#666",
+                          fontSize: 12,
+                        }}
+                      >
+                        {items.combo.quantity * items?.variants?.length} kg
+                      </Text>
+                      <View style={styles.comboPrice}>
+                        <Text style={styles.comboTotalPrice}>
+                          ₹
+                          {items.combo.quantity *
+                            items?.variants?.length *
+                            items.combo.sellingPrice}
+                        </Text>
+                        <Text style={styles.comboPricePerKg}>
+                          ₹{items.combo.sellingPrice}/kg
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={styles.cartItemContainer}>
+                    {items.variants.length > 0 ? (
+                      _.map(items.variants, (variant, _index) => (
+                        <View
+                          key={variant.variantSku}
+                          style={[
+                            styles.variantContainer,
+                            {
+                              borderBottomWidth:
+                                _index === items.variants.length - 1 ? 0 : 1,
+                              borderColor: "#ccc",
+                            },
+                          ]}
+                        >
+                          <View style={styles.variantImageContainer}>
+                            <Image
+                              source={{
+                                uri: `${backendUrl}${variant.image?.replace(
+                                  "/api",
+                                  ""
+                                )}`,
+                              }}
+                              style={styles.variantImage}
+                              resizeMode="cover"
+                            />
+                          </View>
+                          <View style={styles.variantDetails}>
+                            <Text style={styles.variantArticleCode}>
+                              {items.combo.articleCode}
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() => {
+                                // if (items.combo.published === "true") {
+                                //   navigate(
+                                //     `${items.combo.pimUrl}?variantId=${variant.variantSku}`
+                                //   );
+                                // }
+                                // console.log("Variant Sku:", variant.variantSku);
+                              }}
+                            >
+                              <Text style={styles.variantSku}>
+                                {variant.variantSku}
+                              </Text>
+                            </TouchableOpacity>
+                            {items.combo.published === "false" && (
+                              <Text style={styles.unavailableText}>
+                                (Product unavailable)
+                              </Text>
+                            )}
+                            <Text style={styles.colorValue}>
+                              #
+                              {
+                                variant.variants.filter(
+                                  (item) => item.type === "Colour"
+                                )[0].value
+                              }
+                            </Text>
+                          </View>
+                        </View>
+                      ))
+                    ) : (
+                      <Text style={styles.unavailableText}>
+                        (Combo unavailable)
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              ))}
         </View>
       </View>
       <View style={styles.cartContainer}>
@@ -687,11 +687,11 @@ const ReviewOrder = ({
                 - ₹{" "}
                 {Math.min(
                   Number(cartInfo.total) +
-                  parseFloat(
-                    delivery === "DELIVERED TO CUSTOMER"
-                      ? calculateShippingCharge
-                      : 0
-                  ),
+                    parseFloat(
+                      delivery === "DELIVERED TO CUSTOMER"
+                        ? calculateShippingCharge
+                        : 0
+                    ),
                   amount
                 )}
               </Text>
@@ -734,14 +734,14 @@ const ReviewOrder = ({
                 ) -
                 (wallet
                   ? Math.min(
-                    Number(cartInfo.total) +
-                    parseFloat(
-                      delivery === "DELIVERED TO CUSTOMER"
-                        ? calculateShippingCharge
-                        : 0
-                    ),
-                    amount
-                  )
+                      Number(cartInfo.total) +
+                        parseFloat(
+                          delivery === "DELIVERED TO CUSTOMER"
+                            ? calculateShippingCharge
+                            : 0
+                        ),
+                      amount
+                    )
                   : 0)
               ).toFixed(2)}
             </Text>

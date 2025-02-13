@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Vibration,
-  View
+  View,
 } from "react-native";
 import { Eye, EyeOff } from "react-native-feather";
 import { ScrollView } from "react-native-gesture-handler";
@@ -28,8 +28,8 @@ const SignUpScreen = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
   });
 
@@ -130,7 +130,7 @@ const SignUpScreen = () => {
     } else {
       Vibration.vibrate(100);
 
-      console.log("Error", "Please fill in all the required fields.");
+      // console.log("Error", "Please fill in all the required fields.");
     }
   };
   const fetchData = async () => {
@@ -164,7 +164,7 @@ const SignUpScreen = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isAlert.setShowAlert(false);
         },

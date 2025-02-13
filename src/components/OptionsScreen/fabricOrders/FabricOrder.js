@@ -1,7 +1,8 @@
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import _ from "lodash";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  BackHandler,
   Image,
   Modal,
   ScrollView,
@@ -17,7 +18,8 @@ import { FiInput } from "../../../Common/FiInput";
 import { font } from "../../../Common/Theme";
 import api from "../../../Service/api";
 
-const FabricOrder = () => {
+const FabricOrder = ({ route }) => {
+  const params = route.params;
   const initialTransaction = {
     bankName: "",
     utrNo: "",
@@ -35,7 +37,9 @@ const FabricOrder = () => {
     "DELIVERED",
     "CANCELLED",
   ];
-  const [orderStatus, setOrderStatus] = useState(orderOptions[0]);
+  const [orderStatus, setOrderStatus] = useState(
+    params === undefined ? orderOptions[0] : params
+  );
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = useCallback(() => setExpanded(!expanded), [expanded]);
   const buttonRef = useRef(null);
@@ -201,11 +205,48 @@ const FabricOrder = () => {
     }));
     hideDatePicker();
   };
-  const navigate = useNavigation();
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        const state = navigation.getState();
+        const prevRoute = state?.routes[state.index - 1]?.name;
+
+        if (prevRoute === "checkout") {
+          navigation.navigate("Tabs", { screen: "Cart" });
+        } else if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.navigate("Tabs", { screen: "Home" });
+        }
+        return true; // ✅ Prevent default back action
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress
+      );
+
+      return () => {
+        subscription.remove();
+      };
+    }, [navigation])
+  );
   return (
     <View style={styles.fabricContainer}>
       <TouchableOpacity
-        onPress={() => navigate.goBack()}
+        onPress={() => {
+          const state = navigation.getState();
+          const prevRoute = state?.routes[state.index - 1]?.name;
+
+          if (prevRoute === "checkout") {
+            navigation.navigate("Tabs", { screen: "Cart" });
+          } else if (navigation.canGoBack()) {
+            navigation.goBack();
+          } else {
+            navigation.navigate("Tabs", { screen: "Home" });
+          }
+        }}
         style={{
           paddingVertical: 10,
           paddingHorizontal: 10,
@@ -220,6 +261,7 @@ const FabricOrder = () => {
           Back
         </Text>
       </TouchableOpacity>
+
       <View style={styles.fabricInnerContainer}>
         <Text style={styles.fabricHeader}>Fabric Orders</Text>
         {count > 0 && (
@@ -256,9 +298,9 @@ const FabricOrder = () => {
                         style={
                           orderStatus === item
                             ? [
-                              styles.dropdownItemContainer,
-                              { backgroundColor: "#ffcbc6" },
-                            ]
+                                styles.dropdownItemContainer,
+                                { backgroundColor: "#ffcbc6" },
+                              ]
                             : styles.dropdownItemContainer
                         }
                       >
@@ -266,9 +308,9 @@ const FabricOrder = () => {
                           style={
                             orderStatus === item
                               ? [
-                                styles.dropdownItemLabelText,
-                                { color: "#ff6f61" },
-                              ]
+                                  styles.dropdownItemLabelText,
+                                  { color: "#ff6f61" },
+                                ]
                               : styles.dropdownItemLabelText
                           }
                         >
@@ -378,9 +420,9 @@ const FabricOrder = () => {
                           style={
                             order?.utrNo
                               ? [
-                                styles.orderConfirmButton,
-                                { backgroundColor: "#e3e3e3" },
-                              ]
+                                  styles.orderConfirmButton,
+                                  { backgroundColor: "#e3e3e3" },
+                                ]
                               : styles.orderConfirmButton
                           }
                           onPress={() => {
@@ -437,10 +479,11 @@ const FabricOrder = () => {
                               : "Product Name"}{" "}
                             :{" "}
                             {order?.orderType !== "SWATCH"
-                              ? `${item?.productVariant?.variants.filter(
-                                (variant) => variant?.type === "Colour"
-                              )[0]?.value || "N/A"
-                              }`
+                              ? `${
+                                  item?.productVariant?.variants.filter(
+                                    (variant) => variant?.type === "Colour"
+                                  )[0]?.value || "N/A"
+                                }`
                               : `${item?.productName || "N/A"}`}
                           </Text>
                         </View>
@@ -528,8 +571,8 @@ const FabricOrder = () => {
                       <Text style={{ width: "85%", fontFamily: font.medium }}>
                         {transactionDetails.dateOfDeposit
                           ? new Date(
-                            transactionDetails.dateOfDeposit
-                          ).toLocaleDateString("en-GB")
+                              transactionDetails.dateOfDeposit
+                            ).toLocaleDateString("en-GB")
                           : "Select deposit date"}
                       </Text>
 
@@ -566,8 +609,8 @@ const FabricOrder = () => {
                       value={
                         field.name === "depositAmount"
                           ? parseFloat(transactionDetails[field.name]).toFixed(
-                            2
-                          )
+                              2
+                            )
                           : transactionDetails[field.name]
                       }
                       onChangeText={(value) =>
@@ -596,15 +639,15 @@ const FabricOrder = () => {
             <TouchableOpacity
               style={
                 !transactionDetails?.bankName ||
-                  !transactionDetails?.utrNo ||
-                  !transactionDetails?.depositAmount ||
-                  !transactionDetails?.dateOfDeposit
+                !transactionDetails?.utrNo ||
+                !transactionDetails?.depositAmount ||
+                !transactionDetails?.dateOfDeposit
                   ? [
-                    styles.confirmButton,
-                    {
-                      backgroundColor: "#e3e3e3",
-                    },
-                  ]
+                      styles.confirmButton,
+                      {
+                        backgroundColor: "#e3e3e3",
+                      },
+                    ]
                   : styles.confirmButton
               }
               onPress={() => handleTrackingIdSubmit()}
@@ -797,7 +840,6 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
 
-  // Modal Styles
   modalBackground: {
     flex: 1,
     justifyContent: "center",
@@ -858,7 +900,7 @@ const styles = StyleSheet.create({
   },
 
   //Button styles
-  // modal one btn styles
+
   buttonsContainer: {
     flexDirection: "row",
     width: "100%",
@@ -883,7 +925,6 @@ const styles = StyleSheet.create({
     fontFamily: font.bold,
   },
 
-  // modal two btn styles
   orderConfirmBtnContainer: {
     flexDirection: "row",
     justifyContent: "space-between",

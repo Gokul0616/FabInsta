@@ -1,12 +1,10 @@
-import {
-  useNavigation,
-  useRoute
-} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
   Modal,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -733,52 +731,79 @@ const CartDetails = () => {
       console.error("Error removing item:", error);
     }
   };
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchCarts();
+    setRefreshing(false);
+  };
 
   const cartItems = sampleCart
     ? sample
     : wholesaleCart
-      ? wholesale
-      : comboCart
-        ? combo
-        : swatchCart
-          ? swatch
-          : [];
+    ? wholesale
+    : comboCart
+    ? combo
+    : swatchCart
+    ? swatch
+    : [];
 
   return (
     <SafeAreaView style={styles.topBottom}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
         <View style={styles.container}>
           <Text style={styles.cartHeader}>Cart</Text>
           <View style={styles.cartContainer}>
-
             <View style={styles.tabs}>
               <TouchableOpacity
-                style={activeIndex === 'sample' ? styles.selectedTab : styles.tab}
-                onPress={() => setActiveIndex('sample')}
+                style={
+                  activeIndex === "sample" ? styles.selectedTab : styles.tab
+                }
+                onPress={() => setActiveIndex("sample")}
               >
                 <Text style={styles.tabText}>Sample</Text>
-                <Text style={styles.badgeCount}>{calculateTotalCount(sample)}</Text>
+                <Text style={styles.badgeCount}>
+                  {calculateTotalCount(sample)}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={activeIndex === 'wholesale' ? styles.selectedTab : styles.tab}
-                onPress={() => setActiveIndex('wholesale')}
+                style={
+                  activeIndex === "wholesale" ? styles.selectedTab : styles.tab
+                }
+                onPress={() => setActiveIndex("wholesale")}
               >
                 <Text style={styles.tabText}>Wholesale</Text>
-                <Text style={styles.badgeCount}>{calculateTotalCount(wholesale)}</Text>
+                <Text style={styles.badgeCount}>
+                  {calculateTotalCount(wholesale)}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={activeIndex === 'swatch' ? styles.selectedTab : styles.tab}
-                onPress={() => setActiveIndex('swatch')}
+                style={
+                  activeIndex === "swatch" ? styles.selectedTab : styles.tab
+                }
+                onPress={() => setActiveIndex("swatch")}
               >
                 <Text style={styles.tabText}>Swatch</Text>
-                <Text style={styles.badgeCount}>{calculateTotalCount(swatch)}</Text>
+                <Text style={styles.badgeCount}>
+                  {calculateTotalCount(swatch)}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={activeIndex === 'combo' ? styles.selectedTab : styles.tab}
-                onPress={() => setActiveIndex('combo')}
+                style={
+                  activeIndex === "combo" ? styles.selectedTab : styles.tab
+                }
+                onPress={() => setActiveIndex("combo")}
               >
                 <Text style={styles.tabText}>Combo</Text>
-                <Text style={styles.badgeCount}>{calculateComboTotalCount(combo)}</Text>
+                <Text style={styles.badgeCount}>
+                  {calculateComboTotalCount(combo)}
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -793,9 +818,14 @@ const CartDetails = () => {
                 <Text style={styles.selectAllLabel}>Select All</Text>
               </TouchableOpacity>
               {(sampleCart || wholesaleCart || comboCart) && (
-                <Text style={styles.selectAllLabel}>{getItemCountAndTotalPrice()}</Text>
+                <Text style={styles.selectAllLabel}>
+                  {getItemCountAndTotalPrice()}
+                </Text>
               )}
-              <TouchableOpacity onPress={() => removeAllCartItems(null)} style={styles.deleteCart}>
+              <TouchableOpacity
+                onPress={() => removeAllCartItems(null)}
+                style={styles.deleteCart}
+              >
                 <Text style={styles.selectAllLabel}>Delete</Text>
                 <Icon name="delete" size={15} color="#000" />
               </TouchableOpacity>
@@ -805,9 +835,9 @@ const CartDetails = () => {
               {(sampleCart || wholesaleCart || comboCart || swatchCart) && (
                 <View style={styles.cartProducts}>
                   {(sampleCart && calculateTotalCount(sample) !== 0) ||
-                    (wholesaleCart && calculateTotalCount(wholesale) !== 0) ||
-                    (comboCart && calculateComboTotalCount(combo) !== 0) ||
-                    (swatchCart && calculateTotalCount(swatch) !== 0) ? (
+                  (wholesaleCart && calculateTotalCount(wholesale) !== 0) ||
+                  (comboCart && calculateComboTotalCount(combo) !== 0) ||
+                  (swatchCart && calculateTotalCount(swatch) !== 0) ? (
                     <View style={styles.cartItems}>
                       {_.map(cartItems, (items, articleCode) => (
                         <View

@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
   useWindowDimensions,
-  View
+  View,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { common } from "../../Common/Common";
@@ -60,7 +60,6 @@ const ProductInformation = ({
       </View>
     );
   };
-
   const handleScubaClick = (category) => {
     for (const [key, value] of Object.entries(pimData?.attributes || {})) {
       const stateValue = { [key]: value };
@@ -143,13 +142,13 @@ const ProductInformation = ({
         <View style={styles.seeSpecMapContainer}>
           {pimData?.product?.productCategories["Fabric Type"]
             ?.heirarchyLabel && (
-              <Text style={styles.seeSpecsMap}>
-                {
-                  pimData?.product?.productCategories["Fabric Type"]
-                    ?.heirarchyLabel
-                }
-              </Text>
-            )}
+            <Text style={styles.seeSpecsMap}>
+              {
+                pimData?.product?.productCategories["Fabric Type"]
+                  ?.heirarchyLabel
+              }
+            </Text>
+          )}
           {pimData?.product?.fabricContent?.value && (
             <Text style={styles.seeSpecsMap}>
               {pimData?.product?.fabricContent?.value}

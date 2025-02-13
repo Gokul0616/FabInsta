@@ -72,8 +72,8 @@ const NewInquiryScreen = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
   });
   const handleSeasonSelect = (value) => {
@@ -116,15 +116,15 @@ const NewInquiryScreen = () => {
   const handleImageSelect = () => {
     launchImageLibrary({ mediaType: "photo", quality: 0.5 }, (response) => {
       if (response.didCancel) {
-        console.log("User cancelled image picker");
+        // console.log("User cancelled image picker");
       } else if (response.errorCode) {
-        console.log("ImagePicker Error: ", response.errorCode);
+        // console.log("ImagePicker Error: ", response.errorCode);
         setIsError({
           message: response.errorCode || "An Unexpected error occurred",
           heading: "Error",
           isRight: false,
           rightButtonText: "OK",
-          triggerFunction: () => { },
+          triggerFunction: () => {},
           setShowAlert: () => {
             isError.setShowAlert(false);
           },
@@ -302,7 +302,7 @@ const NewInquiryScreen = () => {
           heading: "Error",
           isRight: false,
           rightButtonText: "OK",
-          triggerFunction: () => { },
+          triggerFunction: () => {},
           setShowAlert: () => {
             isError.setShowAlert(false);
           },
@@ -315,7 +315,7 @@ const NewInquiryScreen = () => {
             heading: "Error",
             isRight: false,
             rightButtonText: "OK",
-            triggerFunction: () => { },
+            triggerFunction: () => {},
             setShowAlert: () => {
               isError.setShowAlert(false);
             },
@@ -328,7 +328,7 @@ const NewInquiryScreen = () => {
             heading: "Error",
             isRight: false,
             rightButtonText: "OK",
-            triggerFunction: () => { },
+            triggerFunction: () => {},
             setShowAlert: () => {
               isError.setShowAlert(false);
             },
@@ -341,7 +341,7 @@ const NewInquiryScreen = () => {
             heading: "Error",
             isRight: false,
             rightButtonText: "OK",
-            triggerFunction: () => { },
+            triggerFunction: () => {},
             setShowAlert: () => {
               isError.setShowAlert(false);
             },
