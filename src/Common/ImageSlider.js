@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
 
 const deviceWidth = Dimensions.get("window").width;
 
@@ -93,11 +94,11 @@ const ImageSlider = ({ media }) => {
   useEffect(() => {
     Animated.timing(shiftAnimated, {
       toValue: shiftValue,
-      duration: 300,
+      duration: 500,
       easing: Easing.inOut(Easing.ease),
       useNativeDriver: true,
     }).start();
-  }, [shiftValue, shiftAnimated]);
+  }, [shiftValue, shiftAnimated, currentSlide]);
 
   const translateX = useRef(
     new Animated.Value(-currentSlide * deviceWidth)
@@ -111,52 +112,85 @@ const ImageSlider = ({ media }) => {
       useNativeDriver: true,
     }).start();
   }, [currentSlide, translateX]);
+  const gestureHandler = (event) => {
+    const { translationX, state } = event.nativeEvent;
+    if (state === State.END) {
+      if (translationX < -50 && currentSlide <= image.length - 1) {
+        if (currentSlide === image.length - 1) {
+          setShiftValue(0);
+          onChange(currentSlide, currentSlide + 1);
+          setCurrentSlide(0);
+        } else {
+          setCurrentSlide((prev) => prev + 1);
+          onChange(currentSlide, currentSlide + 1);
+        }
+      } else if (translationX > 50 && currentSlide >= 0) {
+        if (currentSlide == 0) {
+          setShiftValue(0);
+          onChange(currentSlide, currentSlide - 1);
+          setCurrentSlide(image.length - 1);
+        } else {
+          onChange(currentSlide, currentSlide - 1);
+          setCurrentSlide((prev) => prev - 1);
+        }
+      }
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.carouselContainer}>
-        <Animated.View
-          style={[
-            styles.carouselWrapper,
-            {
-              width: deviceWidth,
-              transform: [{ translateX }],
-            },
-          ]}
-        >
-          {image?.map((src, index) => (
-            <Image
-              key={index}
-              source={{ uri: src }}
-              style={styles.image}
-              resizeMode="contain"
-            />
-          ))}
-        </Animated.View>
-      </View>
-
-      <View style={styles.innerContainer}>
-        <View style={styles.sliderNav}>
+    <PanGestureHandler
+      onGestureEvent={gestureHandler}
+      onHandlerStateChange={gestureHandler}
+    >
+      <View style={styles.container}>
+        <View style={styles.carouselContainer}>
           <Animated.View
             style={[
-              styles.sliderNavLists,
-              { transform: [{ translateX: shiftAnimated }] },
+              styles.carouselWrapper,
+              {
+                width: deviceWidth,
+                transform: [{ translateX }],
+              },
             ]}
           >
-            {media?.map((_, i) => (
-              <TouchableOpacity
-                key={i}
-                style={[
-                  styles.sliderBtn,
-                  currentSlide === i && styles.activeSliderBtn,
-                ]}
-                onPress={() => setCurrentSlide(i)} // Manual navigation (optional)
+            {image?.map((src, index) => (
+              <Image
+                key={index}
+                source={{ uri: src }}
+                style={styles.image}
+                resizeMode="contain"
               />
             ))}
           </Animated.View>
         </View>
+
+        <View style={styles.innerContainer}>
+          <View
+            style={[
+              styles.sliderNav,
+              { alignItems: image.length < 5 ? "center" : "flex-start" },
+            ]}
+          >
+            <Animated.View
+              style={[
+                styles.sliderNavLists,
+                { transform: [{ translateX: shiftAnimated }] },
+              ]}
+            >
+              {image?.map((_, i) => (
+                <View
+                  key={i}
+                  style={[
+                    styles.sliderBtn,
+                    currentSlide === i && styles.activeSliderBtn,
+                  ]}
+                />
+              ))}
+            </Animated.View>
+          </View>
+        </View>
       </View>
-    </View>
+    </PanGestureHandler>
   );
 };
 
