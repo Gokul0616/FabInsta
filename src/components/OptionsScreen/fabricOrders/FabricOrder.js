@@ -2,6 +2,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import _ from "lodash";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   BackHandler,
   Image,
   Modal,
@@ -9,6 +10,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -41,6 +43,7 @@ const FabricOrder = ({ route }) => {
     params === undefined ? orderOptions[0] : params
   );
   const [expanded, setExpanded] = useState(false);
+  const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
   const toggleExpanded = useCallback(() => setExpanded(!expanded), [expanded]);
   const buttonRef = useRef(null);
   const [orders, setOrders] = useState([]);
@@ -56,8 +59,10 @@ const FabricOrder = ({ route }) => {
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const onSelect = (item) => {
+    setIsFullScreenLoading(true);
     setOrderStatus(item);
     setExpanded(false);
+    setIsFullScreenLoading(false);
   };
 
   useEffect(() => {
@@ -232,6 +237,11 @@ const FabricOrder = ({ route }) => {
       };
     }, [navigation])
   );
+  const onRequestClose = () => {
+    setTransactionDetails(initialTransaction);
+    setModalOpened(false);
+    handleCloseCancelPopup();
+  };
   return (
     <View style={styles.fabricContainer}>
       <TouchableOpacity
@@ -329,6 +339,11 @@ const FabricOrder = ({ route }) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.fabricDetailsContainer}
         >
+          {isFullScreenLoading && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color="#FF6F61" />
+            </View>
+          )}
           {Object.keys(groupList).length > 0 ? (
             Object.keys(groupList).map((orderNo) => (
               <View key={orderNo} style={styles.fabricDetailsInnerContainer}>
@@ -402,6 +417,7 @@ const FabricOrder = ({ route }) => {
                     ).toFixed(2) || 0}
                   </Text>
                 ))}
+
                 {groupList[orderNo].map(
                   (order, index) =>
                     ((order.orderStatus === "CONFIRMED" &&
@@ -448,6 +464,7 @@ const FabricOrder = ({ route }) => {
                       </View>
                     )
                 )}
+
                 {groupList[orderNo].map((order) =>
                   order.items.map((item, index) => (
                     <TouchableOpacity
@@ -522,16 +539,17 @@ const FabricOrder = ({ route }) => {
       </View>
 
       <Modal
-        animationType="fade"
+        animationType="none"
         transparent={true}
         visible={modalOpened}
         onRequestClose={() => {
-          setTransactionDetails(initialTransaction);
-          setModalOpened(false);
-          handleCloseCancelPopup();
+          onRequestClose();
         }}
       >
         <View style={styles.modalBackground}>
+          <TouchableWithoutFeedback onPress={onRequestClose}>
+            <View style={styles.modalBackdrop} />
+          </TouchableWithoutFeedback>
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
               <Text style={styles.editHeaderLabel}>
@@ -743,7 +761,7 @@ const styles = StyleSheet.create({
   },
   fabricDetailsContainer: {
     flexDirection: "column",
-    paddingBottom: 90,
+    paddingBottom: 200,
   },
   fabricDetailsInnerContainer: {
     backgroundColor: "#f2f2f2",
@@ -945,6 +963,17 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontFamily: font.bold,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)", // Or transparent if you don't need a dimmed background
   },
 });
 

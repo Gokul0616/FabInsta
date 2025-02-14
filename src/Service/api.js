@@ -2,6 +2,18 @@
 import axios from "axios";
 import { backendUrl, storage } from "../Common/Common";
 import { navigate } from "./Hook/navigationRef";
+import { ToastAndroid, Platform, Alert } from "react-native";
+
+const triggerNetworkErrorFunction = () => {
+  if (Platform.OS === "android") {
+    ToastAndroid.show(
+      "Network Error. Please check your internet connection.",
+      ToastAndroid.LONG
+    );
+  } else {
+    Alert.alert("Network Error", "Please check your internet connection.");
+  }
+};
 
 const api = axios.create({
   baseURL: backendUrl,
@@ -25,14 +37,16 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 api.interceptors.response.use(
   (response) => {
     return response.data;
   },
   async (error) => {
-    const { response } = error;
+    if (!error.response) {
+      triggerNetworkErrorFunction();
+    }
 
+    const { response } = error;
     if (response && response.status === 401) {
       if (!isNavigate) {
         navigate("Logout");

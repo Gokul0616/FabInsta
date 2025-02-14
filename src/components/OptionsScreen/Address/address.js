@@ -20,6 +20,7 @@ import { FiInput } from "../../../Common/FiInput";
 import statesAndDistricts from "../../../Common/StatesAndDistricts.json";
 import { font } from "../../../Common/Theme";
 import api from "../../../Service/api";
+import { TouchableWithoutFeedback } from "react-native";
 
 const Address = () => {
   const [data, setData] = useState([]);
@@ -278,7 +279,7 @@ const Address = () => {
         <Modal
           visible={isEditModalVisible}
           transparent
-          animationType="slide"
+          animationType="none"
           style={{
             flex: 1,
             maxHeight: "80%",
@@ -286,6 +287,9 @@ const Address = () => {
           onRequestClose={closeEditModal}
         >
           <View style={styles.modalContainer}>
+            <TouchableWithoutFeedback onPress={closeEditModal}>
+              <View style={styles.modalBackdrop} />
+            </TouchableWithoutFeedback>
             <View style={[styles.modalContent, { maxHeight: "80%" }]}>
               <ScrollView
                 contentContainerStyle={styles.scrollContent}
@@ -305,7 +309,10 @@ const Address = () => {
                         if (editAddress == null) {
                           setAddress({ ...address, nickName: text });
                         } else {
-                          setEditAddress({ ...editAddress, nickName: text });
+                          setEditAddress({
+                            ...editAddress,
+                            nickName: text,
+                          });
                         }
                       }}
                       placeholder="Nickname"
@@ -448,7 +455,10 @@ const Address = () => {
                         if (editAddress == null) {
                           setAddress({ ...address, address1: text });
                         } else {
-                          setEditAddress({ ...editAddress, address1: text });
+                          setEditAddress({
+                            ...editAddress,
+                            address1: text,
+                          });
                         }
                       }}
                       placeholder="Street 1"
@@ -473,7 +483,10 @@ const Address = () => {
                         if (editAddress == null) {
                           setAddress({ ...address, address2: text });
                         } else {
-                          setEditAddress({ ...editAddress, address2: text });
+                          setEditAddress({
+                            ...editAddress,
+                            address2: text,
+                          });
                         }
                       }}
                       placeholder="Street 2"
@@ -522,7 +535,10 @@ const Address = () => {
                         if (editAddress == null) {
                           setAddress({ ...address, mobileNo: text });
                         } else {
-                          setEditAddress({ ...editAddress, mobileNo: text });
+                          setEditAddress({
+                            ...editAddress,
+                            mobileNo: text,
+                          });
                         }
                       }}
                       placeholder="Contact Phone"
@@ -575,7 +591,10 @@ const Address = () => {
                         onChangeText={(text) => {
                           const uppercasedText = text.toUpperCase();
                           if (editAddress == null) {
-                            setAddress({ ...address, gstNo: uppercasedText });
+                            setAddress({
+                              ...address,
+                              gstNo: uppercasedText,
+                            });
                             checkAndSetGstNo(uppercasedText);
                           } else {
                             setEditAddress({
@@ -726,17 +745,17 @@ const Address = () => {
           <View style={styles.headerRow}>
             <Text style={styles.headerText}>Addresses</Text>
           </View>
-          <View style={styles.addAddressContainer}>
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => openEditModal()}
-            >
+          <TouchableOpacity
+            style={styles.addAddressContainer}
+            onPress={() => openEditModal()}
+          >
+            <View style={{ alignItems: "center" }}>
               <View style={styles.iconContainer}>
                 <Icon name="plus" size={24} color="#fff" />
               </View>
               <Text style={styles.addAddressText}>Add Address</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
           {data.length > 0 ? (
             data.map((item) => renderAddress(item))
           ) : (
@@ -943,5 +962,9 @@ const styles = StyleSheet.create({
   },
   errorInput: {
     borderColor: "red",
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)", // Or transparent if you don't need a dimmed background
   },
 });

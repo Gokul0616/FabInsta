@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
@@ -328,7 +329,7 @@ const Shipping = ({
         <Modal
           visible={isEditModalVisible}
           transparent
-          animationType="slide"
+          animationType="none"
           style={{
             flex: 1,
             maxHeight: "80%",
@@ -336,6 +337,9 @@ const Shipping = ({
           onRequestClose={closeEditModal}
         >
           <View style={styles.modalContainer2}>
+            <TouchableWithoutFeedback onPress={closeEditModal}>
+              <View style={styles.modalBackdrop} />
+            </TouchableWithoutFeedback>
             <View style={[styles.modalContent2, { maxHeight: "80%" }]}>
               <ScrollView
                 contentContainerStyle={styles.scrollContent2}
@@ -674,10 +678,18 @@ const Shipping = ({
       <Modal
         visible={isSelectAddressModalVisible}
         transparent
-        animationType="slide"
+        animationType="none"
         onRequestClose={closeSelectAddressModal}
       >
         <View style={styles.modalContainer}>
+          <TouchableWithoutFeedback onPress={closeSelectAddressModal}>
+            <View
+              style={[
+                styles.modalBackdrop,
+                { backgroundColor: "rgba(0, 0, 0, 0.1)" },
+              ]}
+            />
+          </TouchableWithoutFeedback>
           <View style={[styles.modalContent, {}]}>
             <View
               style={{
@@ -1431,5 +1443,9 @@ const styles = StyleSheet.create({
   },
   errorInput2: {
     borderColor: "red",
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)", // Or transparent if you don't need a dimmed background
   },
 });

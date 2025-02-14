@@ -9,7 +9,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 import AlertBox from "../../Common/AlertBox";
 import { common, storage } from "../../Common/Common";
@@ -28,8 +28,8 @@ const ProfileScreen = () => {
     heading: "",
     isRight: false,
     rightButtonText: "OK",
-    triggerFunction: () => { },
-    setShowAlert: () => { },
+    triggerFunction: () => {},
+    setShowAlert: () => {},
     showAlert: false,
   });
   useEffect(() => {
@@ -53,7 +53,7 @@ const ProfileScreen = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -73,7 +73,7 @@ const ProfileScreen = () => {
         heading: "Error",
         isRight: false,
         rightButtonText: "OK",
-        triggerFunction: () => { },
+        triggerFunction: () => {},
         setShowAlert: () => {
           isError.setShowAlert(false);
         },
@@ -114,14 +114,14 @@ const ProfileScreen = () => {
     return (
       <Modal
         visible={isModalVisible}
-        animationType="slide"
+        animationType="none"
         transparent={true}
         onRequestClose={close}
       >
-        <TouchableWithoutFeedback onPress={close}>
-          <View style={styles.modalOverlay} />
-        </TouchableWithoutFeedback>
         <View style={styles.modalContainer}>
+          <TouchableWithoutFeedback onPress={close}>
+            <View style={styles.modalBackdrop} />
+          </TouchableWithoutFeedback>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Edit Profile</Text>
             <View style={styles.inputContainer}>
@@ -525,5 +525,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: font.semiBold,
     fontSize: 16,
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)", // Or transparent if you don't need a dimmed background
   },
 });
